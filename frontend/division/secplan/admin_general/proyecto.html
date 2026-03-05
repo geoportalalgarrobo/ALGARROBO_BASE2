@@ -1408,22 +1408,27 @@
                     nextStepsHTML = `
                         <div class="space-y-3 mt-4">
                             ${pasos.map(p => {
+                        const isCompleted = p.estado === 'COMPLETADO';
                         const pColor = p.prioridad === 'ALTA' ? 'text-rose-600 bg-rose-50 border-rose-200' : (p.prioridad === 'MEDIA' ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-emerald-600 bg-emerald-50 border-emerald-200');
                         const plazoDate = new Date(p.fecha_plazo + 'T12:00:00'); // Force local interpretation
-                        const isOverdue = plazoDate < new Date();
+                        const isOverdue = !isCompleted && plazoDate < new Date();
+
                         return `
-                                    <div class="flex items-start gap-4 p-4 rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition">
+                                    <div class="flex items-start gap-4 p-4 rounded-xl border border-gray-100 ${isCompleted ? 'bg-gray-50 opacity-75' : 'bg-white shadow-sm'} hover:shadow-md transition">
                                         <div class="flex-shrink-0 mt-1">
-                                            <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center border border-indigo-100 shadow-sm">
-                                                <i class="fas fa-forward"></i>
+                                            <div class="w-10 h-10 rounded-full ${isCompleted ? 'bg-emerald-50 text-emerald-500' : 'bg-indigo-50 text-indigo-500'} flex items-center justify-center border ${isCompleted ? 'border-emerald-100' : 'border-indigo-100'} shadow-sm">
+                                                <i class="fas ${isCompleted ? 'fa-check' : 'fa-forward'}"></i>
                                             </div>
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <div class="flex items-center justify-between gap-2 mb-1">
-                                                <h5 class="text-sm font-bold text-gray-900 truncate">${p.comentario}</h5>
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${pColor} whitespace-nowrap">
-                                                    ${p.prioridad}
-                                                </span>
+                                                <h5 class="text-sm font-bold ${isCompleted ? 'text-gray-500 line-through' : 'text-gray-900'} truncate">${p.comentario}</h5>
+                                                <div class="flex items-center gap-1.5">
+                                                    ${isCompleted ? '<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 uppercase">Completado</span>' : ''}
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${pColor} whitespace-nowrap">
+                                                        ${p.prioridad}
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                                                 <div class="text-xs text-gray-500 flex items-center gap-1.5">
@@ -2055,27 +2060,36 @@
             // Checkbox: financiamiento_municipal es VARCHAR(50) en DB
             data.financiamiento_municipal = document.getElementById('financiamiento_municipal').checked ? 'SI' : 'NO';
 
-            // FK IDs: parsear como enteros, eliminar si vacíos
+            // FK IDs: parsear como enteros, eliminar si vacíos o inválidos
             const fkFields = ['area_id', 'estado_proyecto_id', 'etapa_proyecto_id', 'estado_postulacion_id', 'financiamiento_id', 'lineamiento_estrategico_id', 'sector_id'];
             fkFields.forEach(f => {
-                if (data[f]) data[f] = parseInt(data[f], 10);
-                else delete data[f];
+                if (data[f] !== "" && data[f] !== undefined && data[f] !== null) {
+                    const parsed = parseInt(data[f], 10);
+                    if (!isNaN(parsed)) data[f] = parsed;
+                    else delete data[f];
+                } else {
+                    delete data[f];
+                }
             });
 
             // Campos numéricos: parsear o eliminar si vacíos
-            if (data.monto) data.monto = parseFloat(data.monto); else delete data.monto;
-            if (data.avance_total_porcentaje) data.avance_total_porcentaje = parseFloat(data.avance_total_porcentaje); else delete data.avance_total_porcentaje;
-            if (data.n_registro) data.n_registro = parseInt(data.n_registro, 10); else delete data.n_registro;
-            if (data.anno_elaboracion) data.anno_elaboracion = parseInt(data.anno_elaboracion, 10); else delete data.anno_elaboracion;
-            if (data.anno_ejecucion) data.anno_ejecucion = parseInt(data.anno_ejecucion, 10); else delete data.anno_ejecucion;
-            if (data.latitud) data.latitud = parseFloat(data.latitud); else delete data.latitud;
-            if (data.longitud) data.longitud = parseFloat(data.longitud); else delete data.longitud;
+            const numFields = ['monto', 'avance_total_porcentaje', 'n_registro', 'anno_elaboracion', 'anno_ejecucion', 'latitud', 'longitud'];
+            numFields.forEach(f => {
+                if (data[f] !== "" && data[f] !== undefined && data[f] !== null) {
+                    const parsed = parseFloat(data[f]);
+                    if (!isNaN(parsed)) data[f] = parsed;
+                    else delete data[f];
+                } else {
+                    delete data[f];
+                }
+            });
 
             // Eliminar campos que NO existen en la tabla proyectos
             delete data.codigo;
             delete data.es_prioridad;
+            delete data.fecha_actualizacion;
 
-            // Eliminar strings vacíos para campos opcionales
+            // Limpieza final de strings vacíos
             Object.keys(data).forEach(k => {
                 if (data[k] === '') delete data[k];
             });
@@ -2216,6 +2230,9 @@
             }
         }
 
+        function showAddProximoPasoForm() {
+            document.getElementById('addProximoPasoForm').classList.remove('hidden');
+        }
 
         function hideAddProximoPasoForm() {
             document.getElementById('addProximoPasoForm').classList.add('hidden');
@@ -2237,23 +2254,33 @@
                 }
 
                 listContainer.innerHTML = pasos.map(p => {
+                    const isCompleted = p.estado === 'COMPLETADO';
                     const pColor = p.prioridad === 'ALTA' ? 'text-rose-600 bg-rose-50 border-rose-200' : (p.prioridad === 'MEDIA' ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-emerald-600 bg-emerald-50 border-emerald-200');
                     const plazoDate = new Date(p.fecha_plazo + 'T12:00:00');
+
                     return `
-                        <div class="flex items-center justify-between p-3 rounded-lg border border-gray-200 bg-gray-50/50 hover:bg-gray-50 hover:border-indigo-200 transition group">
+                        <div class="flex items-center justify-between p-3 rounded-lg border border-gray-200 ${isCompleted ? 'bg-gray-100 opacity-60' : 'bg-gray-50/50'} hover:bg-gray-50 hover:border-indigo-200 transition group">
                             <div class="flex-1 min-w-0 pr-4">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold border ${pColor} uppercase">${p.prioridad}</span>
-                                    <span class="text-sm font-bold text-gray-800 truncate">${p.comentario}</span>
+                                    <span class="text-sm font-bold ${isCompleted ? 'text-gray-500 line-through' : 'text-gray-800'} truncate">${p.comentario}</span>
+                                    ${isCompleted ? '<span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold">Hecho</span>' : ''}
                                 </div>
                                 <div class="flex items-center gap-3 text-xs text-gray-500">
                                     <span><i class="far fa-calendar mr-1"></i> ${plazoDate.toLocaleDateString('es-CL')}</span>
                                     ${p.responsable ? `<span><i class="far fa-user mr-1"></i> ${p.responsable}</span>` : ''}
                                 </div>
                             </div>
-                            <button type="button" onclick="deleteProximoPaso(${p.id}, ${pid})" class="w-8 h-8 rounded-full bg-white text-gray-400 border border-gray-200 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 flex items-center justify-center transition opacity-0 group-hover:opacity-100 focus:opacity-100" title="Eliminar paso">
-                                <i class="fas fa-trash-alt text-xs"></i>
-                            </button>
+                            <div class="flex items-center gap-2">
+                                ${!isCompleted ? `
+                                    <button type="button" onclick="completeProximoPaso(${p.id}, ${pid})" class="w-8 h-8 rounded-full bg-white text-emerald-600 border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 flex items-center justify-center transition opacity-0 group-hover:opacity-100 focus:opacity-100" title="Marcar como completado">
+                                        <i class="fas fa-check text-xs"></i>
+                                    </button>
+                                ` : ''}
+                                <button type="button" onclick="deleteProximoPaso(${p.id}, ${pid})" class="w-8 h-8 rounded-full bg-white text-gray-400 border border-gray-200 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 flex items-center justify-center transition opacity-0 group-hover:opacity-100 focus:opacity-100" title="Eliminar paso">
+                                    <i class="fas fa-trash-alt text-xs"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -2310,6 +2337,17 @@
             } catch (e) {
                 console.error(e);
                 showToast('Error al eliminar', 'error');
+            }
+        }
+
+        async function completeProximoPaso(pasoId, pid) {
+            try {
+                await api.put(`/proyectos/proximos_pasos/${pasoId}`, { estado: 'COMPLETADO' });
+                showToast('Paso completado', 'success');
+                await loadProximosPasos(pid);
+            } catch (e) {
+                console.error(e);
+                showToast('Error al actualizar', 'error');
             }
         }
     </script>

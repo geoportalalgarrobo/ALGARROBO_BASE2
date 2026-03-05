@@ -1283,9 +1283,6 @@ def create_proyecto(current_user_id):
             cur.execute(sql, tuple(clean_data.values()))
             new_id = cur.fetchone()[0]
             
-            # Log audit
-            log_auditoria(current_user_id, "create_proyecto", f"Creó proyecto {new_id}: {clean_data.get('nombre')}")
-            
         conn.commit()
         return jsonify({"message": "Proyecto creado", "id": new_id}), 201
     except Exception as e:
@@ -1734,14 +1731,17 @@ def update_proyecto(current_user_id, pid):
         data = request.get_json()
 
         forbidden = {"id", "user_id", "actualizado_por", "fecha_actualizacion"}
-        data = {k: v for k, v in data.items() if k not in forbidden}
+        clean_data = {k: v for k, v in data.items() if k not in forbidden}
 
-        data["actualizado_por"] = current_user_id
+        if not clean_data:
+            return jsonify({"message": "No hay campos para actualizar"}), 400
+
+        clean_data["actualizado_por"] = current_user_id
 
         fields = []
         values = []
 
-        for k, v in data.items():
+        for k, v in clean_data.items():
             fields.append(f"{k} = %s")
             values.append(v)
 
@@ -1761,12 +1761,15 @@ def update_proyecto(current_user_id, pid):
 
         conn.commit()
         
-        log_control(current_user_id, "editar_proyecto", modulo="proyectos", 
-                    entidad_tipo="proyecto", entidad_id=pid,
-                    detalle="Actualización de datos del proyecto")
-
+        # Nota: La actividad se registra mediante el trigger trg_control_proyectos en DB
+        # Solo logueamos si el trigger falla o para auditoría manual externa.
+        
         return jsonify({"message": "Proyecto actualizado"})
 
+    except Exception as e:
+        if conn: conn.rollback()
+        logger.error(f"Error update_proyecto: {e}")
+        return jsonify({"message": "Error interno", "detail": str(e)}), 500
     finally:
         if conn:
             release_db_connection(conn)
@@ -3123,6 +3126,41 @@ def crear_proximo_paso(current_user_id, pid):
 
     except Exception as e:
         logger.error(f"Error creando proximo_paso: {e}")
+        return jsonify({"message": "Error interno", "detail": str(e)}), 500
+    finally:
+        if conn:
+            release_db_connection(conn)
+
+@app.route("/proyectos/proximos_pasos/<int:paso_id>", methods=["PUT"])
+@session_required
+def actualizar_proximo_paso(current_user_id, paso_id):
+    conn = None
+    try:
+        data = request.get_json()
+        fields = []
+        vals = []
+        
+        allowed = ["comentario", "descripcion", "fecha_plazo", "estado", "prioridad", "responsable"]
+        for k in allowed:
+            if k in data:
+                fields.append(f"{k} = %s")
+                vals.append(data[k])
+                
+        if not fields:
+            return jsonify({"message": "Sin datos para actualizar"}), 400
+            
+        vals.append(paso_id)
+        sql = f"UPDATE proximos_pasos SET {', '.join(fields)} WHERE id = %s"
+        
+        conn = get_db_connection()
+        with conn.cursor() as cur:
+            cur.execute(sql, tuple(vals))
+        conn.commit()
+        
+        log_control(current_user_id, "editar_proximo_paso", modulo="proyectos", entidad_tipo="proximo_paso", entidad_id=paso_id, exitoso=True)
+        return jsonify({"message": "Próximo paso actualizado"})
+    except Exception as e:
+        logger.error(f"Error actualizando proximo_paso: {e}")
         return jsonify({"message": "Error interno", "detail": str(e)}), 500
     finally:
         if conn:
