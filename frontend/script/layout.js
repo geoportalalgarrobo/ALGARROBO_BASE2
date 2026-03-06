@@ -454,9 +454,7 @@ function renderSidebar(containerId = "sidebarContainer") {
                 </li>
             </ul>
 
-            <ul class="space-y-1">
-                ${modulosHTML}
-            </ul>
+            
         </nav>
     </aside>
     `;

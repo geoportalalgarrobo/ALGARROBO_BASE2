@@ -223,6 +223,8 @@ def audit_project(cur, project_id, lote_id=None):
         # --- Lógica de Auditoría Interna ---
         alerts = []
         scores = {}
+        r = []
+        sep = "─" * 80
         
         # Dim 1: Identificación (Peso 10%)
         d1_valid = 0
