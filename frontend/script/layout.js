@@ -5,8 +5,8 @@ const BASE_PATH = (() => {
     const { hostname, pathname } = window.location;
     const isGhPages = hostname.endsWith('github.io');
     const isLocal = hostname === '' || hostname === 'localhost' || hostname === '127.0.0.1';
-    if (isGhPages || (!isLocal && pathname.startsWith('/ALGARROBO_BASE'))) {
-        return '/ALGARROBO_BASE';
+    if (isGhPages || (!isLocal && pathname.startsWith('/ALGARROBO_BASE2'))) {
+        return '/ALGARROBO_BASE2';
     }
     return '';
 })();

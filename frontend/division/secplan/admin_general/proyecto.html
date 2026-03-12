@@ -2065,6 +2065,15 @@
                             input.checked = (proyecto[key] === 'SI' || proyecto[key] === true);
                         } else if (input.type === 'date') {
                             input.value = formatDateForInput(proyecto[key]);
+                        } else if (key === 'avance_total_porcentaje') {
+                            // Normalizar decimal (DB 0-1) a porcentaje (UI 0-100)
+                            const val = parseFloat(proyecto[key]);
+                            if (!isNaN(val)) {
+                                input.value = (val <= 1.0 && val > 0) ? (val * 100).toFixed(2) : val;
+                                if (val === 1.0) input.value = 100;
+                            } else {
+                                input.value = '';
+                            }
                         } else {
                             input.value = proyecto[key] || '';
                         }
@@ -2143,7 +2152,13 @@
 
             // Campos numéricos: parsear o eliminar si vacíos
             if (data.monto) data.monto = parseFloat(data.monto); else delete data.monto;
-            if (data.avance_total_porcentaje) data.avance_total_porcentaje = parseFloat(data.avance_total_porcentaje); else delete data.avance_total_porcentaje;
+            if (data.avance_total_porcentaje) {
+                // Convertir porcentaje (UI 0-100) a decimal (DB 0-1)
+                const val = parseFloat(data.avance_total_porcentaje);
+                data.avance_total_porcentaje = val / 100;
+            } else {
+                delete data.avance_total_porcentaje;
+            }
             if (data.n_registro) data.n_registro = parseInt(data.n_registro, 10); else delete data.n_registro;
             if (data.anno_elaboracion) data.anno_elaboracion = parseInt(data.anno_elaboracion, 10); else delete data.anno_elaboracion;
             if (data.anno_ejecucion) data.anno_ejecucion = parseInt(data.anno_ejecucion, 10); else delete data.anno_ejecucion;
@@ -2684,12 +2699,44 @@
                             target.classList.remove('audit-highlight');
                             helpText.remove();
                         }, { once: true });
+
+                        // Inyectar botón de retorno flotante (en caso de que se haya abierto en la misma pestaña)
+                        const backBtn = document.createElement('button');
+                        backBtn.id = 'auditBackBtn';
+                        backBtn.className = 'fixed bottom-8 left-8 z-[100] px-6 py-4 bg-slate-900 text-white rounded-2xl shadow-2xl border-2 border-indigo-500 font-black text-sm uppercase tracking-widest animate-fade-in flex items-center gap-3 hover:bg-slate-800 transition-all transform hover:-translate-y-1';
+                        backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Volver al Reporte PDF';
+                        backBtn.onclick = () => {
+                            if (window.history.length > 1) window.history.back();
+                            else window.close();
+                        };
+                        document.body.appendChild(backBtn);
+
                     } else {
                         console.warn(`[Audit] Campo '${fieldId}' no encontrado en el formulario.`);
                     }
                 }, 800); // Esperar a que el modal y la carga de datos (hitos/etc) terminen
             }
         }
+
+        // Limpieza de UI de auditoría al cerrar modal
+        function clearAuditUI() {
+            const btn = document.getElementById('auditBackBtn');
+            if (btn) btn.remove();
+            
+            // Limpiar parámetros de la URL sin recargar para no disparar de nuevo la lógica
+            const url = new URL(window.location);
+            url.searchParams.delete('pid');
+            url.searchParams.delete('audit_field');
+            window.history.replaceState({}, '', url);
+        }
+
+        // Interceptar cierre de modal para limpiar UI de auditoria
+        const originalCloseModal = closeModal;
+        window.closeModal = function() {
+            clearAuditUI();
+            originalCloseModal();
+        };
+
     </script>
 </body>
 

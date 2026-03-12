@@ -217,6 +217,9 @@ CREATE TABLE areas (
 CREATE TABLE financiamientos (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) UNIQUE NOT NULL,
+    fuente VARCHAR(100),
+    anyo VARCHAR(50),
+    comentario TEXT,
     activo BOOLEAN DEFAULT TRUE
 );
 
@@ -250,6 +253,7 @@ CREATE TABLE sectores (
 CREATE TABLE lineamientos_estrategicos (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(300) UNIQUE NOT NULL,
+
     activo BOOLEAN DEFAULT TRUE
 );
 

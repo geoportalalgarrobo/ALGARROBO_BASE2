@@ -62,7 +62,7 @@ def generate_pdf_from_text(lines, filename):
                             # Convertir links tipo [Texto](URL) a <a href="URL">Texto</a> para ReportLab
                             cell_text = str(cell).strip()
                             if "[" in cell_text and "](" in cell_text:
-                                cell_text = re.sub(r'\[(.*?)\]\((.*?)\)', r'<a href="\2" color="blue"><u>\1</u></a>', cell_text)
+                                cell_text = re.sub(r'\[(.*?)\]\((.*?)\)', r'<a href="\2" color="blue" target="_blank"><u>\1</u></a>', cell_text)
                             
                             formatted_row.append(Paragraph(cell_text, txt_style))
                     formatted_data.append(formatted_row)
@@ -291,11 +291,14 @@ def audit_project(cur, project_id, lote_id=None):
             alerts.append(("MEDIO", "A02", f"Diferencia de {diff_years} años entre elab. y ejec.", "30 días", "SECPLAC"))
         scores['Dim2'] = (d2_valid / d2_total) * 100
 
-        # --- Variables de Estado y Normalización ---
+        # Normalización de Avance (DB 0-1 -> UI 0-100)
+        raw_avance = float(project['avance_total_porcentaje'] or 0)
+        avance_pct = raw_avance * 100 if raw_avance <= 1.0 and raw_avance > 0 else raw_avance
+        if raw_avance == 1.0: avance_pct = 100.0 # Caso borde exacto 1
+
         etapa = project['etapa_nombre'] or ""
         estado = project['estado_nombre'] or ""
         postulacion = project['postulacion_nombre'] or ""
-        avance_pct = float(project['avance_total_porcentaje'] or 0)
         diff_years = (project['anno_ejecucion'] or 0) - (project['anno_elaboracion'] or 0)
 
         # Dim 3: Variables Técnicas (Peso 20%)

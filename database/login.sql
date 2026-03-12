@@ -13,7 +13,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     nombre VARCHAR(150) NOT NULL,
 
-    nivel_acceso SMALLINT NOT NULL CHECK (nivel_acceso BETWEEN 0 AND 5),
+    nivel_acceso SMALLINT NOT NULL CHECK (nivel_acceso BETWEEN 0 AND 20),
     division_id INT,  -- relación simple 1 usuario = 1 división principal
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,

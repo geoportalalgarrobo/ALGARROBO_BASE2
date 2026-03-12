@@ -45,16 +45,13 @@ APP_PORT = int(os.getenv("PORT", 8000))
 DEBUG = os.getenv("FLASK_DEBUG", "True").lower() in ("1", "true", "yes")
 
 app = Flask(__name__)
+CORS(app)
 
-@app.after_request
-def add_cors_headers(response):
+# Logger middleware simplificado
+@app.before_request
+def log_request_info():
     if request.path.startswith('/api'):
-        logger.info(f"REQUEST {request.method} {request.path} -> {response.status_code}")
-    
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Access-Control-Allow-Credentials'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    return response
+        logger.info(f"REQUEST {request.method} {request.path}")
 
 @app.errorhandler(Exception)
 def handle_exception(e):
@@ -62,9 +59,6 @@ def handle_exception(e):
     response.status_code = 500
     if hasattr(e, 'code'):
         response.status_code = e.code
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Access-Control-Allow-Credentials'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
     return response
 
 logger.info("Backend Municipal iniciando...")
@@ -1273,6 +1267,9 @@ def create_proyecto(current_user_id):
         clean_data["actualizado_por"] = current_user_id
         clean_data["fecha_actualizacion"] = datetime.now()
 
+        if not data or not data.get("nombre"):
+             return jsonify({"message": "El nombre del proyecto es obligatorio"}), 400
+
         if not clean_data:
              return jsonify({"message": "No data provided"}), 400
 
@@ -1969,14 +1966,14 @@ def get_financiamientos(current_user_id):
 @session_required
 def create_financiamiento(current_user_id):
     data = request.get_json()
-    new_id = generic_create("financiamientos", data)
+    new_id = generic_create("financiamientos", data, extra_columns=['fuente', 'anyo', 'comentario'])
     return jsonify({"id": new_id}), 201
 
 @app.route("/financiamientos/<int:id>", methods=["PUT"])
 @session_required
 def update_financiamiento(current_user_id, id):
     data = request.get_json()
-    generic_update("financiamientos", id, data)
+    generic_update("financiamientos", id, data, extra_columns=['fuente', 'anyo', 'comentario'])
     return jsonify({"message": "Actualizado"})
 
 @app.route("/financiamientos/<int:id>", methods=["DELETE"])

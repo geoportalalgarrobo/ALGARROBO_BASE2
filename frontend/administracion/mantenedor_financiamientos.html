@@ -58,6 +58,27 @@
                                 placeholder="Ej: FNDR, Circular 33" required>
                         </div>
 
+                        <div class="form-group flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-slate-400 tracking-wider uppercase">Fuente</label>
+                            <input type="text" id="fuente" name="fuente"
+                                class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all bg-slate-50/50"
+                                placeholder="Ej: Municipal, Regional">
+                        </div>
+
+                        <div class="form-group flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-slate-400 tracking-wider uppercase">Año</label>
+                            <input type="text" id="anyo" name="anyo"
+                                class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all bg-slate-50/50"
+                                placeholder="Ej: 2024">
+                        </div>
+
+                        <div class="form-group flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-slate-400 tracking-wider uppercase">Comentario</label>
+                            <textarea id="comentario" name="comentario" rows="3"
+                                class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all bg-slate-50/50"
+                                placeholder="Notas adicionales..."></textarea>
+                        </div>
+
                         <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="activo" name="activo" class="sr-only peer" checked>
@@ -98,8 +119,9 @@
                             <thead class="bg-slate-50/50 border-b border-slate-100">
                                 <tr>
                                     <th class="p-4 text-xs font-bold text-slate-400 uppercase tracking-widest">ID</th>
-                                    <th class="p-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Nombre
-                                    </th>
+                                    <th class="p-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Nombre</th>
+                                    <th class="p-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Fuente</th>
+                                    <th class="p-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Año</th>
                                     <th
                                         class="p-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">
                                         Estado</th>
@@ -206,6 +228,8 @@
                     <td class="p-4">
                         <div class="font-bold text-slate-700">${item.nombre}</div>
                     </td>
+                    <td class="p-4 text-sm text-slate-600">${item.fuente || '-'}</td>
+                    <td class="p-4 text-sm text-slate-600 text-center">${item.anyo || '-'}</td>
                     <td class="p-4 text-center">${statusBadge}</td>
                     <td class="p-4 text-right">
                         <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -224,7 +248,10 @@
 
         function editItem(item) {
             document.getElementById('itemId').value = item.id;
-            document.getElementById('nombre').value = item.nombre;
+            document.getElementById('nombre').value = item.nombre || '';
+            document.getElementById('fuente').value = item.fuente || '';
+            document.getElementById('anyo').value = item.anyo || '';
+            document.getElementById('comentario').value = item.comentario || '';
             document.getElementById('activo').checked = item.activo;
 
             formTitle.textContent = 'Editar Origen';
@@ -255,6 +282,9 @@
                 const formData = utils.serializeForm(e.target);
                 const body = {
                     nombre: formData.nombre,
+                    fuente: formData.fuente,
+                    anyo: formData.anyo,
+                    comentario: formData.comentario,
                     activo: document.getElementById('activo').checked
                 };
 

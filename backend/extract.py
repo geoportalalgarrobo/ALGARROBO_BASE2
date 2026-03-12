@@ -8,7 +8,12 @@ import pathlib
 import time
 import os
 
-SOFFICE = os.getenv("SOFFICE_PATH", r"C:\Program Files\LibreOffice\program\soffice.exe")
+SOFFICE = os.getenv("SOFFICE_PATH")
+if not SOFFICE:
+    if os.name == 'nt': # Windows
+        SOFFICE = r"C:\Program Files\LibreOffice\program\soffice.exe"
+    else: # Linux / Docker
+        SOFFICE = "/usr/bin/soffice"
 
 def extract_doc(archivo):
     archivo = pathlib.Path(archivo)
