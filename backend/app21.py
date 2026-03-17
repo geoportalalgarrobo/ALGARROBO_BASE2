@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from functools import wraps
 from contextlib import contextmanager
 import secrets
+import re
 
 from dotenv import load_dotenv
 
@@ -4778,19 +4779,29 @@ def control_export_pdf(current_user_id):
 # Endpoints para: lanzar, monitorear, servir PDFs y dashboard KPIs
 # ==============================================================================
 
-from auditoria_engine import (
-    run_auditoria_async, get_status as auditoria_get_status, AUDIT_OUT_DIR
-)
+# Definición diferida para evitar fallos de arranque si faltan dependencias
+AUDIT_OUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "auditoria_reportes")
 
+def get_auditoria_engine():
+    try:
+        import auditoria_engine
+        return auditoria_engine
+    except ImportError as e:
+        logger.error(f"Error cargando motor de auditoría: {e}")
+        return None
 
 @app.route("/auditoria/lanzar", methods=["POST"])
 @session_required
 def auditoria_lanzar(current_user_id):
     """Lanza la auditoría integral de todos los proyectos (async)."""
+    engine = get_auditoria_engine()
+    if not engine:
+        return jsonify({"ok": False, "message": "Motor de auditoría no disponible (verificar dependencias como reportlab)"}), 503
+
     base_url = request.json.get("base_url", "https://sud-austral.github.io/ALGARROBO_BASE2") \
         if request.is_json else "https://sud-austral.github.io/ALGARROBO_BASE2"
 
-    lanzado = run_auditoria_async(
+    lanzado = engine.run_auditoria_async(
         db_factory=get_db_connection,
         release_fn=release_db_connection,
         user_id=current_user_id,
@@ -4808,7 +4819,9 @@ def auditoria_lanzar(current_user_id):
 @session_required
 def auditoria_estado(current_user_id):
     """Retorna el estado en tiempo real de la auditoría en curso."""
-    return jsonify(auditoria_get_status())
+    engine = get_auditoria_engine()
+    if not engine: return jsonify({"error": "No disponible"}), 503
+    return jsonify(engine.get_status())
 
 
 @app.route("/auditoria/reportes", methods=["GET"])

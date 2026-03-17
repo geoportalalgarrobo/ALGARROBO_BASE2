@@ -4,9 +4,7 @@
 const API_CONFIG = {
     // Intentar obtener de una variable global (inyectada por el servidor o config)
     // o usar el host actual si estamos en el mismo servidor, de lo contrario fallback a IP conocida.
-    BASE_URL: window.API_BASE_URL || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-        ? "http://localhost:8000" 
-        : "https://186.67.61.251:8000"),
+    BASE_URL: window.API_BASE_URL || "https://186.67.61.251:8000",
     get token() {
         return localStorage.getItem('authToken');
     }

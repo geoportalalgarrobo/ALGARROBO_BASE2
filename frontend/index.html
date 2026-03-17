@@ -277,9 +277,7 @@
 
                 clearAlerts();
 
-                const apiBase = window.API_BASE_URL || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-                    ? "http://localhost:8000" 
-                    : "https://186.67.61.251:8000");
+                const apiBase = window.API_BASE_URL || "https://186.67.61.251:8000";
                 fetch(`${apiBase}/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
