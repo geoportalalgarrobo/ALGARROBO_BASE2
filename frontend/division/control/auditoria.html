@@ -617,28 +617,31 @@
                         </div>
                         <p class="text-xs text-slate-300 mt-0.5">${r.modificado ? 'Generado: ' + fmtDate(r.modificado) : ''} · ${r.size_kb} KB</p>
                     </div>
-                    <div class="flex items-center gap-3 flex-shrink-0">
+                    <div class="flex items-center gap-2 flex-shrink-0">
                         ${r.puntaje_general !== undefined ? scoreBadge(r.puntaje_general) : ''}
-                        ${r.alertas_criticas > 0 ? `<span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-lg">🔴 ${r.alertas_criticas}</span>` : ''}
-                        <button onclick="openPdf(${r.proyecto_id}, '${escHtml(r.nombre)}')"
-                            class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition">
-                            <i class="fas fa-eye"></i> Ver
-                        </button>
-                        <a href="${BASE_URL}/auditoria/pdf/${r.proyecto_id}?download=1&token=${API_CONFIG.token}"
-                            class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-200 transition">
-                            <i class="fas fa-download"></i>
-                        </a>
+                        <div class="flex flex-col gap-1">
+                            ${r.has_calidad ? `
+                            <button onclick="openPdf(${r.proyecto_id}, '${escHtml(r.nombre)}', 'calidad')"
+                                class="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-700 transition">
+                                <i class="fas fa-search"></i> CALIDAD
+                            </button>` : ''}
+                            ${r.has_cambios ? `
+                            <button onclick="openPdf(${r.proyecto_id}, '${escHtml(r.nombre)}', 'cambios')"
+                                class="flex items-center gap-1.5 px-3 py-1 bg-amber-500 text-white rounded-lg text-[10px] font-bold hover:bg-amber-600 transition">
+                                <i class="fas fa-history"></i> CAMBIOS
+                            </button>` : ''}
+                        </div>
                     </div>
                 </div>
             `).join('');
         }
 
         /* ───────────────────────────── PDF MODAL ────────────────────────── */
-        function openPdf(projectId, nombre) {
-            const url = `${BASE_URL}/auditoria/pdf/${projectId}?token=${API_CONFIG.token}`;
+        function openPdf(projectId, nombre, tipo = 'calidad') {
+            const url = `${BASE_URL}/auditoria/pdf/${projectId}?tipo=${tipo}&token=${API_CONFIG.token}`;
             document.getElementById('pdfFrame').src = url;
-            document.getElementById('pdfModalTitle').textContent = nombre || `Proyecto #${projectId}`;
-            document.getElementById('pdfModalSub').textContent = `ID: ${projectId}`;
+            document.getElementById('pdfModalTitle').textContent = (tipo === 'cambios' ? 'Historial: ' : 'Calidad: ') + (nombre || `Proyecto #${projectId}`);
+            document.getElementById('pdfModalSub').textContent = `ID: ${projectId} | Reporte: ${tipo.toUpperCase()}`;
             document.getElementById('btnPdfDownload').href = url + '&download=1';
             document.getElementById('pdfModal').classList.remove('hidden');
             document.getElementById('pdfModal').classList.add('flex');
@@ -725,8 +728,16 @@
         }
 
         function destroyChart(id) {
-            if (charts[id]) { charts[id].destroy(); delete charts[id]; }
-            // fix: charts keyed by short name
+            const existing = Chart.getChart(id);
+            if (existing) {
+                existing.destroy();
+            }
+            // También limpiar nuestra referencia interna si existe
+            for (let key in charts) {
+                if (charts[key].canvas && charts[key].canvas.id === id) {
+                    delete charts[key];
+                }
+            }
         }
 
         function scoreBadge(val) {

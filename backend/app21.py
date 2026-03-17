@@ -4870,31 +4870,26 @@ def auditoria_reportes(current_user_id):
     conn = None
     try:
         # Obtener archivos del directorio
-        pdf_files = {}
+        pdf_qual = set() # ids con reporte calidad
+        pdf_hist = set() # ids con reporte cambios
         if os.path.exists(AUDIT_OUT_DIR):
             for fn in os.listdir(AUDIT_OUT_DIR):
-                if fn.endswith(".pdf"):
-                    try:
-                        pid = int(fn.replace(".pdf", ""))
-                        fpath = os.path.join(AUDIT_OUT_DIR, fn)
-                        pdf_files[pid] = {
-                            "proyecto_id": pid,
-                            "filename": fn,
-                            "size_kb": round(os.path.getsize(fpath) / 1024, 1),
-                            "modificado": datetime.fromtimestamp(
-                                os.path.getmtime(fpath)
-                            ).isoformat(),
-                        }
-                    except ValueError:
-                        pass
+                if fn.endswith("_cambios.pdf"):
+                    try: pdf_hist.add(int(fn.replace("_cambios.pdf", "")))
+                    except: pass
+                elif fn.endswith(".pdf"):
+                    try: pdf_qual.add(int(fn.replace(".pdf", "")))
+                    except: pass
 
-        if not pdf_files:
+        if not pdf_qual and not pdf_hist:
             return jsonify({"reportes": [], "total": 0})
+
+        all_ids = list(pdf_qual | pdf_hist)
 
         # Enriquecer con datos BD + filtros
         conn = get_db_connection()
         filtros = ["p.id = ANY(%s)"]
-        params  = [list(pdf_files.keys())]
+        params  = [all_ids]
 
         area_id    = request.args.get("area_id")
         if area_id:
@@ -4950,10 +4945,9 @@ def auditoria_reportes(current_user_id):
         reportes = []
         for proy in proyectos:
             pid = proy["id"]
-            f   = pdf_files.get(pid, {})
             aud = audit_rows.get(pid, {})
             reportes.append({
-                **f,
+                "proyecto_id"     : pid,
                 "nombre"          : proy["nombre"],
                 "area_nombre"     : proy["area_nombre"],
                 "estado_nombre"   : proy["estado_nombre"],
@@ -4961,7 +4955,10 @@ def auditoria_reportes(current_user_id):
                 "profesional_1"   : proy["profesional_1"],
                 "puntaje_general" : float(aud.get("puntaje_general") or 0),
                 "alertas_criticas": int(aud.get("alertas_criticas") or 0),
-                "alertas_altas"   : int(aud.get("alertas_altas") or 0),
+                "has_calidad"     : pid in pdf_qual,
+                "has_cambios"     : pid in pdf_hist,
+                "url_calidad"     : f"/auditoria/pdf/{pid}" if pid in pdf_qual else None,
+                "url_cambios"     : f"/auditoria/pdf/{pid}?tipo=cambios" if pid in pdf_hist else None,
                 "fecha_auditoria" : aud.get("fecha_ejecucion").isoformat()
                                     if aud.get("fecha_ejecucion") else None,
             })

@@ -114,19 +114,28 @@ def _generate_pdf(lines: list, filepath: str) -> bool:
 
             cols = len(cur_table[0])
             hdr  = " ".join(cur_table[0]).upper()
-            wmap = {2: [6*cm, 20*cm], 4: [7*cm, 4*cm, 5*cm, 10*cm],
-                    5: [10*cm, 3.5*cm, 3.5*cm, 4.5*cm, 4.5*cm],
-                    6: [2.5*cm, 10.5*cm, 4.5*cm, 2.5*cm, 3*cm, 3*cm]}
-            cw  = wmap.get(cols)
+            
+            # Mapa de anchos expandido para cubrir Verificador 1 y 2
+            wmap = {
+                2: [5*cm, 22*cm],
+                3: [5*cm, 5*cm, 17*cm],
+                4: [5*cm, 5*cm, 6*cm, 11*cm],
+                5: [4.5*cm, 3.5*cm, 4*cm, 4*cm, 11*cm],
+                6: [2.8*cm, 3.5*cm, 3.5*cm, 3*cm, 3*cm, 11.2*cm]
+            }
+            cw = wmap.get(cols)
             if cols == 7:
                 cw = [2*cm, 10*cm, 3*cm, 2*cm, 2*cm, 3.5*cm, 3.5*cm]
-            hbg = colors.HexColor('#4f46e5')
-            if "NIVEL" in hdr and "CÓDIGO" in hdr:
-                hbg = colors.HexColor('#ef4444')
-            elif "PUNTAJE" in hdr:
-                hbg = colors.HexColor('#10b981')
-            elif "ACCIÓN" in hdr and "PRIORIDAD" in hdr:
-                hbg = colors.HexColor('#f59e0b')
+            
+            hbg = colors.HexColor('#4f46e5') # Indigo default
+            if any(x in hdr for x in ["NIVEL", "CÓDIGO", "CRÍTICA", "ALERTA"]):
+                hbg = colors.HexColor('#ef4444') # Rojo
+            elif "PUNTAJE" in hdr or "AVANCE" in hdr:
+                hbg = colors.HexColor('#10b981') # Verde
+            elif any(x in hdr for x in ["ACCIÓN", "PRIORIDAD", "HISTORIAL", "CAMBIOS"]):
+                hbg = colors.HexColor('#f59e0b') # Ambar
+            elif any(x in hdr for x in ["FECHA", "AUTOR"]):
+                hbg = colors.HexColor('#3b82f6') # Azul
 
             t = Table(fmt, colWidths=cw)
             t.setStyle(TableStyle([
@@ -159,7 +168,7 @@ def _generate_pdf(lines: list, filepath: str) -> bool:
                     story.append(Paragraph(line, title_style))
                 elif "Sistema Multi-Dimensional" in line:
                     story.append(Paragraph(line, sub_style))
-                elif line[:2] in ("📊","🎯","🚨","📈","✅","🔍"):
+                elif line[:2] in ("📊","🎯","🚨","📈","✅","🔍","🕒"):
                     story.append(Paragraph(line, h2_style))
                     story.append(HRFlowable(width="100%", thickness=1.5,
                                             color=colors.HexColor('#4f46e5')))
@@ -549,6 +558,120 @@ def _audit_project(cur, project_id: int, lote_id: int, base_url: str) -> tuple:
 
 
 # ──────────────────────────────────────────────
+# MOTOR DE HISTORIAL Y CAMBIOS (Basado en verificador2.py)
+# ──────────────────────────────────────────────
+def _audit_history(cur, project_id: int) -> str:
+    """Extrae historial de avances (auditoria_proyectos) y cambios (control_actividad)."""
+    try:
+        cur.execute("SELECT n_registro, nombre FROM proyectos WHERE id = %s", (project_id,))
+        p = cur.fetchone()
+        if not p: return ""
+        
+        r = []
+        sep = "─" * 80
+        r.append(f"📋 REPORTE DE HISTORIAL Y CAMBIOS - PROYECTO ID: {project_id}")
+        r.append(f"CÓDIGO: {p['n_registro'] or 'PENDIENTE'} | NOMBRE: {p['nombre']}")
+        r.append(f"Generado el: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
+        r.append(sep)
+
+        # 1. Avances desde auditoría
+        cur.execute("""
+            SELECT 
+                al.fecha_ejecucion, 
+                ap.avance_declarado, 
+                LAG(ap.avance_declarado) OVER (ORDER BY al.fecha_ejecucion ASC) as prev_avance,
+                ap.etapa, 
+                LAG(ap.etapa) OVER (ORDER BY al.fecha_ejecucion ASC) as prev_etapa,
+                ap.puntaje_general, 
+                LAG(ap.puntaje_general) OVER (ORDER BY al.fecha_ejecucion ASC) as prev_puntaje,
+                ap.alertas_criticas,
+                LAG(ap.alertas_criticas) OVER (ORDER BY al.fecha_ejecucion ASC) as prev_criticas
+            FROM auditoria_proyectos ap
+            JOIN auditoria_lotes al ON ap.lote_id = al.id
+            WHERE ap.proyecto_id = %s
+            ORDER BY al.fecha_ejecucion DESC
+        """, (project_id,))
+        auds = cur.fetchall()
+
+        r.append("📈 SECUENCIA DE AVANCES Y REVISIONES")
+        if not auds:
+            r.append("No hay registros históricos de auditoría.")
+        else:
+            r.append(f"{'Fecha':<16}\t{'Avance (Ant ➔ Act)':<22}\t{'Etapa (Ant ➔ Act)':<35}\t{'Puntaje':<15}\t{'Críticas'}")
+            for a in auds:
+                f   = a['fecha_ejecucion'].strftime("%d/%m/%y %H:%M") if a['fecha_ejecucion'] else "-"
+                def np(v):
+                    if v is None: return 0.0
+                    vf = float(v)
+                    return vf * 100 if (0 < vf <= 1.0) else vf
+                
+                av_a = np(a['prev_avance'])
+                av_n = np(a['avance_declarado'])
+                av_s = f"{av_a:.0f}% ➔ {av_n:.0f}%" if f"{av_a:.0f}" != f"{av_n:.0f}" else f"{av_n:.0f}%"
+                
+                et_a = a['prev_etapa'] or "Inicio"
+                et_n = a['etapa'] or "-"
+                et_s = f"{et_a} ➔ {et_n}" if et_a != et_n else et_n
+                
+                pt_a = np(a['prev_puntaje'])
+                pt_n = np(a['puntaje_general'])
+                pt_s = f"{pt_a:.0f}% ➔ {pt_n:.0f}%" if f"{pt_a:.0f}" != f"{pt_n:.0f}" else f"{pt_n:.0f}%"
+                
+                cr_a = a['prev_criticas'] or 0
+                cr_n = a['alertas_criticas'] or 0
+                cr_s = f"{cr_a} ➔ {cr_n}" if cr_a != cr_n else str(cr_n)
+                
+                r.append(f"{f:<16}\t{av_s:<22}\t{et_s:<35}\t{pt_s:<15}\t{cr_s}")
+        r.append(sep)
+
+        # 2. Cambios desde control_actividad
+        cur.execute("""
+            SELECT c.fecha, c.accion, u.nombre as autor, c.detalle, c.datos_antes, c.datos_despues
+            FROM control_actividad c
+            LEFT JOIN users u ON c.user_id = u.user_id
+            WHERE c.entidad_tipo = 'proyecto' AND c.entidad_id = %s
+            ORDER BY c.fecha DESC
+            LIMIT 50
+        """, (project_id,))
+        logs = cur.fetchall()
+
+        r.append("🕒 HISTORIAL DETALLADO DE ACCIONES Y CAMBIOS")
+        if not logs:
+            r.append("No hay registros de actividad específica para este proyecto.")
+        else:
+            r.append(f"{'Fecha':<16}\t{'Acción':<20}\t{'Autor':<15}\t{'Detalle de Cambios'}")
+            for l in logs:
+                f = l['fecha'].strftime("%d/%m/%y %H:%M") if l['fecha'] else "-"
+                ac = str(l['accion'])[:20]
+                au = str(l['autor'] or "Sistema")[:15]
+                dt = l['detalle'] or ""
+                
+                if l['accion'] == 'editar_proyecto':
+                    try:
+                        ant = l['datos_antes'] or {}
+                        des = l['datos_despues'] or {}
+                        if isinstance(ant, str): ant = json.loads(ant)
+                        if isinstance(des, str): des = json.loads(des)
+                        cambios = []
+                        for k, v in des.items():
+                            v0 = ant.get(k)
+                            if str(v) != str(v0) and k not in ['fecha_actualizacion','user_id']:
+                                label = k.replace('_',' ').title()
+                                cambios.append(f"{label}: [{v0}]➔[{v}]")
+                        if cambios: dt = "CAMBIOS: " + " | ".join(cambios)
+                    except: pass
+                
+                if len(dt) > 200: dt = dt[:197] + "..."
+                r.append(f"{f:<16}\t{ac:<20}\t{au:<15}\t{dt}")
+        
+        r.append(sep)
+        return "\n".join(r)
+    except Exception as e:
+        logger.error(f"Error _audit_history pid={project_id}: {e}")
+        return f"Error extrayendo historial: {str(e)}"
+
+
+# ──────────────────────────────────────────────
 # TAREA ASÍNCRONA PRINCIPAL
 # ──────────────────────────────────────────────
 def run_auditoria_async(db_factory, release_fn, ejecutor_nombre: str,
@@ -633,11 +756,16 @@ def _worker(db_factory, release_fn, ejecutor_nombre, base_url):
         with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
             for i, pid in enumerate(ids, 1):
                 try:
+                    # Reporte 1: Calidad (verificador.py)
                     report_txt, tupla = _audit_project(cur, pid, lote_id, base_url)
-
-                    # Guardar PDF (nombrado con ID)
                     pdf_path = os.path.join(AUDIT_OUT_DIR, f"{pid}.pdf")
                     _generate_pdf(report_txt.split('\n'), pdf_path)
+
+                    # Reporte 2: Historial y Cambios (verificador2.py)
+                    history_txt = _audit_history(cur, pid)
+                    if history_txt:
+                        hist_pdf_path = os.path.join(AUDIT_OUT_DIR, f"{pid}_cambios.pdf")
+                        _generate_pdf(history_txt.split('\n'), hist_pdf_path)
 
                     if tupla:
                         batch.append(tupla)
