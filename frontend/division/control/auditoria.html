@@ -401,13 +401,13 @@
             // 2. Recalcular KPIs
             const kpi = {
                 total_proyectos: filtered.length,
-                puntaje_promedio: filtered.length ? (filtered.reduce((acc, p) => acc + p.puntaje_general, 0) / filtered.length).toFixed(1) : 0,
-                proyectos_ok: filtered.filter(p => p.puntaje_general >= 80).length,
-                proyectos_criticos: filtered.filter(p => p.puntaje_general < 60).length,
-                total_alertas_criticas: filtered.reduce((acc, p) => acc + p.alertas_criticas, 0),
-                total_alertas_altas: filtered.reduce((acc, p) => acc + p.alertas_altas, 0),
-                sin_proximos_pasos: filtered.filter(p => p.cant_proximos_pasos === 0).length,
-                sin_documentos: filtered.filter(p => p.cant_documentos === 0).length
+                puntaje_promedio: filtered.length ? (filtered.reduce((acc, p) => acc + (parseFloat(p.puntaje_general) || 0), 0) / filtered.length).toFixed(1) : 0,
+                proyectos_ok: filtered.filter(p => (parseFloat(p.puntaje_general) || 0) >= 80).length,
+                proyectos_criticos: filtered.filter(p => (parseFloat(p.puntaje_general) || 0) < 60).length,
+                total_alertas_criticas: filtered.reduce((acc, p) => acc + (parseInt(p.alertas_criticas) || 0), 0),
+                total_alertas_altas: filtered.reduce((acc, p) => acc + (parseInt(p.alertas_altas) || 0), 0),
+                sin_proximos_pasos: filtered.filter(p => (parseInt(p.cant_proximos_pasos) || 0) === 0).length,
+                sin_documentos: filtered.filter(p => (parseInt(p.cant_documentos) || 0) === 0).length
             };
             renderKPIs(kpi, dashboardData.ctrl_kpi);
 
@@ -421,37 +421,47 @@
 
         function updateCascadingCatalogos(filteredData, type) {
             const prefix = type === 'f' ? 'f-' : 'r-';
+            const profId = type === 'f' ? 'f-profesional' : 'r-prof';
+            const all = type === 'f' ? (dashboardData.proyectos || []) : (reportesData.reportes || []);
             
             // Obtenemos valores actuales
             const selArea = document.getElementById(prefix + 'area').value;
             const selEtapa = document.getElementById(prefix + 'etapa').value;
             const selEstado = document.getElementById(prefix + 'estado').value;
+            const selProf = document.getElementById(profId).value;
 
-            // Helpers para extraer únicos de la data filtrada
+            // Mapeo de llaves (varían ligeramente entre dashboard y reportes)
+            const k = {
+                area: 'area_id',
+                etapa: type === 'f' ? 'etapa_proyecto_id' : 'etapa_id',
+                estado: type === 'f' ? 'estado_proyecto_id' : 'estado_id',
+                prof: 'profesional_1'
+            };
+
             const getUniques = (data, idKey, nameKey) => {
                 const map = new Map();
-                data.forEach(p => { if(p[idKey]) map.set(String(p[idKey]), p[nameKey]); });
+                data.forEach(p => { 
+                    const id = p[idKey];
+                    if(id !== undefined && id !== null) map.set(String(id), p[nameKey] || '—'); 
+                });
                 return Array.from(map.entries()).map(([id, nombre]) => ({ id, nombre })).sort((a,b)=>a.nombre.localeCompare(b.nombre));
             };
 
-            // Para que la cascada no sea "destructiva", el orden de filtrado de los DROPDOWNS es:
-            // - Etapas: dependen solo de Area seleccionada (o todas si no hay area)
-            let proysForEtapa = dashboardData.proyectos || [];
-            if (selArea) proysForEtapa = proysForEtapa.filter(p => String(p.area_id) === selArea);
-            
-            // - Estados: dependen de Area + Etapa
-            let proysForEstado = proysForEtapa;
-            if (selEtapa) proysForEstado = proysForEstado.filter(p => String(p.etapa_proyecto_id) === selEtapa);
-
-            // - Profesionales: dependen de Area + Etapa + Estado
-            let proysForProf = proysForEstado;
-            if (selEstado) proysForProf = proysForProf.filter(p => String(p.estado_proyecto_id) === selEstado);
+            // Para cada dropdown, las opciones dependen de la data filtrada por los DEMÁS dropdowns
+            const filterOthers = (excludeKey) => {
+                let d = all;
+                if (excludeKey !== 'area' && selArea) d = d.filter(p => String(p[k.area]) === selArea);
+                if (excludeKey !== 'etapa' && selEtapa) d = d.filter(p => String(p[k.etapa]) === selEtapa);
+                if (excludeKey !== 'estado' && selEstado) d = d.filter(p => String(p[k.estado]) === selEstado);
+                if (excludeKey !== 'prof' && selProf) d = d.filter(p => String(p[k.prof]) === selProf);
+                return d;
+            };
 
             const cat = {
-                areas: getUniques(dashboardData.proyectos || [], 'area_id', 'area_nombre'),
-                etapas: getUniques(proysForEtapa, 'etapa_proyecto_id', 'etapa_nombre'),
-                estados: getUniques(proysForEstado, 'estado_proyecto_id', 'estado_nombre'),
-                profesionales: [...new Set(proysForProf.map(p => p.profesional_1).filter(Boolean))].sort()
+                areas: getUniques(filterOthers('area'), k.area, 'area_nombre'),
+                etapas: getUniques(filterOthers('etapa'), k.etapa, 'etapa_nombre'),
+                estados: getUniques(filterOthers('estado'), k.estado, 'estado_nombre'),
+                profesionales: [...new Set(filterOthers('prof').map(p => p[k.prof]).filter(Boolean))].sort()
             };
 
             renderCatalogosElements(cat, type);
@@ -559,7 +569,7 @@
                 if (!areaMap.has(a)) areaMap.set(a, { total: 0, sum: 0, crit: 0 });
                 const o = areaMap.get(a);
                 o.total++;
-                o.sum += p.puntaje_general;
+                o.sum += (parseFloat(p.puntaje_general) || 0);
                 if (p.alertas_criticas > 0) o.crit += p.alertas_criticas;
             });
             const pa = Array.from(areaMap.entries()).map(([area, o]) => ({ 
@@ -589,7 +599,7 @@
                 if (!etapaMap.has(e)) etapaMap.set(e, { total: 0, sum: 0 });
                 const o = etapaMap.get(e);
                 o.total++;
-                o.sum += p.puntaje_general;
+                o.sum += (parseFloat(p.puntaje_general) || 0);
             });
             const pe = Array.from(etapaMap.entries()).map(([etapa, o]) => ({ 
                 etapa, 
@@ -668,35 +678,10 @@
             renderReportesList(filtered);
             
             // Actualizar catálogos en cascada para reportes
-            // Reutilizamos la lógica del dashboard pero con la data de reportes
-            updateCascadingCatalogosForReportes(filtered);
+            updateCascadingCatalogos(filtered, 'r');
         }
 
-        function updateCascadingCatalogosForReportes(filtered) {
-            // El backend retorna 'catalogos' con todos, pero para la cascada calculamos dinamicamente
-            const getUniques = (data, idKey, nameKey) => {
-                const map = new Map();
-                data.forEach(p => { if(p[idKey]) map.set(String(p[idKey]), p[nameKey]); });
-                return Array.from(map.entries()).map(([id, nombre]) => ({ id, nombre })).sort((a,b)=>a.nombre.localeCompare(b.nombre));
-            };
 
-            const selArea = document.getElementById('r-area').value;
-            const selEtapa = document.getElementById('r-etapa').value;
-
-            let dataEtapa = reportesData.reportes || [];
-            if (selArea) dataEtapa = dataEtapa.filter(r => String(r.area_id) === selArea);
-            
-            let dataEstado = dataEtapa;
-            if (selEtapa) dataEstado = dataEstado.filter(r => String(r.etapa_id) === selEtapa);
-
-            const cat = {
-                areas: getUniques(reportesData.reportes || [], 'area_id', 'area_nombre'),
-                etapas: getUniques(dataEtapa, 'etapa_id', 'etapa_nombre'),
-                estados: getUniques(dataEstado, 'estado_id', 'estado_nombre'),
-                profesionales: [...new Set(dataEstado.map(r => r.profesional_1).filter(Boolean))].sort()
-            };
-            renderCatalogosElements(cat, 'r');
-        }
 
         function renderReportesList(items) {
             const el = document.getElementById('reportesList');
