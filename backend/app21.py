@@ -93,6 +93,13 @@ active_sessions = {}
 sessions_lock = threading.Lock()
 SESSION_EXPIRY_HOURS = 1
 
+def cleanup():
+    """Función de limpieza al cerrar el servidor"""
+    global connection_pool
+    if connection_pool:
+        connection_pool.closeall()
+        logger.info("Pool de conexiones cerrado correctamente.")
+
 # -----------------------
 # UTIL: inicialización y gestión del pool de conexiones
 # -----------------------
@@ -166,6 +173,8 @@ def release_db_connection(conn):
 #-------------------------
 
 from extract import extract_text_from_file
+import correo
+
 
 # -----------------------
 # CONFIG DOCUMENTOS
@@ -4795,6 +4804,7 @@ def control_export_pdf(current_user_id):
 # ── Fin Módulo de Control ──────────────────────────────────────
 
 
+
 # ==============================================================================
 # MÓDULO DE AUDITORÍA INTEGRAL (control.py functionality)
 # Endpoints para: lanzar, monitorear, servir PDFs y dashboard KPIs
@@ -5002,8 +5012,164 @@ def auditoria_pdf_view(current_user_id, proyecto_id):
                 detalle=f"PDF auditoria proyecto {proyecto_id}")
 
     return send_file(pdf_path, mimetype="application/pdf",
-                     as_attachment=as_attachment,
                      download_name=download_name)
+
+
+@app.route("/api/proyectos/<int:proyecto_id>/enviar-auditoria", methods=["POST"])
+@session_required
+def endpoint_enviar_auditoria(current_user_id, proyecto_id):
+    """
+    Envía el reporte de auditoría por correo a los responsables (profesionales 1-5).
+    Mapea nombres a correos usando config_correo.json.
+    """
+    conn = None
+    try:
+        conn = get_db_connection()
+        with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
+            cur.execute("""
+                SELECT nombre, profesional_1, profesional_2, profesional_3, profesional_4, profesional_5
+                FROM proyectos
+                WHERE id = %s
+            """, (proyecto_id,))
+            proyecto = cur.fetchone()
+            
+        if not proyecto:
+            return jsonify({"success": False, "message": "Proyecto no encontrado"}), 404
+            
+        responsables = [
+            proyecto['profesional_1'], proyecto['profesional_2'], 
+            proyecto['profesional_3'], proyecto['profesional_4'], 
+            proyecto['profesional_5']
+        ]
+        
+        # El motor guarda como Auditoria_Proyecto_{id}.pdf
+        filename = f"Auditoria_Proyecto_{proyecto_id}.pdf"
+        pdf_path = os.path.join(AUDIT_OUT_DIR, filename)
+        
+        # Caso alternativo: el código de app21 a veces usa {id}.pdf. Verificamos ambos.
+        if not os.path.exists(pdf_path):
+            alt_path = os.path.join(AUDIT_OUT_DIR, f"{proyecto_id}.pdf")
+            if os.path.exists(alt_path):
+                pdf_path = alt_path
+
+        if not os.path.exists(pdf_path):
+             return jsonify({
+                 "success": False, 
+                 "message": f"No se encontró el reporte técnico para el proyecto {proyecto_id}. Asegúrese de haber ejecutado la auditoría recientemente."
+             }), 404
+             
+        # Enviar correo usando el módulo correo.py
+        resultado = correo.enviar_email_responsables(
+            proyecto_id=proyecto_id,
+            responsables_names=responsables,
+            ruta_pdf=pdf_path,
+            proyecto_nombre=proyecto['nombre']
+        )
+        
+        if resultado["success"]:
+            log_control(current_user_id, "enviar_auditoria_email", modulo="auditoria",
+                        entidad_tipo="proyecto", entidad_id=proyecto_id,
+                        detalle=f"Reporte enviado a responsables: {', '.join(resultado['enviados'])}")
+            return jsonify(resultado), 200
+        else:
+            return jsonify(resultado), 400
+            
+    except Exception as e:
+        logger.error(f"Error en endpoint_enviar_auditoria: {e}")
+        traceback.print_exc()
+        return jsonify({"success": False, "message": f"Error interno: {str(e)}"}), 500
+    finally:
+        if conn:
+            release_db_connection(conn)
+
+
+@app.route("/api/auditoria/enviar-lote", methods=["POST"])
+@session_required
+def endpoint_enviar_auditoria_lote(current_user_id):
+    """
+    Envía las auditorías de todos los proyectos que tengan un PDF generado 
+    en el último lote a sus respectivos responsables.
+    """
+    if not os.path.exists(AUDIT_OUT_DIR):
+        return jsonify({"success": False, "message": "No se encontraron reportes. Ejecute la auditoría primero."}), 404
+
+    # Buscamos todos los archivos Auditoria_Proyecto_*.pdf
+    files = [f for f in os.listdir(AUDIT_OUT_DIR) if f.startswith("Auditoria_Proyecto_") and f.endswith(".pdf")]
+    
+    if not files:
+        return jsonify({"success": False, "message": "No hay reportes de calidad generados para enviar."}), 404
+
+    # Mapear archivos a IDs
+    project_files = {}
+    for f in files:
+        try:
+            pid = int(f.replace("Auditoria_Proyecto_", "").replace(".pdf", ""))
+            project_files[pid] = f
+        except: continue
+
+    pids = list(project_files.keys())
+    
+    conn = None
+    enviados_count = 0
+    errores = []
+    skipped = 0
+
+    try:
+        conn = get_db_connection()
+        with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
+            # Traer datos de todos los proyectos involucrados
+            cur.execute("""
+                SELECT id, nombre, profesional_1, profesional_2, profesional_3, profesional_4, profesional_5
+                FROM proyectos
+                WHERE id = ANY(%s)
+            """, (pids,))
+            proyectos = cur.fetchall()
+
+        for p in proyectos:
+            pid = p['id']
+            filename = project_files[pid]
+            pdf_path = os.path.join(AUDIT_OUT_DIR, filename)
+            
+            responsables = [
+                p['profesional_1'], p['profesional_2'], p['profesional_3'], 
+                p['profesional_4'], p['profesional_5']
+            ]
+            
+            # Llamar al módulo de envío
+            res = correo.enviar_email_responsables(
+                proyecto_id=pid,
+                responsables_names=responsables,
+                ruta_pdf=pdf_path,
+                proyecto_nombre=p['nombre']
+            )
+            
+            if res["success"]:
+                enviados_count += 1
+                log_control(current_user_id, "enviar_auditoria_email_lote", modulo="auditoria",
+                            entidad_tipo="proyecto", entidad_id=pid,
+                            detalle=f"Enviado en lote a: {', '.join(res['enviados'])}")
+            else:
+                if "No se encontraron correos" in res["message"]:
+                    skipped += 1
+                else:
+                    errores.append(f"Proyecto {pid}: {res['message']}")
+
+        msg = f"Proceso completado. Enviados: {enviados_count} correos."
+        if skipped > 0: msg += f" Ignorados: {skipped} (sin correo configurado)."
+        if errores: msg += f" Errores: {len(errores)}."
+        
+        return jsonify({
+            "success": True, 
+            "message": msg,
+            "detalles": {"enviados": enviados_count, "errores": errores, "skipped": skipped}
+        })
+
+    except Exception as e:
+        logger.error(f"Error en endpoint_enviar_auditoria_lote: {e}")
+        return jsonify({"success": False, "message": f"Error interno: {str(e)}"}), 500
+    finally:
+        if conn: release_db_connection(conn)
+
 
 
 @app.route("/auditoria/dashboard", methods=["GET"])
@@ -5036,7 +5202,8 @@ def auditoria_dashboard(current_user_id):
             lote_where = "AND ap.lote_id = %s"
             lote_param = [int(lote_id_f)]
         else:
-            lote_where = "AND ap.lote_id = (SELECT MAX(id) FROM auditoria_lotes)"
+            # Seleccionar el último lote que realmente tenga datos
+            lote_where = "AND ap.lote_id = (SELECT MAX(lote_id) FROM auditoria_proyectos)"
 
         # Filtros adicionales sobre proyectos
         proy_filtros = []
@@ -5164,15 +5331,19 @@ def auditoria_dashboard(current_user_id):
             """, ctrl_params)
             ctrl_kpi = cur.fetchone() or {}
 
-            # ── 8. Evolución promedio de puntaje (todos los lotes) ──
+            # ── 8. Evolución promedio de puntaje (últimas 10 ejecuciones) ──
             cur.execute("""
-                SELECT al.fecha_ejecucion AS fecha,
-                       ROUND(AVG(ap.puntaje_general)::NUMERIC,1) AS puntaje_prom,
-                       SUM(ap.alertas_criticas) AS criticas
-                FROM auditoria_proyectos ap
-                JOIN auditoria_lotes al ON al.id = ap.lote_id
-                GROUP BY al.id, al.fecha_ejecucion
-                ORDER BY al.fecha_ejecucion ASC
+                SELECT * FROM (
+                    SELECT al.fecha_ejecucion AS fecha,
+                           ROUND(AVG(ap.puntaje_general)::NUMERIC,1) AS puntaje_prom,
+                           SUM(ap.alertas_criticas) AS criticas
+                    FROM auditoria_proyectos ap
+                    JOIN auditoria_lotes al ON al.id = ap.lote_id
+                    GROUP BY al.id, al.fecha_ejecucion
+                    ORDER BY al.fecha_ejecucion DESC
+                    LIMIT 10
+                ) sub
+                ORDER BY fecha ASC
             """)
             evolucion = cur.fetchall()
 

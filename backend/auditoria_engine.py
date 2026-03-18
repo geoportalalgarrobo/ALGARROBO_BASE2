@@ -74,9 +74,17 @@ def _generate_pdf(lines: list, filepath: str) -> bool:
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
         from reportlab.lib.enums import TA_CENTER
 
+        # Extraemos el ID o nombre base del archivo para el título
+        nombre_base = os.path.basename(filepath).replace(".pdf", "").replace("_", " ")
+
         doc    = SimpleDocTemplate(filepath, pagesize=landscape(A4),
                                    leftMargin=1.5*cm, rightMargin=1.5*cm,
-                                   topMargin=1.5*cm, bottomMargin=1.5*cm)
+                                   topMargin=1.5*cm, bottomMargin=1.5*cm,
+                                   # METADATOS ANTI-SPAM
+                                   title=f"Reporte de Auditoría - {nombre_base}",
+                                   author="Departamento de Planificación - Algarrobo",
+                                   subject="Control de Calidad y Seguimiento de Obras",
+                                   creator="Sistema de Gestión Geoportal Algarrobo")
         styles = getSampleStyleSheet()
         story  = []
 
@@ -168,7 +176,7 @@ def _generate_pdf(lines: list, filepath: str) -> bool:
                     story.append(Paragraph(line, title_style))
                 elif "Sistema Multi-Dimensional" in line:
                     story.append(Paragraph(line, sub_style))
-                elif line[:2] in ("📊","🎯","🚨","📈","✅","🔍","🕒"):
+                elif line[:2] in ("📊","🎯","🚨","📈","✅","🔍","🕒","📋"):
                     story.append(Paragraph(line, h2_style))
                     story.append(HRFlowable(width="100%", thickness=1.5,
                                             color=colors.HexColor('#4f46e5')))
@@ -424,26 +432,26 @@ def _audit_project(cur, project_id: int, lote_id: int, base_url: str) -> tuple:
         # Dims 1-3
         for dim_label, rows_extra, dim_score_key in [
             ("📊 DIMENSIÓN 1: IDENTIFICACIÓN Y CLASIFICACIÓN", [
-                (project['n_registro'] or '-', 'Formato ID'),
-                (project['area_nombre'] or '-', 'Lista maestra'),
-                (project['unidad_vecinal'] or '-', 'Cobertura'),
+                ('N° Registro', project['n_registro'] or '-', 'Formato ID'),
+                ('Área Temática', project['area_nombre'] or '-', 'Lista maestra'),
+                ('Unidad Vecinal', project['unidad_vecinal'] or '-', 'Cobertura'),
             ], 'Dim1'),
             ("📊 DIMENSIÓN 2: PRIORIZACIÓN Y FINANCIAMIENTO", [
-                (f"${monto:,.0f}", 'Base monetaria'),
-                (project['financiamiento_nombre'] or '-', 'Origen'),
+                ('Monto Presup.', f"${monto:,.0f}", 'Base monetaria'),
+                ('Fuente Finan.', project['financiamiento_nombre'] or '-', 'Origen'),
             ], 'Dim2'),
             ("📊 DIMENSIÓN 3: VARIABLES TÉCNICAS (Documentación)", [
-                (project['topografia'] or '0%', 'Coherente'),
-                (project['planimetrias'] or '0%', 'Coherente'),
-                (project['ingenieria'] or '0%', 'Coherente'),
-                (project['perfil_tecnico_economico'] or '0%', 'Coherente'),
-                (project['documentos'] or '0%', 'Requerido'),
+                ('Topografía', project['topografia'] or '0%', 'Coherente'),
+                ('Planimetrías', project['planimetrias'] or '0%', 'Coherente'),
+                ('Ingeniería', project['ingenieria'] or '0%', 'Coherente'),
+                ('Perfil Técnico', project['perfil_tecnico_economico'] or '0%', 'Coherente'),
+                ('Documentos', project['documentos'] or '0%', 'Requerido'),
             ], 'Dim3'),
         ]:
             r.append(dim_label)
             r.append(f"{'Variable':<25}\t{'Valor':<15}\t{'Validación':<20}\t{'Resultado'}")
-            for val, valid in rows_extra:
-                r.append(f"{'-':<25}\t{val:<15}\t{valid:<20}\t{'✅ Válido'}")
+            for var_name, val, valid in rows_extra:
+                r.append(f"{var_name:<25}\t{val:<15}\t{valid:<20}\t{'✅ Válido'}")
             r.append(f"Puntaje {dim_score_key}: {scores[dim_score_key]:.0f}%")
             r.append(sep)
 
@@ -455,7 +463,7 @@ def _audit_project(cur, project_id: int, lote_id: int, base_url: str) -> tuple:
         res_post  = "⚠️ Inconsistente" if has_errors else "✅ Válido"
         res_pasos = "🔴 Faltante" if count_pasos == 0 else "✅ Definido"
         r.append(f"{'Postulación':<25}\t{(postulacion or '-'):<15}\t{'Coherente':<20}\t{res_post}")
-        r.append(f"{'Próximos Pasos':<25}\t{count_pasos:<15}\t{'Continuidad':<20}\t{res_pasos}")
+        r.append(f"{'Próximos Pasos':<25}\t{str(count_pasos):<15}\t{'Continuidad':<20}\t{res_pasos}")
         if has_errors:
             r.append("\n🔴 ALERTAS DE ALTA PRIORIDAD DETECTADAS")
             for a in high_alerts:
@@ -569,9 +577,9 @@ def _audit_history(cur, project_id: int) -> str:
         
         r = []
         sep = "─" * 80
-        r.append(f"📋 REPORTE DE HISTORIAL Y CAMBIOS - PROYECTO ID: {project_id}")
-        r.append(f"CÓDIGO: {p['n_registro'] or 'PENDIENTE'} | NOMBRE: {p['nombre']}")
-        r.append(f"Generado el: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
+        r.append(f"📋 REPORTE DE HISTORIAL Y AVANCES DEL PROYECTO")
+        r.append(f"ID DEL PROYECTO: {project_id} | CÓDIGO: {p['n_registro'] or 'PENDIENTE'}")
+        r.append(f"NOMBRE: {p['nombre']}")
         r.append(sep)
 
         # 1. Avances desde auditoría
@@ -593,13 +601,13 @@ def _audit_history(cur, project_id: int) -> str:
         """, (project_id,))
         auds = cur.fetchall()
 
-        r.append("📈 SECUENCIA DE AVANCES Y REVISIONES")
+        r.append("📈 SECUENCIA DE AVANCES Y REVISIONES (Desde Snapshot Auditoría)")
         if not auds:
             r.append("No hay registros históricos de auditoría.")
         else:
-            r.append(f"{'Fecha':<16}\t{'Avance (Ant ➔ Act)':<22}\t{'Etapa (Ant ➔ Act)':<35}\t{'Puntaje':<15}\t{'Críticas'}")
+            r.append(f"{'Fecha Auditoría':<16}\t{'Avance (Ant ➔ Act)':<22}\t{'Etapa (Anterior ➔ Actual)':<40}\t{'Puntaje (Ant ➔ Act)':<22}\t{'Críticas'}")
             for a in auds:
-                f   = a['fecha_ejecucion'].strftime("%d/%m/%y %H:%M") if a['fecha_ejecucion'] else "-"
+                f = a['fecha_ejecucion'].strftime("%d/%m/%y %H:%M") if a['fecha_ejecucion'] else "-"
                 def np(v):
                     if v is None: return 0.0
                     vf = float(v)
@@ -621,7 +629,7 @@ def _audit_history(cur, project_id: int) -> str:
                 cr_n = a['alertas_criticas'] or 0
                 cr_s = f"{cr_a} ➔ {cr_n}" if cr_a != cr_n else str(cr_n)
                 
-                r.append(f"{f:<16}\t{av_s:<22}\t{et_s:<35}\t{pt_s:<15}\t{cr_s}")
+                r.append(f"{f:<16}\t{av_s:<22}\t{et_s:<40}\t{pt_s:<22}\t{cr_s}")
         r.append(sep)
 
         # 2. Cambios desde control_actividad
@@ -635,11 +643,11 @@ def _audit_history(cur, project_id: int) -> str:
         """, (project_id,))
         logs = cur.fetchall()
 
-        r.append("🕒 HISTORIAL DETALLADO DE ACCIONES Y CAMBIOS")
+        r.append("🕒 HISTORIAL COMPLETO DE ACCIONES Y CAMBIOS DEL PROYECTO")
         if not logs:
             r.append("No hay registros de actividad específica para este proyecto.")
         else:
-            r.append(f"{'Fecha':<16}\t{'Acción':<20}\t{'Autor':<15}\t{'Detalle de Cambios'}")
+            r.append(f"{'Fecha':<16}\t{'Acción':<20}\t{'Autor':<15}\t{'Detalle / Cambios Modificados'}")
             for l in logs:
                 f = l['fecha'].strftime("%d/%m/%y %H:%M") if l['fecha'] else "-"
                 ac = str(l['accion'])[:20]
@@ -657,7 +665,7 @@ def _audit_history(cur, project_id: int) -> str:
                             v0 = ant.get(k)
                             if str(v) != str(v0) and k not in ['fecha_actualizacion','user_id']:
                                 label = k.replace('_',' ').title()
-                                cambios.append(f"{label}: [{v0}]➔[{v}]")
+                                cambios.append(f"{label}: [{v0}] ➔ [{v}]")
                         if cambios: dt = "CAMBIOS: " + " | ".join(cambios)
                     except: pass
                 
@@ -675,7 +683,7 @@ def _audit_history(cur, project_id: int) -> str:
 # TAREA ASÍNCRONA PRINCIPAL
 # ──────────────────────────────────────────────
 def run_auditoria_async(db_factory, release_fn, ejecutor_nombre: str,
-                        base_url: str = "https://sud-austral.github.io/ALGARROBO_BASE2"):
+                        base_url: str = "https://geoportalalgarrobo.github.io/ALGARROBO_BASE2"):
     """
     Lanza la auditoría en un hilo secundario.
     db_factory  → función sin args que retorna una conexión psycopg2
@@ -758,13 +766,13 @@ def _worker(db_factory, release_fn, ejecutor_nombre, base_url):
                 try:
                     # Reporte 1: Calidad (verificador.py)
                     report_txt, tupla = _audit_project(cur, pid, lote_id, base_url)
-                    pdf_path = os.path.join(AUDIT_OUT_DIR, f"{pid}.pdf")
+                    pdf_path = os.path.join(AUDIT_OUT_DIR, f"Auditoria_Proyecto_{pid}.pdf")
                     _generate_pdf(report_txt.split('\n'), pdf_path)
 
                     # Reporte 2: Historial y Cambios (verificador2.py)
                     history_txt = _audit_history(cur, pid)
                     if history_txt:
-                        hist_pdf_path = os.path.join(AUDIT_OUT_DIR, f"{pid}_cambios.pdf")
+                        hist_pdf_path = os.path.join(AUDIT_OUT_DIR, f"Historial_Cambios_Proyecto_{pid}.pdf")
                         _generate_pdf(history_txt.split('\n'), hist_pdf_path)
 
                     if tupla:

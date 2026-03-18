@@ -141,11 +141,17 @@
                             style="background:rgba(255,255,255,.2); color:white; border:1px solid rgba(255,255,255,.3);">
                             <i class="fas fa-play" id="iconLanzar"></i> Ejecutar Auditoría
                         </button>
+                        <button id="btnEnviarLote" onclick="enviarAuditoriaLote()"
+                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95"
+                            style="background:rgba(255,255,255,.15); color:white; border:1px solid rgba(255,255,255,0.25);">
+                            <i class="fas fa-paper-plane" id="iconEnviarLote"></i> Enviar Auditoría por Correo
+                        </button>
                         <button onclick="loadDashboard()"
                             class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm"
                             style="background:rgba(255,255,255,.1); color:white; border:1px solid rgba(255,255,255,.2);">
                             <i class="fas fa-sync-alt"></i> Actualizar
                         </button>
+
                     </div>
                 </div>
             </div>
@@ -624,12 +630,17 @@
                             <button onclick="openPdf(${r.proyecto_id}, '${escHtml(r.nombre)}', 'calidad')"
                                 class="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-700 transition">
                                 <i class="fas fa-search"></i> CALIDAD
+                            </button>
+                            <button onclick="enviarCorreoIndividual(${r.proyecto_id})"
+                                class="flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-lg text-[10px] font-bold hover:bg-emerald-700 transition mt-1">
+                                <i class="fas fa-paper-plane"></i> ENVIAR EMAIL
                             </button>` : ''}
                             ${r.has_cambios ? `
                             <button onclick="openPdf(${r.proyecto_id}, '${escHtml(r.nombre)}', 'cambios')"
                                 class="flex items-center gap-1.5 px-3 py-1 bg-amber-500 text-white rounded-lg text-[10px] font-bold hover:bg-amber-600 transition">
                                 <i class="fas fa-history"></i> CAMBIOS
                             </button>` : ''}
+
                         </div>
                     </div>
                 </div>
@@ -709,6 +720,43 @@
                 setTimeout(() => document.getElementById('progressZone').classList.add('hidden'), 4000);
             }
         }
+
+        /* ───────────────────────────── ENVÍO CORREOS ───────────────────────── */
+        async function enviarAuditoriaLote() {
+            if (!confirm('¿Desea enviar los reportes de calidad del último lote a todos los responsables configurados?')) return;
+            
+            const btn = document.getElementById('btnEnviarLote');
+            const icon = document.getElementById('iconEnviarLote');
+            btn.disabled = true;
+            icon.className = 'fas fa-spinner spin-anim';
+            
+            try {
+                const res = await api.post('/api/auditoria/enviar-lote', {});
+                toast(res.message || 'Proceso de envío iniciado', 'ok');
+            } catch (e) {
+                toast(e.message || 'Error al enviar correos', 'err');
+            } finally {
+                btn.disabled = false;
+                icon.className = 'fas fa-paper-plane';
+            }
+        }
+
+        async function enviarCorreoIndividual(projectId) {
+            if (!confirm(`¿Enviar reporte del proyecto #${projectId} a sus responsables?`)) return;
+            
+            try {
+                toast('Enviando correo...', 'ok');
+                const res = await api.post(`/api/proyectos/${projectId}/enviar-auditoria`, {});
+                if (res.success) {
+                    toast(res.message, 'ok');
+                } else {
+                    toast(res.message, 'err');
+                }
+            } catch (e) {
+                toast(e.message || 'Error en el envío', 'err');
+            }
+        }
+
 
         /* ───────────────────────────── UTILS ────────────────────────────── */
         function clearFilters() {
