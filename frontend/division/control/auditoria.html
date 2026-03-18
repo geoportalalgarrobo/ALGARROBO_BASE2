@@ -174,19 +174,19 @@
                     <div class="flex flex-wrap gap-3 items-end">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Área</label>
-                            <select id="f-area" class="filter-input" onchange="loadDashboard()"><option value="">Todas las áreas</option></select>
+                            <select id="f-area" class="filter-input" onchange="applyDashboardFilters()"><option value="">Todas las áreas</option></select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Etapa</label>
-                            <select id="f-etapa" class="filter-input" onchange="loadDashboard()"><option value="">Todas las etapas</option></select>
+                            <select id="f-etapa" class="filter-input" onchange="applyDashboardFilters()"><option value="">Todas las etapas</option></select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Estado</label>
-                            <select id="f-estado" class="filter-input" onchange="loadDashboard()"><option value="">Todos los estados</option></select>
+                            <select id="f-estado" class="filter-input" onchange="applyDashboardFilters()"><option value="">Todos los estados</option></select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Profesional</label>
-                            <select id="f-profesional" class="filter-input" onchange="loadDashboard()"><option value="">Todos</option></select>
+                            <select id="f-profesional" class="filter-input" onchange="applyDashboardFilters()"><option value="">Todos</option></select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Actividad desde</label>
@@ -278,11 +278,11 @@
                 <div class="sc">
                     <div class="sc-title"><div class="sc-icon" style="background:linear-gradient(135deg,#ef4444,#dc2626)"><i class="fas fa-file-pdf"></i></div>Filtros de Reportes</div>
                     <div class="flex flex-wrap gap-3 items-end">
-                        <input id="r-q" class="filter-input" placeholder="🔍 Buscar proyecto…" oninput="loadReportes()">
-                        <select id="r-area" class="filter-input" onchange="loadReportes()"><option value="">Todas las áreas</option></select>
-                        <select id="r-etapa" class="filter-input" onchange="loadReportes()"><option value="">Todas las etapas</option></select>
-                        <select id="r-estado" class="filter-input" onchange="loadReportes()"><option value="">Todos los estados</option></select>
-                        <select id="r-prof" class="filter-input" onchange="loadReportes()"><option value="">Todos los profesionales</option></select>
+                        <input id="r-q" class="filter-input" placeholder="🔍 Buscar proyecto…" oninput="applyReporteFilters()">
+                        <select id="r-area" class="filter-input" onchange="applyReporteFilters()"><option value="">Todas las áreas</option></select>
+                        <select id="r-etapa" class="filter-input" onchange="applyReporteFilters()"><option value="">Todas las etapas</option></select>
+                        <select id="r-estado" class="filter-input" onchange="applyReporteFilters()"><option value="">Todos los estados</option></select>
+                        <select id="r-prof" class="filter-input" onchange="applyReporteFilters()"><option value="">Todos los profesionales</option></select>
                         <button onclick="clearReporteFilters()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition"><i class="fas fa-times mr-1"></i>Limpiar</button>
                     </div>
                 </div>
@@ -334,7 +334,9 @@
     <script>
         // ── Globals ──
         let charts = {};
-        let catalogos = {};
+        let catalogos = {}; // Aquí guardaremos los catálogos globales recibidos del back
+        let dashboardData = { proyectos: [], lotes: [], ctrl_kpi: {}, evolucion: [] };
+        let reportesData = { reportes: [] };
         let pollTimer = null;
         const BASE_URL = API_CONFIG.BASE_URL;
 
@@ -343,6 +345,7 @@
         });
 
         async function init() {
+            // Cargar dashboard inicial (traerá todo el lote actual)
             await loadDashboard();
         }
 
@@ -358,36 +361,123 @@
         }
 
         /* ───────────────────────────── DASHBOARD ────────────────────────── */
-        async function loadDashboard() {
+        async function loadDashboard(loteId = null) {
             try {
-                const params = buildDashFilters();
-                const data = await api.get('/auditoria/dashboard?' + params);
-                renderKPIs(data.kpi, data.ctrl_kpi);
-                renderCatalogos(data.catalogos, 'f');
+                // Solo pedimos al servidor cuando cambia el lote o las fechas de actividad
+                const p = new URLSearchParams();
+                if (loteId) p.set('lote_id', loteId);
+                const desde = document.getElementById('f-desde')?.value;
+                const hasta = document.getElementById('f-hasta')?.value;
+                if (desde) p.set('fecha_desde', desde);
+                if (hasta) p.set('fecha_hasta', hasta);
+
+                const data = await api.get('/auditoria/dashboard?' + p.toString());
+                
+                // Guardamos la "foto completa" del lote
+                dashboardData = data;
+                catalogos = data.catalogos || {};
+                
                 renderLotes(data.lotes);
-                renderCharts(data);
-                renderTopCriticos(data.top_criticos);
+                applyDashboardFilters(); // Aplicar filtros locales sobre la data recién traída
             } catch (e) {
                 console.error('Dashboard error:', e);
                 toast('Error cargando dashboard', 'err');
             }
         }
 
-        function buildDashFilters() {
-            const p = new URLSearchParams();
+        function applyDashboardFilters() {
             const area = document.getElementById('f-area')?.value;
             const etapa = document.getElementById('f-etapa')?.value;
             const estado = document.getElementById('f-estado')?.value;
             const prof = document.getElementById('f-profesional')?.value;
-            const desde = document.getElementById('f-desde')?.value;
-            const hasta = document.getElementById('f-hasta')?.value;
-            if (area) p.set('area_id', area);
-            if (etapa) p.set('etapa_id', etapa);
-            if (estado) p.set('estado_id', estado);
-            if (prof) p.set('profesional', prof);
-            if (desde) p.set('fecha_desde', desde);
-            if (hasta) p.set('fecha_hasta', hasta);
-            return p.toString();
+
+            // 1. Filtrar lista de proyectos
+            let filtered = dashboardData.proyectos || [];
+            if (area) filtered = filtered.filter(p => String(p.area_id) === String(area));
+            if (etapa) filtered = filtered.filter(p => String(p.etapa_proyecto_id) === String(etapa));
+            if (estado) filtered = filtered.filter(p => String(p.estado_proyecto_id) === String(estado));
+            if (prof) filtered = filtered.filter(p => p.profesional_1 === prof);
+
+            // 2. Recalcular KPIs
+            const kpi = {
+                total_proyectos: filtered.length,
+                puntaje_promedio: filtered.length ? (filtered.reduce((acc, p) => acc + p.puntaje_general, 0) / filtered.length).toFixed(1) : 0,
+                proyectos_ok: filtered.filter(p => p.puntaje_general >= 80).length,
+                proyectos_criticos: filtered.filter(p => p.puntaje_general < 60).length,
+                total_alertas_criticas: filtered.reduce((acc, p) => acc + p.alertas_criticas, 0),
+                total_alertas_altas: filtered.reduce((acc, p) => acc + p.alertas_altas, 0),
+                sin_proximos_pasos: filtered.filter(p => p.cant_proximos_pasos === 0).length,
+                sin_documentos: filtered.filter(p => p.cant_documentos === 0).length
+            };
+            renderKPIs(kpi, dashboardData.ctrl_kpi);
+
+            // 3. Renderizar Listas y Gráficos
+            renderTopCriticos(filtered.sort((a,b) => b.alertas_criticas - a.alertas_criticas).slice(0, 10));
+            renderCharts(filtered, dashboardData.evolucion);
+            
+            // 4. Actualizar catálogos en cascada (calculando qué opciones quedan disponibles)
+            updateCascadingCatalogos(filtered, 'f');
+        }
+
+        function updateCascadingCatalogos(filteredData, type) {
+            const prefix = type === 'f' ? 'f-' : 'r-';
+            
+            // Obtenemos valores actuales
+            const selArea = document.getElementById(prefix + 'area').value;
+            const selEtapa = document.getElementById(prefix + 'etapa').value;
+            const selEstado = document.getElementById(prefix + 'estado').value;
+
+            // Helpers para extraer únicos de la data filtrada
+            const getUniques = (data, idKey, nameKey) => {
+                const map = new Map();
+                data.forEach(p => { if(p[idKey]) map.set(String(p[idKey]), p[nameKey]); });
+                return Array.from(map.entries()).map(([id, nombre]) => ({ id, nombre })).sort((a,b)=>a.nombre.localeCompare(b.nombre));
+            };
+
+            // Para que la cascada no sea "destructiva", el orden de filtrado de los DROPDOWNS es:
+            // - Etapas: dependen solo de Area seleccionada (o todas si no hay area)
+            let proysForEtapa = dashboardData.proyectos || [];
+            if (selArea) proysForEtapa = proysForEtapa.filter(p => String(p.area_id) === selArea);
+            
+            // - Estados: dependen de Area + Etapa
+            let proysForEstado = proysForEtapa;
+            if (selEtapa) proysForEstado = proysForEstado.filter(p => String(p.etapa_proyecto_id) === selEtapa);
+
+            // - Profesionales: dependen de Area + Etapa + Estado
+            let proysForProf = proysForEstado;
+            if (selEstado) proysForProf = proysForProf.filter(p => String(p.estado_proyecto_id) === selEstado);
+
+            const cat = {
+                areas: getUniques(dashboardData.proyectos || [], 'area_id', 'area_nombre'),
+                etapas: getUniques(proysForEtapa, 'etapa_proyecto_id', 'etapa_nombre'),
+                estados: getUniques(proysForEstado, 'estado_proyecto_id', 'estado_nombre'),
+                profesionales: [...new Set(proysForProf.map(p => p.profesional_1).filter(Boolean))].sort()
+            };
+
+            renderCatalogosElements(cat, type);
+        }
+
+        function renderCatalogosElements(cat, type) {
+            const prefix = type === 'f' ? 'f-' : 'r-';
+            const profId = type === 'f' ? 'f-profesional' : 'r-prof';
+
+            const updateSelect = (id, options, label, valueKey = 'id', textKey = 'nombre') => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const prevVal = el.value;
+                el.innerHTML = `<option value="">${label}</option>`;
+                (options || []).forEach(opt => {
+                    const val = typeof opt === 'object' ? opt[valueKey] : opt;
+                    const txt = typeof opt === 'object' ? opt[textKey] : opt;
+                    const selected = String(val) === String(prevVal) ? 'selected' : '';
+                    el.innerHTML += `<option value="${val}" ${selected}>${txt}</option>`;
+                });
+            };
+
+            updateSelect(prefix + 'area', cat.areas, 'Todas las áreas');
+            updateSelect(prefix + 'etapa', cat.etapas, 'Todas las etapas');
+            updateSelect(prefix + 'estado', cat.estados, 'Todos los estados');
+            updateSelect(profId, cat.profesionales, 'Todos los profesionales');
         }
 
         function renderKPIs(k, ctrl) {
@@ -408,40 +498,6 @@
             }
         }
 
-        function renderCatalogos(cat, type = 'f') {
-            if (!cat) return;
-            
-            // Si es la primera carga (f-area está vacío), guardamos los catálogos globales para reset
-            if (!catalogos.__loaded) {
-                catalogos = JSON.parse(JSON.stringify(cat));
-                catalogos.__loaded = true;
-            }
-
-            const prefix = type === 'f' ? 'f-' : 'r-';
-            const areaId = prefix + 'area';
-            const etapaId = prefix + 'etapa';
-            const estadoId = prefix + 'estado';
-            const profId = type === 'f' ? 'f-profesional' : 'r-prof';
-
-            // Función helper para actualizar select preservando valor
-            const updateSelect = (id, options, label, valueKey = 'id', textKey = 'nombre') => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                const prevVal = el.value;
-                el.innerHTML = `<option value="">${label}</option>`;
-                (options || []).forEach(opt => {
-                    const val = typeof opt === 'object' ? opt[valueKey] : opt;
-                    const txt = typeof opt === 'object' ? opt[textKey] : opt;
-                    const selected = String(val) === String(prevVal) ? 'selected' : '';
-                    el.innerHTML += `<option value="${val}" ${selected}>${txt}</option>`;
-                });
-            };
-
-            updateSelect(areaId, cat.areas, 'Todas las áreas');
-            updateSelect(etapaId, cat.etapas, 'Todas las etapas');
-            updateSelect(estadoId, cat.estados, 'Todos los estados');
-            updateSelect(profId, cat.profesionales, 'Todos los profesionales');
-        }
 
         function renderLotes(lotes) {
             if (!lotes?.length) return;
@@ -458,9 +514,9 @@
             `).join('');
         }
 
-        function renderCharts(data) {
-            // Evolución
-            const evo = data.evolucion || [];
+        function renderCharts(filteredData, evolutionData) {
+            // 1. Evolución (Global - no se filtra por area/etapa en este grafico por ahora)
+            const evo = evolutionData || [];
             destroyChart('chartEvolucion');
             if (evo.length > 0) {
                 charts.evo = new Chart(document.getElementById('chartEvolucion').getContext('2d'), {
@@ -468,54 +524,87 @@
                     data: {
                         labels: evo.map(e => fmtDate(e.fecha)),
                         datasets: [
-                            { label: 'Puntaje Prom.', data: evo.map(e => e.puntaje_prom), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,.1)', fill: true, tension: 0.4, yAxisID: 'y' },
-                            { label: 'Críticas', data: evo.map(e => e.criticas), borderColor: '#ef4444', borderDash: [4,3], tension: 0.3, yAxisID: 'y1' }
+                            { label: 'Puntaje Prom.', data: evo.map(e => e.puntaje_prom), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,.1)', fill: true, tension: 0.4, yAxisID: 'y' }
                         ]
                     },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } },
-                        scales: { y: { min:0, max:100, title:{ display:true, text:'Puntaje' } }, y1: { position:'right', title:{ display:true, text:'Alertas' } } } }
+                        scales: { y: { min:0, max:100, title:{ display:true, text:'Puntaje' } } } }
                 });
             }
 
-            // Dist puntaje
-            const d = data.dist_puntaje || {};
+            // 2. Distribución de puntajes (Local)
+            const dist = { r_80: 0, r_60: 0, r_40: 0, r_0: 0 };
+            filteredData.forEach(p => {
+                if (p.puntaje_general >= 80) dist.r_80++;
+                else if (p.puntaje_general >= 60) dist.r_60++;
+                else if (p.puntaje_general >= 40) dist.r_40++;
+                else dist.r_0++;
+            });
+
             destroyChart('chartDist');
             charts.dist = new Chart(document.getElementById('chartDist').getContext('2d'), {
                 type: 'doughnut',
                 data: {
                     labels: ['≥ 80% 🟢', '60–80% 🟡', '40–60% 🟠', '< 40% 🔴'],
-                    datasets: [{ data: [d.rango_80_100||0, d.rango_60_80||0, d.rango_40_60||0, d.rango_0_40||0],
+                    datasets: [{ data: [dist.r_80, dist.r_60, dist.r_40, dist.r_0],
                         backgroundColor: ['#10b981','#f59e0b','#f97316','#ef4444'] }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right' } } }
             });
 
-            // Por área
-            const pa = data.por_area || [];
+            // 3. Por área (Local)
+            const areaMap = new Map();
+            filteredData.forEach(p => {
+                const a = p.area_nombre || 'Sin área';
+                if (!areaMap.has(a)) areaMap.set(a, { total: 0, sum: 0, crit: 0 });
+                const o = areaMap.get(a);
+                o.total++;
+                o.sum += p.puntaje_general;
+                if (p.alertas_criticas > 0) o.crit += p.alertas_criticas;
+            });
+            const pa = Array.from(areaMap.entries()).map(([area, o]) => ({ 
+                area, 
+                prom: (o.sum / o.total).toFixed(1),
+                crit: o.crit
+            })).sort((a,b) => b.crit - a.crit).slice(0, 10);
+
             destroyChart('chartArea');
             charts.area = new Chart(document.getElementById('chartArea').getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: pa.map(a => a.area || 'Sin área'),
+                    labels: pa.map(a => a.area),
                     datasets: [
-                        { label: 'Puntaje Prom.', data: pa.map(a => a.puntaje_prom), backgroundColor: 'rgba(99,102,241,.8)', borderRadius: 6, yAxisID: 'y' },
-                        { label: 'Críticas', data: pa.map(a => a.criticas), backgroundColor: 'rgba(239,68,68,.6)', borderRadius: 6, yAxisID: 'y1' },
+                        { label: 'Puntaje Prom.', data: pa.map(a => a.prom), backgroundColor: 'rgba(99,102,241,.8)', borderRadius: 6, yAxisID: 'y' },
+                        { label: 'Críticas', data: pa.map(a => a.crit), backgroundColor: 'rgba(239,68,68,.6)', borderRadius: 6, yAxisID: 'y1' },
                     ]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } },
                     scales: { y: { beginAtZero:true, max:100 }, y1: { position:'right', beginAtZero:true } } }
             });
 
-            // Por etapa
-            const pe = data.por_etapa || [];
+            // 4. Por etapa (Local)
+            const etapaMap = new Map();
+            filteredData.forEach(p => {
+                const e = p.etapa || 'Sin etapa';
+                if (!etapaMap.has(e)) etapaMap.set(e, { total: 0, sum: 0 });
+                const o = etapaMap.get(e);
+                o.total++;
+                o.sum += p.puntaje_general;
+            });
+            const pe = Array.from(etapaMap.entries()).map(([etapa, o]) => ({ 
+                etapa, 
+                total: o.total,
+                prom: (o.sum / o.total).toFixed(1)
+            })).sort((a,b) => b.total - a.total);
+
             destroyChart('chartEtapa');
             charts.etapa = new Chart(document.getElementById('chartEtapa').getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: pe.map(e => e.etapa || 'Sin etapa'),
+                    labels: pe.map(e => e.etapa),
                     datasets: [
                         { label: 'Proyectos', data: pe.map(e => e.total), backgroundColor: 'rgba(16,185,129,.8)', borderRadius: 6 },
-                        { label: 'Puntaje Prom.', data: pe.map(e => e.puntaje_prom), backgroundColor: 'rgba(245,158,11,.6)', borderRadius: 6 }
+                        { label: 'Puntaje Prom.', data: pe.map(e => e.prom), backgroundColor: 'rgba(245,158,11,.6)', borderRadius: 6 }
                     ]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
@@ -550,31 +639,63 @@
 
         /* ───────────────────────────── REPORTES ─────────────────────────── */
         async function loadReportes() {
-            const params = buildReporteFilters();
             try {
-                const data = await api.get('/auditoria/reportes?' + params);
-                setText('r-count', data.total + ' reporte' + (data.total !== 1 ? 's' : ''));
-                renderReportesList(data.reportes || []);
-                renderCatalogos(data.catalogos, 'r');
+                // Solo cargamos la lista una vez al entrar o resetear
+                const data = await api.get('/auditoria/reportes');
+                reportesData = data;
+                applyReporteFilters();
             } catch (e) {
                 console.error('Reportes error:', e);
                 document.getElementById('reportesList').innerHTML = '<p class="text-center py-8 text-slate-400">Error cargando reportes</p>';
             }
         }
 
-        function buildReporteFilters() {
-            const p = new URLSearchParams();
-            const q = document.getElementById('r-q')?.value;
+        function applyReporteFilters() {
+            const q = document.getElementById('r-q')?.value.toLowerCase();
             const area = document.getElementById('r-area')?.value;
             const etapa = document.getElementById('r-etapa')?.value;
             const estado = document.getElementById('r-estado')?.value;
             const prof = document.getElementById('r-prof')?.value;
-            if (q) p.set('q', q);
-            if (area) p.set('area_id', area);
-            if (etapa) p.set('etapa_id', etapa);
-            if (estado) p.set('estado_id', estado);
-            if (prof) p.set('profesional', prof);
-            return p.toString();
+
+            let filtered = reportesData.reportes || [];
+            if (q) filtered = filtered.filter(r => r.nombre?.toLowerCase().includes(q) || String(r.proyecto_id).includes(q));
+            if (area) filtered = filtered.filter(r => String(r.area_id) === area);
+            if (etapa) filtered = filtered.filter(r => String(r.etapa_id) === etapa);
+            if (estado) filtered = filtered.filter(r => String(r.estado_id) === estado);
+            if (prof) filtered = filtered.filter(r => r.profesional_1 === prof);
+
+            setText('r-count', filtered.length + ' reporte' + (filtered.length !== 1 ? 's' : ''));
+            renderReportesList(filtered);
+            
+            // Actualizar catálogos en cascada para reportes
+            // Reutilizamos la lógica del dashboard pero con la data de reportes
+            updateCascadingCatalogosForReportes(filtered);
+        }
+
+        function updateCascadingCatalogosForReportes(filtered) {
+            // El backend retorna 'catalogos' con todos, pero para la cascada calculamos dinamicamente
+            const getUniques = (data, idKey, nameKey) => {
+                const map = new Map();
+                data.forEach(p => { if(p[idKey]) map.set(String(p[idKey]), p[nameKey]); });
+                return Array.from(map.entries()).map(([id, nombre]) => ({ id, nombre })).sort((a,b)=>a.nombre.localeCompare(b.nombre));
+            };
+
+            const selArea = document.getElementById('r-area').value;
+            const selEtapa = document.getElementById('r-etapa').value;
+
+            let dataEtapa = reportesData.reportes || [];
+            if (selArea) dataEtapa = dataEtapa.filter(r => String(r.area_id) === selArea);
+            
+            let dataEstado = dataEtapa;
+            if (selEtapa) dataEstado = dataEstado.filter(r => String(r.etapa_id) === selEtapa);
+
+            const cat = {
+                areas: getUniques(reportesData.reportes || [], 'area_id', 'area_nombre'),
+                etapas: getUniques(dataEtapa, 'etapa_id', 'etapa_nombre'),
+                estados: getUniques(dataEstado, 'estado_id', 'estado_nombre'),
+                profesionales: [...new Set(dataEstado.map(r => r.profesional_1).filter(Boolean))].sort()
+            };
+            renderCatalogosElements(cat, 'r');
         }
 
         function renderReportesList(items) {
