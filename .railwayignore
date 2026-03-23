@@ -1,0 +1,32 @@
+# 🚀 Railway Ignore - Acelera el Despliegue
+# ----------------------------------------
+# Ponemos aquí todo lo que Railway NO necesita procesar:
+
+# 1. El Front (Se maneja en GitHub Pages según acordamos)
+frontend/
+movil/
+docs/
+
+# 2. Otros backends (Viejos o locales)
+backend/
+notebook/
+script/
+transversal/
+database/
+DOCUMENTACION/
+
+# 3. Datos locales y temporales
+*.env
+*.pem
+*.key
+*.log
+__pycache__/
+*.xlsx
+*.html
+*.txt
+!backend_railway/requirements.txt # Excepción: Necesario para el builder
+
+# 4. Git y configuración de editores
+.git/
+.vscode/
+.antigravityignore
