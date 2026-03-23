@@ -1,1 +1,30 @@
+# Git ignore para el repositorio ALGARROBO_BASE2
+
+# 1. Secretos del Backend (MUY IMPORTANTE)
 backend/.env
+backend_railway/.env
+*.env
+*.pem
+*.key
+
+# 2. Archivos basura de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env/
+
+# 3. Logs y temporales
+*.log
+docs/
+temp/
+tmp/
+.ipynb_checkpoints/
+
+# 4. Otros
+.vscode/
+.idea/
+.DS_Store
