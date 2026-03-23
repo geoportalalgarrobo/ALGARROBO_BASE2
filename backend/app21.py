@@ -1,27 +1,5 @@
-# app21.py - Versión optimizada para Railway Postgres
 import os
 import hashlib
-
-# ── HACK: Parche de compatibilidad para hashlib ────────────────────────────────
-# Algunas versiones de Python/OpenSSL en entornos específicos fallan con el keyword 
-# 'usedforsecurity' que usan librerías como ReportLab.
-_orig_new = hashlib.new
-def _patched_new(name, *args, **kwargs):
-    kwargs.pop('usedforsecurity', None)
-    kwargs.pop('useforsecurity', None)
-    return _orig_new(name, *args, **kwargs)
-hashlib.new = _patched_new
-
-try:
-    _orig_md5 = hashlib.md5
-    def _patched_md5(*args, **kwargs):
-        kwargs.pop('usedforsecurity', None)
-        kwargs.pop('useforsecurity', None)
-        return _orig_md5(*args, **kwargs)
-    hashlib.md5 = _patched_md5
-except: pass
-# ───────────────────────────────────────────────────────────────────────────────
-
 import traceback
 import time
 import psycopg2
@@ -38,6 +16,7 @@ from functools import wraps
 from contextlib import contextmanager
 import secrets
 import re
+
 
 from dotenv import load_dotenv
 
@@ -4844,8 +4823,8 @@ def auditoria_lanzar(current_user_id):
     finally:
         if conn: release_db_connection(conn)
 
-    base_url = request.json.get("base_url", "https://sud-austral.github.io/ALGARROBO_BASE2") \
-        if request.is_json else "https://sud-austral.github.io/ALGARROBO_BASE2"
+    base_url = request.json.get("base_url", "https://geoportalalgarrobo.github.io/ALGARROBO_BASE2") \
+        if request.is_json else "https://geoportalalgarrobo.github.io/ALGARROBO_BASE2"
 
     lanzado = engine.run_auditoria_async(
         db_factory=get_db_connection,
