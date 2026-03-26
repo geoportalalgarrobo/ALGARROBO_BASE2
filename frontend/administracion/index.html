@@ -4,605 +4,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Municipal de Algarrobo</title>
+    <title>Portal Municipal · Algarrobo</title>
+    <meta name="description" content="Plataforma de Gestión Interna - Ilustre Municipalidad de Algarrobo">
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap"
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Tailwind (requerido por layout.js / renderHeader) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <link rel="stylesheet" href="../division/secplan/admin_general/styles/admin-styles.css">
-
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #eff6ff;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --bg-body: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #0f172a;
-            --text-light: #64748b;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-            --radius: 16px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-        }
-
-        .hero {
-            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
-            color: white;
-            padding: 4rem 1.5rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.1;
-            z-index: 0;
-        }
-
-        .hero>* {
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            letter-spacing: -0.025em;
-        }
-
-        .hero p {
-            font-size: 1.125rem;
-            opacity: 0.9;
-            max-width: 700px;
-            margin: 0 auto 2.5rem auto;
-            font-weight: 300;
-        }
-
-        .search-container {
-            max-width: 650px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 1rem 1.5rem 1rem 3.5rem;
-            border-radius: 9999px;
-            border: none;
-            font-size: 1.125rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-            outline: none;
-            transition: var(--transition);
-            color: #1e293b;
-        }
-
-        .search-input:focus {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
-            transform: scale(1.02);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-            font-size: 1.25rem;
-        }
-
-        .quick-access {
-            max-width: 1200px;
-            margin: -2.5rem auto 3rem auto;
-            padding: 0 1.5rem;
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 10;
-        }
-
-        .btn-cta {
-            background-color: var(--accent);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(245, 124, 0, 0.4);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: var(--transition);
-            text-decoration: none;
-
-        }
-
-        .btn-cta:hover {
-            background-color: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(245, 124, 0, 0.5);
-            color: white;
-        }
-
-        .btn-cta.secondary {
-            background-color: white;
-            color: var(--primary);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-cta.secondary:hover {
-            background-color: #f8f9fa;
-            color: var(--primary-dark);
-        }
-
-        main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem 1.5rem 4rem 1.5rem;
-            flex: 1;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 2rem;
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
-        }
-
-        .card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            transition: var(--transition);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border-color: var(--primary-light);
-        }
-
-        .card-header {
-            background: linear-gradient(to right, #f5f7fa, #c3cfe2);
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #eee;
-        }
-
-        .card[data-type="SECPLAC"] .card-header {
-            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-            color: white;
-        }
-
-        .card[data-type="DOM"] .card-header {
-            background: linear-gradient(to right, #43e97b 0%, #38f9d7 100%);
-            color: white;
-        }
-
-        .card[data-type="Seguridad"] .card-header {
-            background: linear-gradient(to right, #ff0844 0%, #ffb199 100%);
-            color: white;
-        }
-
-        .card[data-type="Rentas"] .card-header {
-            background: linear-gradient(to right, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .card[data-type="DIMAO"] .card-header {
-            background: linear-gradient(to right, #89f7fe 0%, #66a6ff 100%);
-            color: white;
-        }
-
-        .card[data-type="DIDECO"] .card-header {
-            background: linear-gradient(to right, #fdbb2d 0%, #22c1c3 100%);
-            color: white;
-        }
-
-        .card[data-type="Mantenedores"] .card-header {
-            background: linear-gradient(to right, #374151 0%, #111827 100%);
-            color: white;
-        }
-
-        .card[data-type="Transparencia"] .card-header {
-            background: linear-gradient(to right, #1d4ed8 0%, #1e3a8a 100%);
-            color: white;
-        }
-
-        .card-header h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        .card-body {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .card-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            background: white;
-            color: var(--text-main);
-            font-size: 0.95rem;
-            transition: var(--transition);
-            text-align: left;
-            width: 100%;
-            text-decoration: none;
-        }
-
-        .card-link i {
-            color: var(--primary);
-            width: 20px;
-            text-align: center;
-        }
-
-        .card-link:hover {
-            background-color: var(--primary-light);
-            border-color: var(--primary);
-            color: var(--primary-dark);
-        }
-
-        .card-link:hover i {
-            color: var(--accent);
-        }
-
-        footer {
-            background-color: #263238;
-            color: #b0bec5;
-            text-align: center;
-            padding: 2rem;
-            margin-top: auto;
-        }
-
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .hero h1 {
-                font-size: 1.6rem;
-            }
-
-            .quick-access {
-                margin-top: 0;
-            }
-
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <!-- Estilos propios del portal -->
+    <link rel="stylesheet" href="css/portal.css">
 </head>
 
 <body>
 
+    <!-- ═══════════════════════════════════════════════
+         HEADER — inyectado por layout.js (user desde localStorage['userData'])
+    ═══════════════════════════════════════════════ -->
     <div id="headerRender"></div>
-    <script src="../script/layout.js"></script>
-    <script>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof renderHeader === 'function') renderHeader();
-        });
-    </script>
-
+    <!-- ═══════════════════════════════════════════════
+         HERO
+    ═══════════════════════════════════════════════ -->
     <section class="hero">
-        <h1>Portal de Información Municipal</h1>
-        <p>Acceso centralizado a datos, geoportal e informes de las distintas direcciones.</p>
+        <div class="hero-bg"></div>
+        <div class="hero-grid"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
 
-        <div class="search-container">
-            <i class="fa-solid fa-search search-icon"></i>
-            <input type="text" class="search-input" id="searchInput"
-                placeholder="Buscar dirección, servicio o palabra clave...">
+        <div class="hero-content">
+
+            <!-- Badge institucional -->
+            <div class="institution-badge">
+                <i class="fas fa-award"></i>
+                Ilustre Municipalidad de Algarrobo · V Región
+            </div>
+
+            <!-- Título -->
+            <h1 class="hero-title">
+                Plataforma de<br><span>Gestión Municipal</span>
+            </h1>
+
+            <!-- Subtítulo dinámico (portal.js lo personaliza con el nombre del usuario) -->
+            <p class="hero-subtitle" id="hero-subtitle">
+                Acceso centralizado a los sistemas de SECPLAC, Geoportal y Licitaciones del municipio.
+            </p>
+
+            <!-- ═══ 3 MÓDULOS PRINCIPALES ═══ -->
+            <div class="modules-grid">
+
+                <!-- SECPLAC -->
+                <a href="../division/secplan/admin_general/proyecto.html"
+                    class="module-card module-secplac"
+                    id="card-secplac">
+                    <div class="module-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <span class="module-label">SECPLAC</span>
+                    <span class="module-desc">Proyectos e inversión municipal</span>
+                    <div class="module-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- GEOPORTAL -->
+                <a href="../geoportal/index.html"
+                    class="module-card module-geoportal"
+                    id="card-geoportal">
+                    <div class="module-icon">
+                        <i class="fas fa-map-location-dot"></i>
+                    </div>
+                    <span class="module-label">Geoportal</span>
+                    <span class="module-desc">Cartografía y análisis territorial</span>
+                    <div class="module-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- LICITACIONES -->
+                <a href="../division/licitaciones/admin_proyectos/dashboard.html"
+                    class="module-card module-licitaciones"
+                    id="card-licitaciones">
+                    <div class="module-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <span class="module-label">Licitaciones</span>
+                    <span class="module-desc">Procesos y workflow licitatorio</span>
+                    <div class="module-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- Wave divisor -->
+        <div class="hero-wave">
+            <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 40 C240 80 480 0 720 40 C960 80 1200 0 1440 40 L1440 80 L0 80 Z" fill="#f0f4f9" />
+            </svg>
         </div>
     </section>
 
-    <div class="quick-access">
-        <a href="../geoportal/index.html" class="btn-cta">
-            <i class="fa-solid fa-map-location-dot"></i> Geoportal General
-        </a>
-        <a href="usuario.html" class="btn-cta secondary">
-            <i class="fa-solid fa-users"></i> Usuarios
-        </a>
-        <a href="../division/secplan/admin_general/dashboard.html" class="btn-cta secondary">
-            <i class="fa-solid fa-chart-line"></i> SECPLAC
-        </a>
-        <a href="../division/seguridad/admin_general/dashboard.html" class="btn-cta secondary">
-            <i class="fa-solid fa-shield-halved"></i> Seguridad
-        </a>
-        <a href="../division/secplan/admin_general/calendario.html" class="btn-cta secondary">
-            <i class="fa-solid fa-calendar-days"></i> Calendario
-        </a>
-        <a href="../division/licitaciones/admin_proyectos/dashboard.html" class="btn-cta secondary">
-            <i class="fa-solid fa-file-invoice-dollar"></i> Licitaciones
-        </a>
-        <a href="../division/transparencia/admin_general/index/inicio.html" class="btn-cta secondary">
-            <i class="fa-solid fa-scale-balanced"></i> Transparencia
-        </a>
-        <a href="../division/control/dashboard.html" class="btn-cta"
-            style="background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 100%);">
-            <i class="fa-solid fa-shield-halved"></i> Control y Auditoría
-        </a>
-    </div>
-
-    <main>
-        <h2 class="section-title">Seleccione una dirección para acceder a su información específica</h2>
-
-        <div class="cards-grid" id="cardsGrid">
-
-            <article class="card" data-type="Mantenedores">
-                <div class="card-header">
-                    <h3>Tablas Maestras</h3>
-                    <i class="fa-solid fa-cogs"></i>
-                </div>
-                <div class="card-body">
-                    <a href="mantenedor_areas.html" class="card-link"><i class="fa-solid fa-map"></i> Áreas</a>
-                    <a href="mantenedor_financiamientos.html" class="card-link"><i class="fa-solid fa-coins"></i>
-                        Financiamientos</a>
-                    <a href="mantenedor_etapas.html" class="card-link"><i class="fa-solid fa-layer-group"></i> Etapas
-                        Proyecto</a>
-                    <a href="mantenedor_estados_proyecto.html" class="card-link"><i
-                            class="fa-solid fa-traffic-light"></i> Estados Proyecto</a>
-                    <a href="mantenedor_estados_postulacion.html" class="card-link"><i
-                            class="fa-solid fa-clipboard-check"></i> Estados Postulación</a>
-                    <a href="mantenedor_sectores.html" class="card-link"><i class="fa-solid fa-draw-polygon"></i>
-                        Sectores</a>
-                    <a href="mantenedor_lineamientos.html" class="card-link"><i class="fa-solid fa-compass"></i>
-                        Lineamientos</a>
-                    <a href="mantenedor_hitoscalendario.html" class="card-link"><i
-                            class="fa-solid fa-calendar-check"></i>
-                        Categorías Calendario</a>
-                    <!-- Herramientas de Infraestructura (Railway) -->
-                    <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
-                    <a href="http://186.67.61.251:8000/api/volume/gui" class="card-link" style="background-color: #fffaf0; border-color: #fbd38d;">
-                        <i class="fa-solid fa-server" style="color: #d97706;"></i> 
-                        <b style="color: #92400e;">Gestión de Volumen (Migración)</b>
-                    </a>
-                </div>
-            </article>
-
-            <article class="card" data-type="SECPLAC">
-                <div class="card-header">
-                    <h3>SECPLAC</h3>
-                    <i class="fa-solid fa-city"></i>
-                </div>
-                <div class="card-body">
-                    <!--
-                    <a href="../division/secplan/admin_general/dashboard.html" class="card-link"><i
-                            class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                    -->
-                    <a href="../division/secplan/admin_general/proyecto.html" class="card-link"><i
-                            class="fa-solid fa-database"></i> Proyecto</a>
-                    <!--
-                    <a href="../division/secplan/admin_general/mapa.html" class="card-link"><i
-                            class="fa-solid fa-map"></i> Mapas</a>
-                    <a href="../division/secplan/admin_general/informe.html" class="card-link"><i
-                            class="fa-solid fa-file-invoice"></i> Informes</a>
-                    <a href="../division/secplan/admin_general/calendario.html" class="card-link"><i
-                            class="fa-solid fa-calendar-days"></i> Calendario</a>
-
-                    <div style="height: 1px; background: #f1f5f9; margin: 8px 0;"></div>
-                    <a href="../division/secplan/admin_general/chat.html" class="card-link"><i
-                            class="fa-solid fa-robot"></i> Asistente Virtual</a>
-                    -->
-                </div>
-            </article>
-
-            <article class="card" data-type="Licitaciones">
-                <div class="card-header"
-                    style="background: linear-gradient(to right, #6366f1 0%, #a855f7 100%); color: white;">
-                    <h3>Licitaciones</h3>
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                </div>
-                <div class="card-body">
-                    <a href="../division/licitaciones/admin_proyectos/dashboard.html" class="card-link">
-                        <i class="fa-solid fa-chart-pie"></i> Dashboard Gestión
-                    </a>
-                    <a href="../division/licitaciones/admin_general/dashboard.html" class="card-link">
-                        <i class="fa-solid fa-list-check"></i> Consolidado General
-                    </a>
-                    <a href="../division/licitaciones/admin_proyectos/calendario.html" class="card-link">
-                        <i class="fa-solid fa-calendar-days"></i> Calendario / Línea de Tiempo
-                    </a>
-                    <div style="height: 1px; background: #f1f5f9; margin: 8px 0;"></div>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase px-3">Operativa Core</p>
-                    <a href="../division/licitaciones/admin_proyectos/seguimiento.html" class="card-link">
-                        <i class="fa-solid fa-code-branch"></i> Workflow de Fichas
-                    </a>
-                    <a href="../division/licitaciones/admin_proyectos/documentos.html" class="card-link">
-                        <i class="fa-regular fa-folder-open"></i> Repositorio Documental
-                    </a>
-                    <a href="../division/licitaciones/admin_proyectos/pasos.html" class="card-link">
-                        <i class="fa-solid fa-gears"></i> Mantenedor de Pasos Maestro
-                    </a>
-                </div>
-            </article>
-
-            <article class="card" data-type="Transparencia">
-                <div class="card-header">
-                    <h3>Transparencia</h3>
-                    <i class="fa-solid fa-scale-balanced"></i>
-                </div>
-                <div class="card-body">
-                    <a href="../division/transparencia/admin_general/index/inicio.html" class="card-link">
-                        <i class="fa-solid fa-house"></i> Portal Principal
-                    </a>
-                    <a href="../division/transparencia/admin_general/index/inicio.html" class="card-link">
-                        <i class="fa-solid fa-chart-pie"></i> Pagos por Organismo
-                    </a>
-                    <a href="../division/transparencia/admin_general/index/remuneracion_bruta.html" class="card-link">
-                        <i class="fa-solid fa-file-invoice"></i> Remuneración Bruta
-                    </a>
-                    <a href="../division/transparencia/admin_general/index/rutUnico.html" class="card-link">
-                        <i class="fa-solid fa-users"></i> Fichas de Personal
-                    </a>
-                </div>
-            </article>
-
-            <article class="card" data-type="DOM">
-                <div class="card-header">
-                    <h3>DOM</h3>
-                    <i class="fa-solid fa-tree-city"></i>
-                </div>
-                <div class="card-body">
-                    <a href="#" class="card-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-database"></i> Base Datos</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-map"></i> Mapas</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-file-invoice"></i> Informes</a>
-                    <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
-                    <a href="#" class="card-link"><i class="fa-solid fa-robot"></i> Asistente Virtual</a>
-                </div>
-            </article>
-
-            <article class="card" data-type="Seguridad">
-                <div class="card-header">
-                    <h3>Seguridad</h3>
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <div class="card-body">
-                    <a href="../division/seguridad/admin_general/dashboard.html" class="card-link"><i
-                            class="fa-solid fa-chart-pie"></i> Dashboard RID</a>
-                </div>
-            </article>
-
-            <article class="card" data-type="Rentas">
-                <div class="card-header">
-                    <h3>Rentas</h3>
-                    <i class="fa-solid fa-coins"></i>
-                </div>
-                <div class="card-body">
-                    <a href="#" class="card-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-database"></i> Base Datos</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-map"></i> Mapas</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-file-invoice"></i> Informes</a>
-                    <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
-                    <a href="#" class="card-link"><i class="fa-solid fa-robot"></i> Asistente Virtual</a>
-                </div>
-            </article>
-
-            <article class="card" data-type="DIMAO">
-                <div class="card-header">
-                    <h3>DIMAO</h3>
-                    <i class="fa-solid fa-hammer"></i>
-                </div>
-                <div class="card-body">
-                    <a href="#" class="card-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-database"></i> Base Datos</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-map"></i> Mapas</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-file-invoice"></i> Informes</a>
-                    <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
-                    <a href="#" class="card-link"><i class="fa-solid fa-robot"></i> Asistente Virtual</a>
-                </div>
-            </article>
-
-            <article class="card" data-type="DIDECO">
-                <div class="card-header">
-                    <h3>DIDECO</h3>
-                    <i class="fa-solid fa-users"></i>
-                </div>
-                <div class="card-body">
-                    <a href="#" class="card-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-database"></i> Base Datos</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-map"></i> Mapas</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-file-invoice"></i> Informes</a>
-                    <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
-                    <a href="#" class="card-link"><i class="fa-solid fa-robot"></i> Asistente Virtual</a>
-                </div>
-            </article>
-
-            <!-- Módulo de Control Transversal -->
-            <article class="card" data-type="Control">
-                <div class="card-header"
-                    style="background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 100%); color: white;">
-                    <h3>Control y Auditoría</h3>
-                    <i class="fa-solid fa-shield-check"></i>
-                </div>
-                <div class="card-body">
-                    <a href="../division/control/dashboard.html" class="card-link">
-                        <i class="fa-solid fa-gauge-high"></i> Dashboard Trazabilidad
-                    </a>
-                    <a href="../division/control/usuarios.html" class="card-link">
-                        <i class="fa-solid fa-user-shield"></i> Auditoría por Usuario
-                    </a>
-                    <a href="../division/control/proyectos.html" class="card-link">
-                        <i class="fa-solid fa-file-shield"></i> Auditoría por Proyecto
-                    </a>
-                    <div style="height: 1px; background: #f1f5f9; margin: 8px 0;"></div>
-                    <a href="../division/control/auditoria.html" class="card-link">
-                        <i class="fa-solid fa-clipboard-check"></i> Auditoría Integral (PDF/Dashboard)
-                    </a>
-                </div>
-            </article>
-
+    <!-- ═══════════════════════════════════════════════
+         STATS SECTION
+    ═══════════════════════════════════════════════ -->
+    <section class="stats-section">
+        <div class="stats-inner">
+            <div class="stat-item">
+                <div class="stat-value">32</div>
+                <div class="stat-label">Pasos de Workflow</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Trazabilidad Digital</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">3</div>
+                <div class="stat-label">Módulos Activos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">V Región</div>
+                <div class="stat-label">Algarrobo · Chile</div>
+            </div>
         </div>
-    </main>
+    </section>
 
-    <footer>
-        <p>&copy; 2023 Ilustre Municipalidad de Algarrobo. Todos los derechos reservados.</p>
+    <!-- ═══════════════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════════════ -->
+    <footer class="portal-footer">
+        <p>&copy; 2025 <strong>Ilustre Municipalidad de Algarrobo</strong> · Sistema de Gestión Interna · Todos los
+            derechos reservados</p>
     </footer>
 
-    <script>
-        const searchInput = document.getElementById('searchInput');
-        const cards = document.querySelectorAll('.card');
+    <!-- ═══════════════════════════════════════════════
+         SCRIPTS
+         layout.js: inyecta el header con el user info
+         portal.js: auth guard + saludo + animaciones
+    ═══════════════════════════════════════════════ -->
+    <script src="../script/router.js"></script>
+    <script src="../script/layout.js"></script>
+    <script src="js/portal.js"></script>
 
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-
-            cards.forEach(card => {
-                const headerText = card.querySelector('h3').textContent.toLowerCase();
-                const bodyText = card.textContent.toLowerCase();
-
-                if (headerText.includes(term) || bodyText.includes(term)) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    </script>
 </body>
 
 </html>
