@@ -266,7 +266,11 @@
             const colores = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
             el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(lista.map((u, i) => `
                 <div class="user-list-item" id="uitem-${u.user_id}" onclick="cargarDetalleUsuario(${u.user_id})">
-                    <div class="user-avatar" style="background:${colores[i % 5]}15) : lista.map((u, i) => `
+                    <div class="user-avatar" style="background:${colores[i % 5]}15;color:${colores[i % 5]}">${(u.nombre_usuario || u.email).substring(0, 2).toUpperCase()}</div>
+                    <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${u.nombre_usuario || '—'}</p><p class="text-[10px] text-gray-400">${u.email}</p></div>
+                    <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-gray-100">${u.total_acciones}</span>
+                </div>
+            `).join('')) : lista.map((u, i) => `
                 <div class="user-list-item" id="uitem-${u.user_id}" onclick="cargarDetalleUsuario(${u.user_id})">
                     <div class="user-avatar" style="background:${colores[i % 5]}15;color:${colores[i % 5]}">${(u.nombre_usuario || u.email).substring(0, 2).toUpperCase()}</div>
                     <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${u.nombre_usuario || '—'}</p><p class="text-[10px] text-gray-400">${u.email}</p></div>
@@ -319,7 +323,23 @@
                         <div class="section-title">Timeline de Actividad</div>
                         ${actividad.length === 0
                         ? '<p class="text-sm text-gray-400 text-center py-6">Sin actividad registrada para este usuario.</p>'
-                        : `<div style="max-height:400px) : `
+                        : `<div style="max-height:400px;overflow-y:auto">
+                                ${actividad.map(r => `
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot"><i class="fas ${r.accion?.includes('ver') ? 'fa-eye' : 'fa-edit'}"></i></div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="badge ${r.accion?.includes('ver') ? 'badge-ver' : 'badge-editar'}">${r.accion}</span>
+                                                <span class="text-[10px] text-gray-400">${new Date(r.fecha).toLocaleString('es-CL')}</span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-1">${r.detalle || r.entidad_nombre || 'Sin detalles'}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>`
+                    }
+                    </div>
+                `) : `
                     <div class="user-card">
                         <div class="flex items-center justify-between mb-1">
                             <h2 class="text-xl font-bold">${usuario.nombre || '\u2014'}</h2>

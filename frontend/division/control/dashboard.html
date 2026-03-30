@@ -771,7 +771,16 @@
 
             uEl.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(users.slice(0, 10).map((u, i) => `
                 <div class="rank-item">
-                    <div class="rank-num" style="background:#e0e7ff) : users.slice(0, 10).map((u, i) => `
+                    <div class="rank-num" style="background:#e0e7ff;color:#4f46e5">${i + 1}</div>
+                    <div class="rank-bar-wrap">
+                        <div class="flex justify-between text-[0.7rem] mb-1">
+                            <a href="usuarios.html?uid=${u.user_id}" class="font-bold hover:underline">${u.nombre || u.email}</a>
+                            <span class="text-gray-400">${u.total_acciones}</span>
+                        </div>
+                        <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${(u.total_acciones * 100 / maxU).toFixed(0)}%;background:#6366f1"></div></div>
+                    </div>
+                </div>
+            `).join('')) : users.slice(0, 10).map((u, i) => `
                 <div class="rank-item">
                     <div class="rank-num" style="background:#e0e7ff;color:#4f46e5">${i + 1}</div>
                     <div class="rank-bar-wrap">
@@ -786,7 +795,16 @@
 
             pEl.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(projs.slice(0, 10).map((p, i) => `
                 <div class="rank-item">
-                    <div class="rank-num" style="background:#fef3c7) : projs.slice(0, 10).map((p, i) => `
+                    <div class="rank-num" style="background:#fef3c7;color:#d97706">${i + 1}</div>
+                    <div class="rank-bar-wrap">
+                        <div class="flex justify-between text-[0.7rem] mb-1">
+                            <a href="proyectos.html?pid=${p.proyecto_id}" class="font-bold hover:underline truncate w-40">${p.nombre_proyecto || p.proyecto_id}</a>
+                            <span class="text-gray-400">${p.total_accesos}</span>
+                        </div>
+                        <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${(p.total_accesos * 100 / maxP).toFixed(0)}%;background:#f59e0b"></div></div>
+                    </div>
+                </div>
+            `).join('')) : projs.slice(0, 10).map((p, i) => `
                 <div class="rank-item">
                     <div class="rank-num" style="background:#fef3c7;color:#d97706">${i + 1}</div>
                     <div class="rank-bar-wrap">

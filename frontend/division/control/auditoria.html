@@ -641,7 +641,18 @@
                     <td class="font-semibold text-slate-800 max-w-[200px] truncate" title="${r.nombre}">${r.nombre}</td>
                     <td class="text-xs text-slate-500">${r.area_nombre || '—'}</td>
                     <td class="text-xs">${r.etapa || '—'}</td>
-                    <td><div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div style="width:${r.avance_declarado||0}%) : rows.map((r, i) => `
+                    <td><div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div style="width:${r.avance_declarado||0}%;background:#6366f1" class="h-full rounded-full"></div></div><span class="text-xs text-slate-500">${r.avance_declarado||0}%</span></td>
+                    <td>${scoreBadge(r.puntaje_general)}</td>
+                    <td class="text-center"><span class="font-bold text-red-600">${r.alertas_criticas}</span></td>
+                    <td class="text-center"><span class="font-bold text-orange-500">${r.alertas_altas}</span></td>
+                    <td>
+                        <button onclick="openPdf(${r.id}, '${escHtml(r.nombre)}')"
+                            class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition">
+                            <i class="fas fa-file-pdf mr-1"></i>Ver PDF
+                        </button>
+                    </td>
+                </tr>
+            `).join('')) : rows.map((r, i) => `
                 <tr>
                     <td>${i+1}</td>
                     <td class="font-semibold text-slate-800 max-w-[200px] truncate" title="${r.nombre}">${r.nombre}</td>
