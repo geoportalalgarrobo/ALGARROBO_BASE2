@@ -342,12 +342,10 @@
             document.getElementById('v25_stop_crimes').textContent = numCrimes;
             document.getElementById('v25_stop_completion').textContent = completionStop.toFixed(0) + '%';
             document.getElementById('v25_stop_completion').style.color = completionStop > 85 ? '#10b981' : completionStop > 60 ? '#f59e0b' : '#ef4444';
-            document.getElementById('v25_stop_gaps').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(stopGaps === 0
-                ? '<span style="color:#10b981) : stopGaps === 0
+            document.getElementById('v25_stop_gaps').innerHTML = stopGaps === 0
                 ? '<span style="color:#10b981; font-weight:700;">0 gaps — Serie continua ✓</span>'
                 : `<span style="color:#f59e0b; font-weight:700;">${stopGaps} semanas faltantes</span><br><span style="font-size:0.75rem;color:#94a3b8;">${gaps.slice(0, 3).join(' · ')}${gaps.length > 3 ? ' …' : ''}</span>`;
-            document.getElementById('v25_stop_outliers').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(stopOutliers === 0
-                ? '<span style="color:#10b981) : stopOutliers === 0
+            document.getElementById('v25_stop_outliers').innerHTML = stopOutliers === 0
                 ? '<span style="color:#10b981; font-weight:700;">0 — Sin anomal�as ✓</span>'
                 : `<span style="color:#f59e0b; font-weight:700;">${stopOutliers} valores extremos</span>`;
 
@@ -361,8 +359,8 @@
             document.getElementById('v25_stop_crimes').textContent = 'N/D';
             document.getElementById('v25_stop_completion').textContent = '0%';
             document.getElementById('v25_stop_completion').style.color = '#ef4444';
-            document.getElementById('v25_stop_gaps').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<span style="color:#ef4444) : '<span style="color:#ef4444;">Fuente no disponible</span>';
-            document.getElementById('v25_stop_outliers').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<span style="color:#ef4444) : '<span style="color:#ef4444;">Fuente no disponible</span>';
+            document.getElementById('v25_stop_gaps').innerHTML = '<span style="color:#ef4444;">Fuente no disponible</span>';
+            document.getElementById('v25_stop_outliers').innerHTML = '<span style="color:#ef4444;">Fuente no disponible</span>';
             document.getElementById('v25_stop_badge').textContent = '✗ SIN DATOS';
             document.getElementById('v25_stop_badge').style.background = '#fee2e2';
             document.getElementById('v25_stop_badge').style.color = '#dc2626';
@@ -443,12 +441,10 @@
             document.getElementById('v25_cead_crimes').textContent = numCrimesC;
             document.getElementById('v25_cead_completion').textContent = completionCead.toFixed(0) + '%';
             document.getElementById('v25_cead_completion').style.color = completionCead > 85 ? '#10b981' : completionCead > 60 ? '#f59e0b' : '#ef4444';
-            document.getElementById('v25_cead_gaps').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(ceadGaps === 0
-                ? '<span style="color:#10b981) : ceadGaps === 0
+            document.getElementById('v25_cead_gaps').innerHTML = ceadGaps === 0
                 ? '<span style="color:#10b981; font-weight:700;">0 gaps — Serie continua ✓</span>'
                 : `<span style="color:#f59e0b; font-weight:700;">${ceadGaps} meses faltantes</span><br><span style="font-size:0.75rem;color:#94a3b8;">${gaps.slice(0, 3).join(' · ')}${gaps.length > 3 ? ' …' : ''}</span>`;
-            document.getElementById('v25_cead_outliers').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(ceadOutliers === 0
-                ? '<span style="color:#10b981) : ceadOutliers === 0
+            document.getElementById('v25_cead_outliers').innerHTML = ceadOutliers === 0
                 ? '<span style="color:#10b981; font-weight:700;">0 — Sin anomal�as ✓</span>'
                 : `<span style="color:#f59e0b; font-weight:700;">${ceadOutliers} valores extremos</span>`;
 
@@ -462,8 +458,8 @@
             document.getElementById('v25_cead_crimes').textContent = 'N/D';
             document.getElementById('v25_cead_completion').textContent = '0%';
             document.getElementById('v25_cead_completion').style.color = '#ef4444';
-            document.getElementById('v25_cead_gaps').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<span style="color:#ef4444) : '<span style="color:#ef4444;">Fuente no disponible</span>';
-            document.getElementById('v25_cead_outliers').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<span style="color:#ef4444) : '<span style="color:#ef4444;">Fuente no disponible</span>';
+            document.getElementById('v25_cead_gaps').innerHTML = '<span style="color:#ef4444;">Fuente no disponible</span>';
+            document.getElementById('v25_cead_outliers').innerHTML = '<span style="color:#ef4444;">Fuente no disponible</span>';
             document.getElementById('v25_cead_badge').textContent = '✗ SIN DATOS';
             document.getElementById('v25_cead_badge').style.background = '#fee2e2';
             document.getElementById('v25_cead_badge').style.color = '#dc2626';
@@ -518,8 +514,7 @@
             ['Latencia (d�as)', fmtN(stopLatDays), fmtN(ceadLatDays), verdict(typeof stopLatDays === 'number' ? 100 - stopLatDays : 0, 85, 50)],
         ];
 
-        document.getElementById('v25_summary_table').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(rows.map(([label, vStop, vCead, verd]) => `
-            <tr style="border-bottom: 1px solid #f1f5f9) : rows.map(([label, vStop, vCead, verd]) => `
+        document.getElementById('v25_summary_table').innerHTML = rows.map(([label, vStop, vCead, verd]) => `
             <tr style="border-bottom: 1px solid #f1f5f9;">
                 <td style="padding: 8px 12px; font-weight: 600; color: #334155;">${label}</td>
                 <td style="padding: 8px 12px; text-align: center; color: #334155;">${vStop}</td>
@@ -545,7 +540,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista25').then(txt => {
                 const el = document.getElementById('v25_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
     })();

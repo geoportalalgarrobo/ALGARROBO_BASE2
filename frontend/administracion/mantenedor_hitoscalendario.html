@@ -251,7 +251,7 @@
             var emptyState = document.getElementById('emptyState');
 
             if (data.length === 0) {
-                tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+                tbody.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 return;
             }
@@ -271,7 +271,7 @@
                 html += '</td>';
                 html += '</tr>';
             });
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+            tbody.innerHTML = html;
         }
 
         function filterTable() {

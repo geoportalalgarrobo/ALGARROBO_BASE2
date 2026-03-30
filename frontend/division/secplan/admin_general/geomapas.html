@@ -768,7 +768,7 @@
 
         async function loadProjects() {
             const select = document.getElementById('projectSelect');
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="" disabled selected>Cargando...</option>') : '<option value="" disabled selected>Cargando...</option>';
+            select.innerHTML = '<option value="" disabled selected>Cargando...</option>';
             select.disabled = true;
 
             try {
@@ -782,7 +782,7 @@
             } catch (error) {
                 console.error('Error:', error);
                 showToast('Error al conectar con el servidor', 'error');
-                select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="" disabled selected>Error de conexión</option>') : '<option value="" disabled selected>Error de conexión</option>';
+                select.innerHTML = '<option value="" disabled selected>Error de conexión</option>';
             }
         }
 
@@ -795,7 +795,7 @@
                 html += `<option value="${opt}" ${opt === previousValue ? 'selected' : ''}>${opt}</option>`;
             });
 
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+            select.innerHTML = html;
 
             if (previousValue && !optionsList.includes(previousValue)) {
                 select.value = "";
@@ -856,7 +856,7 @@
 
             const currentVal = select.value;
 
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="" disabled selected>-- Selecciona un proyecto --</option>') : '<option value="" disabled selected>-- Selecciona un proyecto --</option>';
+            select.innerHTML = '<option value="" disabled selected>-- Selecciona un proyecto --</option>';
 
             projectList.forEach(p => {
                 const option = document.createElement('option');
@@ -884,7 +884,7 @@
 
             panel.classList.remove('hidden');
             nameDisplay.textContent = projectName;
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tbody.innerHTML = '';
             loading.classList.remove('hidden');
             empty.classList.add('hidden');
 
@@ -901,22 +901,7 @@
                         const tr = document.createElement('tr');
                         tr.className = "hover:bg-gray-50 transition";
 
-                        tr.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">#${geo.geomapa_id}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center gap-2">
-                                <i class="fas fa-map text-emerald-500"></i>
-                                ${geo.nombre}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">${geo.descripcion || '-'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                ${new Date(geo.fecha_creacion).toLocaleDateString('es-CL')}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                <button onclick="openMapViewer(${geo.geomapa_id}, '${geo.nombre.replace(/'/g, "\\'")}')" class="text-emerald-600 hover:text-emerald-900 transition mx-1 p-2 rounded-full hover:bg-emerald-50" title="Ver en mapa">
-                                    <i class="fas fa-globe-americas"></i>
-                                </button>
-                            </td>
-                        `) : `
+                        tr.innerHTML = `
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">#${geo.geomapa_id}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center gap-2">
                                 <i class="fas fa-map text-emerald-500"></i>
@@ -939,7 +924,7 @@
                 console.error('Error cargando geomapas:', error);
                 loading.classList.add('hidden');
                 showToast('Error al cargar lista de mapas', 'error');
-                tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<tr><td colspan="5" class="p-4 text-center text-red-500">Error de carga</td></tr>') : '<tr><td colspan="5" class="p-4 text-center text-red-500">Error de carga</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">Error de carga</td></tr>';
             }
         }
 
@@ -968,7 +953,7 @@
                 loading.classList.add('hidden');
             } catch (err) {
                 console.error(err);
-                loading.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<div class="text-red-500 text-center"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><p>${err.message}</p></div>`) : `<div class="text-red-500 text-center"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><p>${err.message}</p></div>`;
+                loading.innerHTML = `<div class="text-red-500 text-center"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><p>${err.message}</p></div>`;
             }
         }
 
@@ -1081,7 +1066,7 @@
             const btn = document.getElementById('btnSubmitCreate');
             const originalText = document.getElementById('btnCreateText').textContent;
             btn.disabled = true;
-            document.getElementById('btnCreateText').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<span class="loading"></span> Guardando...') : '<span class="loading"></span> Guardando...';
+            document.getElementById('btnCreateText').innerHTML = '<span class="loading"></span> Guardando...';
 
             try {
                 const data = await api.post(`/proyectos/${pid}/geomapas`, payload);
@@ -1107,7 +1092,7 @@
             const countBadge = document.getElementById('sessionCount');
 
             if (tbody.querySelector('td[colspan]')) {
-                tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+                tbody.innerHTML = '';
             }
 
             const now = new Date();
@@ -1125,14 +1110,7 @@
                 ? (Array.from(select.options).find(o => o.value == projectId)?.text || `#${projectId}`)
                 : `#${projectId}`;
 
-            tr.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="badge ${badgeClass}">${icon} ${statusText}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">${itemName}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${projectName}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${timeString}</td>
-            `) : `
+            tr.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap">
                     <span class="badge ${badgeClass}">${icon} ${statusText}</span>
                 </td>
@@ -1160,7 +1138,7 @@
             else if (type === 'error') iconHtml = '<i class="fas fa-times-circle text-red-500 text-xl"></i>';
             else iconHtml = '<i class="fas fa-exclamation-circle text-yellow-500 text-xl"></i>';
 
-            toastIcon.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(iconHtml) : iconHtml;
+            toastIcon.innerHTML = iconHtml;
 
             toast.classList.add('show');
             setTimeout(() => {

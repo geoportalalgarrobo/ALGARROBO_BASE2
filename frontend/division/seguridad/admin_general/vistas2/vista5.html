@@ -163,9 +163,7 @@
 
         // Table
         const tableContainer = document.getElementById('v5_top_table');
-        tableContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(paretoData.slice(0, 5).map((d, i) => {
-            return `
-                <div style="display: flex) : paretoData.slice(0, 5).map((d, i) => {
+        tableContainer.innerHTML = paretoData.slice(0, 5).map((d, i) => {
             return `
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: ${i % 2 === 0 ? '#f8fafc' : '#fff'}; border-radius: 6px;">
                     <div style="flex: 1;">
@@ -276,7 +274,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista5').then(txt => {
                 const el = document.getElementById('v5_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
 

@@ -416,7 +416,7 @@
 
         function populateAreaSelect(areas) {
             var select = document.getElementById('eventArea');
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : ''; // Clear existing
+            select.innerHTML = ''; // Clear existing
 
             areas.forEach(function (area) {
                 var option = document.createElement('option');
@@ -437,7 +437,7 @@
         function populateFilterAreaSelect(areas) {
             var select = document.getElementById('filterAreaCalendar');
             if (!select) return;
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="">Todas las áreas</option>') : '<option value="">Todas las áreas</option>';
+            select.innerHTML = '<option value="">Todas las áreas</option>';
 
             areas.forEach(function (area) {
                 var option = document.createElement('option');
@@ -450,7 +450,7 @@
         function renderLegend(areas) {
             var container = document.getElementById('legendContainer');
             if (!container) return;
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            container.innerHTML = '';
 
             // Ensure unique names
             var uniqueNames = [];
@@ -468,7 +468,7 @@
 
                 var div = document.createElement('div');
                 div.className = 'flex items-center gap-2 px-3 py-1 rounded-full border border-gray-100 bg-white shadow-sm';
-                div.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<span class="w-3 h-3 rounded-full" style="background-color: ${color}) : `<span class="w-3 h-3 rounded-full" style="background-color: ${color};"></span>${name}`;
+                div.innerHTML = `<span class="w-3 h-3 rounded-full" style="background-color: ${color};"></span>${name}`;
                 container.appendChild(div);
             });
         }
@@ -676,7 +676,7 @@
                 }
             });
 
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="">Todos</option>') : '<option value="">Todos</option>';
+            select.innerHTML = '<option value="">Todos</option>';
             Array.from(statuses).sort().forEach(function (st) {
                 var opt = document.createElement('option');
                 opt.value = st;

@@ -150,8 +150,7 @@
             .sort((a, b) => b.idx - a.idx);
 
         const container = document.getElementById('v4_top_months');
-        container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(sortedMonths.slice(0, 3).map((m, i) => `
-            <div style="display: flex) : sortedMonths.slice(0, 3).map((m, i) => `
+        container.innerHTML = sortedMonths.slice(0, 3).map((m, i) => `
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: ${i === 0 ? '#fffbeb' : '#f8fafc'}; border: 1px solid ${i === 0 ? '#fef3c7' : '#e2e8f0'}; border-radius: 8px;">
                 <div style="display: flex; flex-direction: column; gap: 2px;">
                     <span style="font-size: 0.9rem; font-weight: 800; color: #1e293b;">${m.name}</span>
@@ -171,11 +170,11 @@
         const predText = document.getElementById('v4_prediction_text');
 
         if (nextIdx > 115) {
-            predText.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<strong>${nextMonthName} (Alta Probabilidad)</strong> → Convergencia de datos indica mes crítico (~${nextIdx.toFixed(0)}%). Reforzar preventiva.`) : `<strong>${nextMonthName} (Alta Probabilidad)</strong> → Convergencia de datos indica mes crítico (~${nextIdx.toFixed(0)}%). Reforzar preventiva.`;
+            predText.innerHTML = `<strong>${nextMonthName} (Alta Probabilidad)</strong> → Convergencia de datos indica mes crítico (~${nextIdx.toFixed(0)}%). Reforzar preventiva.`;
         } else if (nextIdx < 85) {
-            predText.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<strong>${nextMonthName} (Baja Histórica)</strong> → Ambos modelos proyectan baja actividad.`) : `<strong>${nextMonthName} (Baja Histórica)</strong> → Ambos modelos proyectan baja actividad.`;
+            predText.innerHTML = `<strong>${nextMonthName} (Baja Histórica)</strong> → Ambos modelos proyectan baja actividad.`;
         } else {
-            predText.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<strong>${nextMonthName} (Estándar)</strong> → Comportamiento dentro de rangos normales.`) : `<strong>${nextMonthName} (Estándar)</strong> → Comportamiento dentro de rangos normales.`;
+            predText.innerHTML = `<strong>${nextMonthName} (Estándar)</strong> → Comportamiento dentro de rangos normales.`;
         }
 
         // --- Chart ---
@@ -253,7 +252,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista4').then(txt => {
                 const el = document.getElementById('v4_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
 

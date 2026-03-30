@@ -52,7 +52,7 @@
                 else if (deltaPct < 0) className += inverse ? ' kpi-change--positive' : ' kpi-change--negative';
                 else className += ' kpi-change--neutral'; // 0%
 
-                deltaEl.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`${arrow} ${pct} <span style="font-size:0.8em) : `${arrow} ${pct} <span style="font-size:0.8em; opacity:0.8">${suffix}</span>`;
+                deltaEl.innerHTML = `${arrow} ${pct} <span style="font-size:0.8em; opacity:0.8">${suffix}</span>`;
                 deltaEl.className = className;
             }
         },
@@ -72,7 +72,7 @@
          */
         setHtmlTrusted(id, html) {
             const el = document.getElementById(id);
-            if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+            if (el) el.innerHTML = html;
         },
 
         /**

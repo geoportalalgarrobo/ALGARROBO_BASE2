@@ -158,7 +158,7 @@
         function renderSectorProgress(projects) {
             const sectors = [...new Set(projects.map(p => p.sector_nombre).filter(Boolean))];
             const container = document.getElementById('sectorProgress');
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            container.innerHTML = '';
 
             sectors.slice(0, 5).forEach(sector => {
                 const sectorProjects = projects.filter(p => p.sector_nombre === sector);
@@ -167,15 +167,7 @@
 
                 const item = document.createElement('div');
                 item.className = 'space-y-1';
-                item.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="flex justify-between text-sm">
-                        <span class="font-medium text-gray-700">${sector}</span>
-                        <span class="text-gray-500">${progressPct}%</span>
-                    </div>
-                    <div class="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                        <div class="h-full bg-blue-500 rounded-full" style="width: ${progressPct}%"></div>
-                    </div>
-                `) : `
+                item.innerHTML = `
                     <div class="flex justify-between text-sm">
                         <span class="font-medium text-gray-700">${sector}</span>
                         <span class="text-gray-500">${progressPct}%</span>

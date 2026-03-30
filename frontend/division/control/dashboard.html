@@ -749,7 +749,7 @@
         function renderHeatmap(data) {
             const el = document.getElementById('heatmapHoras');
             const labels = document.getElementById('heatmapLabels');
-            el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : ''; labels.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            el.innerHTML = ''; labels.innerHTML = '';
             const max = Math.max(...data.map(d => d.total), 1);
 
             for (let h = 0; h < 24; h++) {
@@ -769,18 +769,7 @@
             const maxU = users[0]?.total_acciones || 1;
             const maxP = projs[0]?.total_accesos || 1;
 
-            uEl.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(users.slice(0, 10).map((u, i) => `
-                <div class="rank-item">
-                    <div class="rank-num" style="background:#e0e7ff;color:#4f46e5">${i + 1}</div>
-                    <div class="rank-bar-wrap">
-                        <div class="flex justify-between text-[0.7rem] mb-1">
-                            <a href="usuarios.html?uid=${u.user_id}" class="font-bold hover:underline">${u.nombre || u.email}</a>
-                            <span class="text-gray-400">${u.total_acciones}</span>
-                        </div>
-                        <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${(u.total_acciones * 100 / maxU).toFixed(0)}%;background:#6366f1"></div></div>
-                    </div>
-                </div>
-            `).join('')) : users.slice(0, 10).map((u, i) => `
+            uEl.innerHTML = users.slice(0, 10).map((u, i) => `
                 <div class="rank-item">
                     <div class="rank-num" style="background:#e0e7ff;color:#4f46e5">${i + 1}</div>
                     <div class="rank-bar-wrap">
@@ -793,18 +782,7 @@
                 </div>
             `).join('');
 
-            pEl.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(projs.slice(0, 10).map((p, i) => `
-                <div class="rank-item">
-                    <div class="rank-num" style="background:#fef3c7;color:#d97706">${i + 1}</div>
-                    <div class="rank-bar-wrap">
-                        <div class="flex justify-between text-[0.7rem] mb-1">
-                            <a href="proyectos.html?pid=${p.proyecto_id}" class="font-bold hover:underline truncate w-40">${p.nombre_proyecto || p.proyecto_id}</a>
-                            <span class="text-gray-400">${p.total_accesos}</span>
-                        </div>
-                        <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${(p.total_accesos * 100 / maxP).toFixed(0)}%;background:#f59e0b"></div></div>
-                    </div>
-                </div>
-            `).join('')) : projs.slice(0, 10).map((p, i) => `
+            pEl.innerHTML = projs.slice(0, 10).map((p, i) => `
                 <div class="rank-item">
                     <div class="rank-num" style="background:#fef3c7;color:#d97706">${i + 1}</div>
                     <div class="rank-bar-wrap">
@@ -830,19 +808,7 @@
 
         function renderTabla(data) {
             const tbody = document.getElementById('listaActividad');
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(data.map(r => `
-                <tr>
-                    <td class="whitespace-nowrap">${fmtFecha(r.fecha)}</td>
-                    <td><a href="usuarios.html?uid=${r.user_id}" class="text-indigo-600 font-medium">${r.nombre_usuario || '—'}</a></td>
-                    <td><span class="badge-accion ${getBadge(r.accion)}">${r.accion}</span></td>
-                    <td class="text-gray-400 capitalize">${r.modulo}</td>
-                    <td class="max-w-[150px] truncate" title="${r.entidad_nombre || ''}">
-                        ${r.entidad_tipo ? `<b>${r.entidad_tipo}:</b> ` : ''}${r.entidad_nombre || '—'}
-                    </td>
-                    <td><span class="${r.exitoso ? 'badge-ok' : 'badge-fail'}">${r.exitoso ? 'EXITO' : 'FALLO'}</span></td>
-                    <td class="font-mono text-[10px] text-gray-300">${r.ip_origen || '—'}</td>
-                </tr>
-            `).join('')) : data.map(r => `
+            tbody.innerHTML = data.map(r => `
                 <tr>
                     <td class="whitespace-nowrap">${fmtFecha(r.fecha)}</td>
                     <td><a href="usuarios.html?uid=${r.user_id}" class="text-indigo-600 font-medium">${r.nombre_usuario || '—'}</a></td>
@@ -871,7 +837,7 @@
                 }
             }
             html += `<button class="page-btn" ${res.page === res.pages ? 'disabled' : ''} onclick="buscarActividad(${res.page + 1})"><i class="fas fa-chevron-right"></i></button>`;
-            pag.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+            pag.innerHTML = html;
         }
 
         // Helpers

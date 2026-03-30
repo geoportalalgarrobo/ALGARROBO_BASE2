@@ -586,11 +586,7 @@
                 initFilters();
             } catch (error) {
                 console.error('Error al cargar proyectos:', error);
-                DOM.projectListContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="p-4 text-center text-red-500 text-sm">
-                        <i class="fas fa-exclamation-circle mb-2"></i><br>
-                        Error cargando datos.
-                    </div>`) : `
+                DOM.projectListContainer.innerHTML = `
                     <div class="p-4 text-center text-red-500 text-sm">
                         <i class="fas fa-exclamation-circle mb-2"></i><br>
                         Error cargando datos.
@@ -622,7 +618,7 @@
         }
 
         function fillSelect(selectEl, options, defaultLabel) {
-            selectEl.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<option value="">${defaultLabel}</option>`) : `<option value="">${defaultLabel}</option>`;
+            selectEl.innerHTML = `<option value="">${defaultLabel}</option>`;
             options.forEach(opt => selectEl.innerHTML += `<option value="${opt}">${opt}</option>`);
         }
 
@@ -669,9 +665,9 @@
         }
 
         function renderProjectList(list) {
-            DOM.projectListContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize("") : "";
+            DOM.projectListContainer.innerHTML = "";
             if (list.length === 0) {
-                DOM.projectListContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<div class="p-4 text-center text-gray-400 text-sm">No hay proyectos con estos filtros.</div>`) : `<div class="p-4 text-center text-gray-400 text-sm">No hay proyectos con estos filtros.</div>`;
+                DOM.projectListContainer.innerHTML = `<div class="p-4 text-center text-gray-400 text-sm">No hay proyectos con estos filtros.</div>`;
                 return;
             }
 
@@ -686,11 +682,7 @@
                 const codigo = p.codigo || 'N/A';
                 const nombre = p.nombre || 'Sin Nombre';
 
-                div.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="flex items-start gap-3">
-                        <div class="pt-1">
-                            <input type="checkbox" class="project-checkbox w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 cursor-pointer" 
-                                value="${p.id}" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation()) : `
+                div.innerHTML = `
                     <div class="flex items-start gap-3">
                         <div class="pt-1">
                             <input type="checkbox" class="project-checkbox w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 cursor-pointer" 
@@ -787,7 +779,7 @@
         }
 
         function resetVoiceButton() {
-            DOM.voiceButton.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-microphone"></i>') : '<i class="fas fa-microphone"></i>';
+            DOM.voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
             DOM.voiceButton.classList.remove('text-red-500', 'animate-pulse');
             DOM.chatInput.placeholder = "Escribe tu pregunta aquí...";
         }
@@ -798,7 +790,7 @@
                 AppState.recognition.stop();
             } else {
                 AppState.recognition.start();
-                DOM.voiceButton.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-stop"></i>') : '<i class="fas fa-stop"></i>';
+                DOM.voiceButton.innerHTML = '<i class="fas fa-stop"></i>';
                 DOM.voiceButton.classList.add('text-red-500', 'animate-pulse');
                 DOM.chatInput.placeholder = "Escuchando...";
             }
@@ -978,7 +970,7 @@
             // Avatar
             const avatar = document.createElement('div');
             avatar.className = 'avatar';
-            avatar.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>') : sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
 
             // Contenido
             const contentDiv = document.createElement('div');
@@ -988,7 +980,7 @@
                 contentDiv.textContent = text;
             } else {
                 // Parsear Markdown
-                contentDiv.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(marked.parse(sanitizeInput(text))) : marked.parse(sanitizeInput(text));
+                contentDiv.innerHTML = marked.parse(sanitizeInput(text));
 
                 // Botones de acción (Copiar / Hablar)
                 const actionsDiv = document.createElement('div');
@@ -996,12 +988,12 @@
 
                 const btnCopy = document.createElement('button');
                 btnCopy.className = 'text-xs flex items-center gap-1 hover:text-indigo-600';
-                btnCopy.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-copy"></i> Copiar') : '<i class="fas fa-copy"></i> Copiar';
+                btnCopy.innerHTML = '<i class="fas fa-copy"></i> Copiar';
                 btnCopy.onclick = () => { navigator.clipboard.writeText(text); showToast("Texto copiado al portapapeles", "success"); };
 
                 const btnSpeak = document.createElement('button');
                 btnSpeak.className = 'text-xs flex items-center gap-1 hover:text-indigo-600';
-                btnSpeak.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-volume-up"></i> Escuchar') : '<i class="fas fa-volume-up"></i> Escuchar';
+                btnSpeak.innerHTML = '<i class="fas fa-volume-up"></i> Escuchar';
                 btnSpeak.onclick = function () { speakText(text, this); };
 
                 actionsDiv.appendChild(btnCopy);
@@ -1015,7 +1007,7 @@
                     preguntas.forEach(q => {
                         const chip = document.createElement('button');
                         chip.className = 'suggestion-chip';
-                        chip.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fas fa-arrow-right text-xs"></i> ${q}`) : `<i class="fas fa-arrow-right text-xs"></i> ${q}`;
+                        chip.innerHTML = `<i class="fas fa-arrow-right text-xs"></i> ${q}`;
                         chip.onclick = () => {
                             DOM.chatInput.value = q;
                             // Aquí llamamos sendMessage() sin evento (null), lo cual es seguro por el chequeo `if (e)`
@@ -1044,31 +1036,20 @@
             if (!AppState.synthesis) return;
             if (AppState.synthesis.speaking) {
                 AppState.synthesis.cancel();
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-volume-up"></i> Escuchar') : '<i class="fas fa-volume-up"></i> Escuchar';
+                btn.innerHTML = '<i class="fas fa-volume-up"></i> Escuchar';
                 return;
             }
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'es-ES';
-            utterance.onend = () => { btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-volume-up"></i> Escuchar') : '<i class="fas fa-volume-up"></i> Escuchar'; };
+            utterance.onend = () => { btn.innerHTML = '<i class="fas fa-volume-up"></i> Escuchar'; };
             AppState.synthesis.speak(utterance);
-            btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-stop"></i> Detener') : '<i class="fas fa-stop"></i> Detener';
+            btn.innerHTML = '<i class="fas fa-stop"></i> Detener';
         }
 
         function clearChat() {
             if (!confirm("¿Estás seguro de que quieres borrar todo el historial del chat?")) return;
             // Mensaje de bienvenida
-            DOM.messagesArea.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                <div class="message-wrapper bot">
-                    <div class="avatar"><i class="fas fa-robot"></i></div>
-                    <div class="flex-1">
-                        <div class="message-content markdown-body">
-                            <p><strong>¡Hola! Soy tu asistente potenciado por ZhipuAI.</strong></p>
-                            <p>El chat ha sido reiniciado. Selecciona proyectos y comienza de nuevo.</p>
-                        </div>
-                        <div class="message-meta text-gray-500">Hoy, ${new Date().toLocaleTimeString()}</div>
-                    </div>
-                </div>
-            `) : `
+            DOM.messagesArea.innerHTML = `
                 <div class="message-wrapper bot">
                     <div class="avatar"><i class="fas fa-robot"></i></div>
                     <div class="flex-1">
@@ -1110,7 +1091,7 @@
             if (type === 'success') icon = '<i class="fas fa-check-circle text-green-400"></i>';
             if (type === 'error') icon = '<i class="fas fa-exclamation-triangle text-red-400"></i>';
 
-            toast.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`${icon} <span>${message}</span>`) : `${icon} <span>${message}</span>`;
+            toast.innerHTML = `${icon} <span>${message}</span>`;
 
             container.appendChild(toast);
 

@@ -96,7 +96,7 @@ const App = {
         try {
             const response = await fetch('sidebar.html');
             const html = await response.text();
-            this.elements.sidebar.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+            this.elements.sidebar.innerHTML = html;
             this.initNavigation();
             // Init tabs
             if (window.switchSidebarTab) window.switchSidebarTab('tab-stop');
@@ -141,7 +141,7 @@ const App = {
         const container = this.elements.viewContainer;
 
         // Show loading state
-        container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="loading"></div>') : '<div class="loading"></div>';
+        container.innerHTML = '<div class="loading"></div>';
         this.state.currentView = viewName;
 
         // Clean up charts from previous view
@@ -170,7 +170,7 @@ const App = {
             }
 
             const html = await response.text();
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+            container.innerHTML = html;
 
             // Inject report header and source badge into the first card element
             const firstCard = container.querySelector('.card');
@@ -182,7 +182,7 @@ const App = {
                 // Inject source badge into the container (if exists)
                 const sourceBadgeContainer = container.querySelector('#sourceBadgeContainer');
                 if (sourceBadgeContainer) {
-                    sourceBadgeContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(this.getSourceBadgeHtml(viewName)) : this.getSourceBadgeHtml(viewName);
+                    sourceBadgeContainer.innerHTML = this.getSourceBadgeHtml(viewName);
                 }
             }
 
@@ -211,13 +211,7 @@ const App = {
 
         } catch (error) {
             LOG.error('Error loading view:', error);
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                <div class="card" style="text-align: center; padding: 3rem;">
-                    <i class="fa-solid fa-exclamation-triangle" style="font-size: 3rem; color: var(--color-danger); margin-bottom: 1rem;"></i>
-                    <h3 style="margin-bottom: 0.5rem;">Error al cargar vista</h3>
-                    <p class="text-muted">${viewName}</p>
-                </div>
-            `) : `
+            container.innerHTML = `
                 <div class="card" style="text-align: center; padding: 3rem;">
                     <i class="fa-solid fa-exclamation-triangle" style="font-size: 3rem; color: var(--color-danger); margin-bottom: 1rem;"></i>
                     <h3 style="margin-bottom: 0.5rem;">Error al cargar vista</h3>
@@ -265,7 +259,7 @@ const App = {
             const labelContainer = row.querySelector('div:first-child');
             if (labelContainer) {
                 const icon = labelContainer.querySelector('i');
-                labelContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+                labelContainer.innerHTML = '';
                 if (icon) labelContainer.appendChild(icon);
                 labelContainer.innerHTML += ` ${fullText}`;
             }
@@ -452,7 +446,7 @@ const App = {
         const btn = this.elements.exportBtn;
 
         const originalBtnText = btn.innerHTML;
-        btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fa-solid fa-spinner fa-spin"></i> Exportando...') : '<i class="fa-solid fa-spinner fa-spin"></i> Exportando...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Exportando...';
         btn.disabled = true;
 
         this.showExportOverlay();
@@ -475,7 +469,7 @@ const App = {
                 const viewName = this.config.views[i];
                 const progressText = `Procesando vista ${i + 1} de ${this.config.views.length}...`;
 
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fa-solid fa-spinner fa-spin"></i> ${i + 1}/${this.config.views.length}`) : `<i class="fa-solid fa-spinner fa-spin"></i> ${i + 1}/${this.config.views.length}`;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${i + 1}/${this.config.views.length}`;
                 this.updateExportOverlay(progressText);
 
                 this.destroyAllCharts();
@@ -522,7 +516,7 @@ const App = {
                 Chart.defaults.animation = animationDefault;
             }
             this.hideExportOverlay();
-            btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalBtnText) : originalBtnText;
+            btn.innerHTML = originalBtnText;
             btn.disabled = false;
             this.state.isExporting = false;
             this.loadView(originalView);
@@ -551,22 +545,7 @@ const App = {
             transition: opacity 0.3s ease;
         `;
 
-        overlay.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-            <div style="background: white; padding: 2.5rem; border-radius: 16px; max-width: 500px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-                <div style="width: 64px; height: 64px; background: #e0e7ff; color: #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 24px;">
-                    <i class="fa-solid fa-file-pdf fa-beat-fade"></i>
-                </div>
-                <h3 style="margin: 0 0 0.5rem; color: #1e293b; font-size: 1.25rem; font-weight: 700;">Generando Reporte Oficial</h3>
-                <p id="exportStatus" style="margin: 0 0 1.5rem; color: #64748b; font-size: 0.95rem;">Preparando documentos...</p>
-                <div style="padding: 1rem; background: #fff7ed; border: 1px solid #ffedd5; border-radius: 8px; text-align: left; display: flex; gap: 0.75rem;">
-                    <i class="fa-solid fa-lightbulb" style="color: #f59e0b; margin-top: 3px;"></i>
-                    <div>
-                        <strong style="display: block; color: #9a3412; font-size: 0.9rem; margin-bottom: 2px;">Importante</strong>
-                        <span style="color: #c2410c; font-size: 0.85rem; line-height: 1.4;">Por favor, mantenga esta pestaña activa y <strong>no cambie de ventana</strong>. Esto asegura que los gráficos se capturen con la máxima calidad.</span>
-                    </div>
-                </div>
-            </div>
-        `) : `
+        overlay.innerHTML = `
             <div style="background: white; padding: 2.5rem; border-radius: 16px; max-width: 500px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
                 <div style="width: 64px; height: 64px; background: #e0e7ff; color: #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 24px;">
                     <i class="fa-solid fa-file-pdf fa-beat-fade"></i>
@@ -614,16 +593,7 @@ const App = {
     showErrorUI(msg) {
         const container = this.elements.viewContainer;
         if (container) {
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                <div class="card" style="text-align: center; padding: 3rem; border: 1px solid #fca5a5; background: #fef2f2; max-width: 600px; margin: 2rem auto;">
-                     <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #dc2626; margin-bottom: 1rem;"></i>
-                     <h3 style="color: #991b1b; margin-bottom: 0.5rem;">Error de Carga</h3>
-                     <p style="color: #b91c1c; margin-bottom: 1.5rem;">${msg}</p>
-                     <button onclick="location.reload()" style="padding: 0.75rem 1.5rem; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                        <i class="fa-solid fa-rotate-right"></i> Reintentar
-                     </button>
-                </div>
-            `) : `
+            container.innerHTML = `
                 <div class="card" style="text-align: center; padding: 3rem; border: 1px solid #fca5a5; background: #fef2f2; max-width: 600px; margin: 2rem auto;">
                      <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #dc2626; margin-bottom: 1rem;"></i>
                      <h3 style="color: #991b1b; margin-bottom: 0.5rem;">Error de Carga</h3>

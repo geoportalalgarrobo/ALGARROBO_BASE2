@@ -212,7 +212,7 @@
         async function loadDivisiones() {
             const data = await api.get('/divisiones');
             const select = document.getElementById("division_id");
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="">-- Sin división --</option>') : '<option value="">-- Sin división --</option>';
+            select.innerHTML = '<option value="">-- Sin división --</option>';
             data.forEach(d => {
                 const opt = document.createElement("option");
                 opt.value = d.division_id;
@@ -224,7 +224,7 @@
         async function loadRoles() {
             const data = await api.get('/roles');
             const select = document.getElementById("role_id");
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="" disabled selected>-- Seleccionar rol --</option>') : '<option value="" disabled selected>-- Seleccionar rol --</option>';
+            select.innerHTML = '<option value="" disabled selected>-- Seleccionar rol --</option>';
             data.forEach(r => {
                 const opt = document.createElement("option");
                 opt.value = r.role_id;
@@ -236,10 +236,10 @@
         async function loadUsers() {
             const users = await api.get('/users');
             const tbody = document.getElementById("usersBody");
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize("") : "";
+            tbody.innerHTML = "";
 
             if (users.length === 0) {
-                tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 italic">No hay usuarios registrados</td></tr>`) : `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 italic">No hay usuarios registrados</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 italic">No hay usuarios registrados</td></tr>`;
                 return;
             }
 
@@ -250,26 +250,7 @@
                     '<span class="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-emerald-100">Activo</span>' :
                     '<span class="bg-red-50 text-red-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-red-100">Inactivo</span>';
 
-                tr.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <td class="px-4 py-4 text-xs font-mono text-gray-400">#${u.user_id}</td>
-                    <td class="px-4 py-4">
-                        <div class="font-bold text-gray-900">${u.nombre}</div>
-                        <div class="text-xs text-gray-500">${u.email}</div>
-                    </td>
-                    <td class="px-4 py-4 text-sm text-gray-600">${u.division || '<span class="text-gray-300 italic">Sin asignar</span>'}</td>
-                    <td class="px-4 py-4 text-sm font-medium text-blue-600">${u.nivel_acceso || '-'}</td>
-                    <td class="px-4 py-4 text-center">${statusBadge}</td>
-                    <td class="px-4 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button onclick='editUser(${JSON.stringify(u)})' class="text-amber-600 hover:text-amber-800 p-2 rounded-full hover:bg-amber-50 transition-colors" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick='deleteUser(${u.user_id})' class="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors" title="Eliminar">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </td>
-                `) : `
+                tr.innerHTML = `
                     <td class="px-4 py-4 text-xs font-mono text-gray-400">#${u.user_id}</td>
                     <td class="px-4 py-4">
                         <div class="font-bold text-gray-900">${u.nombre}</div>
@@ -302,7 +283,7 @@
 
             try {
                 btn.disabled = true;
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin mr-2"></i> Guardando...') : '<i class="fas fa-spinner fa-spin mr-2"></i> Guardando...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Guardando...';
 
                 const formData = utils.serializeForm(e.target);
                 // Ensure nivel_acceso is string for backend compatibility
@@ -334,7 +315,7 @@
                 showToast(error.message, "error");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalHTML) : originalHTML;
+                btn.innerHTML = originalHTML;
             }
         });
 
@@ -346,7 +327,7 @@
             document.querySelector(".card-modern h2").textContent = "Editar Usuario";
 
             const submitBtn = document.getElementById("submitBtn");
-            submitBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-save"></i> Actualizar Usuario') : '<i class="fas fa-save"></i> Actualizar Usuario';
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Actualizar Usuario';
             submitBtn.className = "flex items-center gap-2 px-6 py-2.5 bg-amber-600 text-white rounded-xl hover:bg-amber-700 shadow-lg shadow-amber-500/30 transition-all font-bold";
 
             // Populate form
@@ -364,7 +345,7 @@
                 cancelBtn.id = "cancelEditBtn";
                 cancelBtn.type = "button"; // Prevent submit
                 cancelBtn.className = "flex items-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-all font-bold mr-3";
-                cancelBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-times"></i> Cancelar') : '<i class="fas fa-times"></i> Cancelar';
+                cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancelar';
                 cancelBtn.onclick = (e) => {
                     e.preventDefault();
                     resetForm();
@@ -382,7 +363,7 @@
             document.querySelector(".card-modern h2").textContent = "Crear Nuevo Usuario";
 
             const submitBtn = document.getElementById("submitBtn");
-            submitBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-save"></i> Guardar Usuario') : '<i class="fas fa-save"></i> Guardar Usuario';
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Usuario';
             submitBtn.className = "flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all font-bold";
 
             document.getElementById("password").required = true;

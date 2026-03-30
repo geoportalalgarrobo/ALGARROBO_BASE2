@@ -43,7 +43,7 @@ function initializeApp() {
     
     } catch (error) {
     console.error('Error al procesar los datos:', error);
-    document.getElementById('loading').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-exclamation-triangle"></i> Error al cargar los datos') : '<i class="fas fa-exclamation-triangle"></i> Error al cargar los datos';
+    document.getElementById('loading').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error al cargar los datos';
     }
 }
 
@@ -72,14 +72,14 @@ function updateStats() {
 
 function renderTable() {
     const table = document.getElementById('data-table');
-    table.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+    table.innerHTML = '';
 
     // Crear header
     const header = document.createElement('thead');
     const headerRow = document.createElement('tr');
 
     const thOrg = document.createElement('th');
-    thOrg.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-building"></i> Organismo') : '<i class="fas fa-building"></i> Organismo';
+    thOrg.innerHTML = '<i class="fas fa-building"></i> Organismo';
     headerRow.appendChild(thOrg);
 
     allMonths.forEach(month => {
@@ -89,7 +89,7 @@ function renderTable() {
     });
 
     const thAvg = document.createElement('th');
-    thAvg.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-calculator"></i> Promedio') : '<i class="fas fa-calculator"></i> Promedio';
+    thAvg.innerHTML = '<i class="fas fa-calculator"></i> Promedio';
     headerRow.appendChild(thAvg);
 
     header.appendChild(headerRow);
@@ -118,7 +118,7 @@ function renderTable() {
         
         if (val === 0) {
         td.classList.add('sin-registro');
-        td.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-times"></i> Sin datos') : '<i class="fas fa-times"></i> Sin datos';
+        td.innerHTML = '<i class="fas fa-times"></i> Sin datos';
         } else if (val) {
         td.textContent = val.toLocaleString();
         sum += val;

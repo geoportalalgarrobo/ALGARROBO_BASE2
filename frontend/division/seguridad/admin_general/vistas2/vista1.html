@@ -308,7 +308,7 @@
         // IA Integration
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista1').then(txt => {
-                document.getElementById('v1_ia_analysis').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                document.getElementById('v1_ia_analysis').innerHTML = txt;
             });
         }
     })();

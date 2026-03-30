@@ -641,7 +641,7 @@
 
             loading.classList.remove('hidden');
             if (empty) empty.classList.add('hidden');
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tbody.innerHTML = '';
 
             try {
                 const docs = await api.get('/documentos');
@@ -664,27 +664,7 @@
                             else if (t.includes('excel') || t.includes('xlsx') || t.includes('csv')) { typeIcon = 'fa-file-excel'; typeColor = 'text-green-600'; }
                         }
 
-                        tr.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-tighter">
-                                    ${doc.tipo_documento || 'General'}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-white shadow-sm border border-slate-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fas ${typeIcon} ${typeColor}"></i>
-                                </div>
-                                ${doc.nombre || doc.archivo_nombre}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-500 italic">
-                                <i class="fas fa-project-diagram mr-1 opacity-50 text-xs"></i> ${doc.proyecto_nombre || '-'}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-500">
-                                ${new Date(doc.fecha_subida).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                ${(() => {
-                                const ext = (doc.archivo_extension || doc.archivo_nombre || '').split('.').pop().toLowerCase()) : `
+                        tr.innerHTML = `
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-tighter">
                                     ${doc.tipo_documento || 'General'}
@@ -722,7 +702,7 @@
 
             } catch (e) {
                 console.error(e);
-                tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<tr><td colspan="5" class="text-center p-4 text-red-500">Error cargando documentos</td></tr>`) : `<tr><td colspan="5" class="text-center p-4 text-red-500">Error cargando documentos</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-red-500">Error cargando documentos</td></tr>`;
             } finally {
                 loading.classList.add('hidden');
             }
@@ -730,7 +710,7 @@
 
         async function loadProjects() {
             const select = document.getElementById('projectSelect');
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="" disabled selected>Cargando...</option>') : '<option value="" disabled selected>Cargando...</option>';
+            select.innerHTML = '<option value="" disabled selected>Cargando...</option>';
             select.disabled = true;
 
             try {
@@ -744,7 +724,7 @@
             } catch (error) {
                 console.error('Error:', error);
                 showToast('Error al conectar con el servidor', 'error');
-                select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="" disabled selected>Error de conexión</option>') : '<option value="" disabled selected>Error de conexión</option>';
+                select.innerHTML = '<option value="" disabled selected>Error de conexión</option>';
             }
         }
 
@@ -757,7 +737,7 @@
                 html += `<option value="${opt}" ${opt === previousValue ? 'selected' : ''}>${opt}</option>`;
             });
 
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+            select.innerHTML = html;
 
             if (previousValue && !optionsList.includes(previousValue)) {
                 select.value = "";
@@ -818,7 +798,7 @@
 
             const currentVal = select.value;
 
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="" disabled selected>-- Selecciona un proyecto --</option>') : '<option value="" disabled selected>-- Selecciona un proyecto --</option>';
+            select.innerHTML = '<option value="" disabled selected>-- Selecciona un proyecto --</option>';
 
             projectList.forEach(p => {
                 const option = document.createElement('option');
@@ -847,7 +827,7 @@
 
             // Show panel and loading state
             panel.classList.remove('hidden');
-            tableBody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tableBody.innerHTML = '';
             loading.classList.remove('hidden');
             empty.classList.add('hidden');
 
@@ -881,32 +861,7 @@
                             else if (t.includes('excel') || t.includes('xlsx') || t.includes('csv')) { typeIcon = 'fa-file-excel'; typeColor = 'text-green-600'; }
                         }
 
-                        tr.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-tighter">
-                                    ${doc.tipo_documento || 'General'}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-white shadow-sm border border-slate-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <i class="fas ${typeIcon} ${typeColor}"></i>
-                                </div>
-                                ${doc.nombre || doc.archivo_nombre}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-500 italic">
-                                ${doc.proyecto_nombre || '-'}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-slate-500 font-medium">${doc.descripcion || '-'}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-400">
-                                ${new Date(doc.fecha_subida).toLocaleDateString('es-CL')} 
-                                <span class="text-[10px] opacity-60 ml-1 font-normal">${new Date(doc.fecha_subida).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-500">
-                                ${formatBytes(doc.archivo_size)}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                ${(() => {
-                                const ext = (doc.archivo_extension || doc.archivo_nombre || '').split('.').pop().toLowerCase()) : `
+                        tr.innerHTML = `
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-tighter">
                                     ${doc.tipo_documento || 'General'}
@@ -949,7 +904,7 @@
                 console.error('Error cargando docs:', error);
                 loading.classList.add('hidden');
                 showToast('Error al cargar lista de documentos', 'error');
-                tableBody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<tr><td colspan="6" class="p-4 text-center text-red-500">Error de carga</td></tr>') : '<tr><td colspan="6" class="p-4 text-center text-red-500">Error de carga</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Error de carga</td></tr>';
             }
         }
 
@@ -983,7 +938,7 @@
                 };
             } catch (err) {
                 console.error(err);
-                loading.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<div class="text-red-500 text-center"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><p>${err.message}</p></div>`) : `<div class="text-red-500 text-center"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><p>${err.message}</p></div>`;
+                loading.innerHTML = `<div class="text-red-500 text-center"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i><p>${err.message}</p></div>`;
             }
         }
 
@@ -1031,7 +986,7 @@
             if (!headers) return;
 
             btn.disabled = true;
-            btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<span class="loading-dark"></span> Procesando...') : '<span class="loading-dark"></span> Procesando...';
+            btn.innerHTML = '<span class="loading-dark"></span> Procesando...';
 
             try {
                 const blob = await api.getBlob(`/proyectos/${pid}/documentos/descargar`);
@@ -1051,7 +1006,7 @@
                 showToast("No se pudo descargar el archivo ZIP", "error");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalContent) : originalContent;
+                btn.innerHTML = originalContent;
             }
         }
 
@@ -1111,7 +1066,7 @@
 
             try {
                 btn.disabled = true;
-                document.getElementById('btnUploadText').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin mr-2"></i> Subiendo...') : '<i class="fas fa-spinner fa-spin mr-2"></i> Subiendo...';
+                document.getElementById('btnUploadText').innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Subiendo...';
 
                 await api.post(`/proyectos/${pid}/documentos/upload`, formData);
 
@@ -1133,7 +1088,7 @@
             const countBadge = document.getElementById('sessionCount');
 
             if (tbody.querySelector('td[colspan]')) {
-                tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+                tbody.innerHTML = '';
             }
 
             const now = new Date();
@@ -1151,14 +1106,7 @@
                 ? (Array.from(select.options).find(o => o.value == projectId)?.text || `#${projectId}`)
                 : `#${projectId}`;
 
-            tr.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="badge ${badgeClass}">${icon} ${statusText}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">${fileName}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${projectName}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${timeString}</td>
-            `) : `
+            tr.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap">
                     <span class="badge ${badgeClass}">${icon} ${statusText}</span>
                 </td>

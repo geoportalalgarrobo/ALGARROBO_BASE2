@@ -194,8 +194,7 @@
             { label: 'Promedio (52 Sem)', date: 'Último Año', val: avgVal.toFixed(1), color: '#f59e0b', bg: '#fffbeb' } // Yellow
         ];
 
-        tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(tableData.map(r => `
-            <tr style="border-bottom: 1px solid #f1f5f9) : tableData.map(r => `
+        tbody.innerHTML = tableData.map(r => `
             <tr style="border-bottom: 1px solid #f1f5f9; background-color: ${r.bg || 'transparent'};">
                 <td style="padding: 12px 8px; font-weight: 700; color: ${r.color};">
                     ${r.label}
@@ -275,7 +274,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista3').then(txt => {
                 const el = document.getElementById('v3_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
 

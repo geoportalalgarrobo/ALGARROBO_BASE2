@@ -451,7 +451,7 @@
                 // Mostrar un mensaje de error más específico al usuario
                 const mapContainer = document.getElementById('map');
                 if (mapContainer) {
-                    mapContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<div class="flex justify-center items-center h-full text-center p-4"><p class="text-red-500 font-semibold">Error al cargar los proyectos.</p><p class="text-gray-600">${error.message}</p></div>`) : `<div class="flex justify-center items-center h-full text-center p-4"><p class="text-red-500 font-semibold">Error al cargar los proyectos.</p><p class="text-gray-600">${error.message}</p></div>`;
+                    mapContainer.innerHTML = `<div class="flex justify-center items-center h-full text-center p-4"><p class="text-red-500 font-semibold">Error al cargar los proyectos.</p><p class="text-gray-600">${error.message}</p></div>`;
                 }
                 // Opcional: Redirigir al login si el error es de autenticación
                 if (error.message.includes('No autorizado') || error.message.includes('Token de autenticación no encontrado')) {
@@ -539,7 +539,7 @@
         // Crear botones de filtro dinámicamente
         function createFilterButtons() {
             const filterContainer = document.getElementById('mapFilters');
-            filterContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : ''; // Limpiar botones existentes
+            filterContainer.innerHTML = ''; // Limpiar botones existentes
 
             // Añadir botón "Todos"
             const allButton = document.createElement('button');
@@ -585,7 +585,7 @@
             
             legend.onAdd = function(map) {
                 const div = L.DomUtil.create('div', 'legend');
-                div.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="legend-title">Áreas de Proyecto</div>') : '<div class="legend-title">Áreas de Proyecto</div>';
+                div.innerHTML = '<div class="legend-title">Áreas de Proyecto</div>';
                 
                 // Obtener áreas únicas de los proyectos para la leyenda
                 const uniqueAreas = [...new Set(allProjects.map(p => p.area))].sort();
@@ -672,7 +672,7 @@
         // Cargar lista de proyectos en el mapa
         function loadMapProjectsList(filterArea = 'all') {
             const listContainer = document.getElementById('mapProjectsList');
-            listContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            listContainer.innerHTML = '';
             
             let filteredProjects = allProjects;
             if (filterArea !== 'all') {
@@ -689,10 +689,7 @@
                 
                 const areaColor = getAreaColor(project.area);
                 
-                projectCard.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="flex items-start space-x-3">
-                        <div class="flex-shrink-0">
-                            <div style="background-color: ${areaColor}) : `
+                projectCard.innerHTML = `
                     <div class="flex items-start space-x-3">
                         <div class="flex-shrink-0">
                             <div style="background-color: ${areaColor}; width: 12px; height: 12px; border-radius: 50%; margin-top: 5px;"></div>
@@ -738,7 +735,7 @@
             const content = document.getElementById('projectDetailsContent');
             
             // Limpiar contenido anterior
-            content.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            content.innerHTML = '';
             
             // Añadir título del proyecto
             const title = document.createElement('h3');

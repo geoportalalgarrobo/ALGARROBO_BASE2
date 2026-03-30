@@ -355,7 +355,7 @@ const dataLoaderCead = {
     updateHeader() {
         const subtitle = document.getElementById('headerSubtitleCead');
         if (subtitle) {
-            subtitle.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`${STATE_DATA_CEAD.periodoDetalle || 'Período Actual'}`) : `${STATE_DATA_CEAD.periodoDetalle || 'Período Actual'}`;
+            subtitle.innerHTML = `${STATE_DATA_CEAD.periodoDetalle || 'Período Actual'}`;
         }
 
         const comunaBtn = document.getElementById('btnComunaTextCead');

@@ -851,7 +851,7 @@
             TABLE_EL.style.display = "table";
           } catch (err) {
             console.error(err);
-            LOADING_EL.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<p style="color:var(--danger-text)">Error: ${err.message}</p>`) : `<p style="color:var(--danger-text)">Error: ${err.message}</p>`;
+            LOADING_EL.innerHTML = `<p style="color:var(--danger-text)">Error: ${err.message}</p>`;
           }
         }
 
@@ -874,7 +874,7 @@
 
           const sortedYears = Array.from(availableYears).sort((a, b) => b - a);
           const prevYear = YEAR_FILTER.value;
-          YEAR_FILTER.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="">Todos los años</option>') : '<option value="">Todos los años</option>';
+          YEAR_FILTER.innerHTML = '<option value="">Todos los años</option>';
           sortedYears.forEach(y => {
             const opt = document.createElement("option");
             opt.value = y; opt.textContent = y;
@@ -898,7 +898,7 @@
 
           const sortedPadres = Array.from(availablePadres).sort();
           const prevPadre = PADRE_FILTER.value;
-          PADRE_FILTER.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="">Todos los organismos padre</option>') : '<option value="">Todos los organismos padre</option>';
+          PADRE_FILTER.innerHTML = '<option value="">Todos los organismos padre</option>';
           sortedPadres.forEach(p => {
             const opt = document.createElement("option");
             opt.value = p; opt.textContent = p;
@@ -933,7 +933,7 @@
         }
 
         function renderTable() {
-          TABLE_EL.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize("") : "";
+          TABLE_EL.innerHTML = "";
           const header = document.createElement("thead");
           const headerRow = document.createElement("tr");
 
@@ -949,7 +949,7 @@
           });
 
           const thAvg = document.createElement("th");
-          thAvg.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i data-lucide="calculator" style="width:14px) : '<i data-lucide="calculator" style="width:14px; display:inline; vertical-align:middle;"></i> Prom';
+          thAvg.innerHTML = '<i data-lucide="calculator" style="width:14px; display:inline; vertical-align:middle;"></i> Prom';
           headerRow.appendChild(thAvg);
 
           header.appendChild(headerRow);
@@ -980,7 +980,7 @@
               { icon: 'fa-birthday-cake', url: `persona/edad1.html?organismo=${codeName}`, t: 'Edad' }
             ].forEach(i => {
               const a = document.createElement("a"); a.href = i.url; a.className = "icon-link"; a.title = i.t;
-              a.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fas ${i.icon}" style="font-size:12px) : `<i class="fas ${i.icon}" style="font-size:12px;"></i>`;
+              a.innerHTML = `<i class="fas ${i.icon}" style="font-size:12px;"></i>`;
               tdAn.appendChild(a);
             });
             tr.appendChild(tdAn);
@@ -1001,7 +1001,7 @@
               const td = document.createElement("td");
               if (val === 0) {
                 td.className = "sin-registro";
-                td.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i data-lucide="x" style="width:10px) : '<i data-lucide="x" style="width:10px;"></i> 0';
+                td.innerHTML = '<i data-lucide="x" style="width:10px;"></i> 0';
               } else if (val) {
                 td.textContent = formatter.format(val);
                 const percent = ((val - rowAvg) / rowAvg) * 100;

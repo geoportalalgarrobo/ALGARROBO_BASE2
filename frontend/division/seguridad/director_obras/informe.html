@@ -592,7 +592,7 @@
             // Mostrar spinner en el botón
             const generateBtn = document.getElementById('generateBtn');
             const originalContent = generateBtn.innerHTML;
-            generateBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<span class="spinner"></span>Generando...') : '<span class="spinner"></span>Generando...';
+            generateBtn.innerHTML = '<span class="spinner"></span>Generando...';
             generateBtn.disabled = true;
             
             // Mostrar mensaje de generación
@@ -601,7 +601,7 @@
             // Simular generación de informe
             setTimeout(() => {
                 // Restaurar botón
-                generateBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalContent) : originalContent;
+                generateBtn.innerHTML = originalContent;
                 generateBtn.disabled = false;
                 
                 // Generar y descargar el informe según el formato
@@ -839,13 +839,13 @@
             // Configurar estilo según tipo
             if (type === 'success') {
                 notification.classList.add('bg-green-500', 'text-white');
-                notification.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fas fa-check-circle"></i><span>${message}</span>`) : `<i class="fas fa-check-circle"></i><span>${message}</span>`;
+                notification.innerHTML = `<i class="fas fa-check-circle"></i><span>${message}</span>`;
             } else if (type === 'error') {
                 notification.classList.add('bg-red-500', 'text-white');
-                notification.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fas fa-exclamation-circle"></i><span>${message}</span>`) : `<i class="fas fa-exclamation-circle"></i><span>${message}</span>`;
+                notification.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>${message}</span>`;
             } else {
                 notification.classList.add('bg-blue-500', 'text-white');
-                notification.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fas fa-info-circle"></i><span>${message}</span>`) : `<i class="fas fa-info-circle"></i><span>${message}</span>`;
+                notification.innerHTML = `<i class="fas fa-info-circle"></i><span>${message}</span>`;
             }
             
             // Añadir al DOM

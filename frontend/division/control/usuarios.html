@@ -264,13 +264,7 @@
         function renderListaUsuarios(lista) {
             const el = document.getElementById('listaUsuarios');
             const colores = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-            el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(lista.map((u, i) => `
-                <div class="user-list-item" id="uitem-${u.user_id}" onclick="cargarDetalleUsuario(${u.user_id})">
-                    <div class="user-avatar" style="background:${colores[i % 5]}15;color:${colores[i % 5]}">${(u.nombre_usuario || u.email).substring(0, 2).toUpperCase()}</div>
-                    <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${u.nombre_usuario || '—'}</p><p class="text-[10px] text-gray-400">${u.email}</p></div>
-                    <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-gray-100">${u.total_acciones}</span>
-                </div>
-            `).join('')) : lista.map((u, i) => `
+            el.innerHTML = lista.map((u, i) => `
                 <div class="user-list-item" id="uitem-${u.user_id}" onclick="cargarDetalleUsuario(${u.user_id})">
                     <div class="user-avatar" style="background:${colores[i % 5]}15;color:${colores[i % 5]}">${(u.nombre_usuario || u.email).substring(0, 2).toUpperCase()}</div>
                     <div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate">${u.nombre_usuario || '—'}</p><p class="text-[10px] text-gray-400">${u.email}</p></div>
@@ -283,10 +277,7 @@
             document.querySelectorAll('.user-list-item').forEach(e => e.classList.remove('active'));
             document.getElementById(`uitem-${uid}`)?.classList.add('active');
 
-            document.getElementById('detallePanel').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                <div class="section-card text-center py-8 text-gray-400">
-                    <i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i><p>Cargando actividad\u2026</p>
-                </div>`) : `
+            document.getElementById('detallePanel').innerHTML = `
                 <div class="section-card text-center py-8 text-gray-400">
                     <i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i><p>Cargando actividad\u2026</p>
                 </div>`;
@@ -303,43 +294,7 @@
                     fallas: actividad.filter(a => !a.exitoso).length
                 };
 
-                document.getElementById('detallePanel').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="user-card">
-                        <div class="flex items-center justify-between mb-1">
-                            <h2 class="text-xl font-bold">${usuario.nombre || '\u2014'}</h2>
-                            <button onclick="descargarUsuarioPDF(${uid})" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 transition">
-                                <i class="fas fa-download"></i> Descargar Usuario
-                            </button>
-                        </div>
-                        <p class="text-gray-500 mb-4">${usuario.email || '\u2014'}</p>
-                        <div class="grid grid-cols-4 gap-3">
-                            <div class="stat-pill"><b>${stats.total}</b><span class="text-[10px] text-gray-500">Total</span></div>
-                            <div class="stat-pill"><b>${stats.vistas}</b><span class="text-[10px] text-gray-500">Vistas</span></div>
-                            <div class="stat-pill"><b>${stats.ediciones}</b><span class="text-[10px] text-gray-500">Edits</span></div>
-                            <div class="stat-pill"><b class="text-red-500">${stats.fallas}</b><span class="text-[10px] text-gray-500">Errores</span></div>
-                        </div>
-                    </div>
-                    <div class="section-card">
-                        <div class="section-title">Timeline de Actividad</div>
-                        ${actividad.length === 0
-                        ? '<p class="text-sm text-gray-400 text-center py-6">Sin actividad registrada para este usuario.</p>'
-                        : `<div style="max-height:400px;overflow-y:auto">
-                                ${actividad.map(r => `
-                                    <div class="timeline-item">
-                                        <div class="timeline-dot"><i class="fas ${r.accion?.includes('ver') ? 'fa-eye' : 'fa-edit'}"></i></div>
-                                        <div class="flex-1">
-                                            <div class="flex items-center gap-2">
-                                                <span class="badge ${r.accion?.includes('ver') ? 'badge-ver' : 'badge-editar'}">${r.accion}</span>
-                                                <span class="text-[10px] text-gray-400">${new Date(r.fecha).toLocaleString('es-CL')}</span>
-                                            </div>
-                                            <p class="text-xs text-gray-500 mt-1">${r.detalle || r.entidad_nombre || 'Sin detalles'}</p>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>`
-                    }
-                    </div>
-                `) : `
+                document.getElementById('detallePanel').innerHTML = `
                     <div class="user-card">
                         <div class="flex items-center justify-between mb-1">
                             <h2 class="text-xl font-bold">${usuario.nombre || '\u2014'}</h2>
@@ -377,10 +332,7 @@
                     </div>
                 `;
             } catch (e) {
-                document.getElementById('detallePanel').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<div class="section-card text-center py-8 text-red-400">
-                        <i class="fas fa-exclamation-triangle text-2xl mb-2 block"></i>
-                        Error al cargar actividad del usuario.
-                    </div>`) : `<div class="section-card text-center py-8 text-red-400">
+                document.getElementById('detallePanel').innerHTML = `<div class="section-card text-center py-8 text-red-400">
                         <i class="fas fa-exclamation-triangle text-2xl mb-2 block"></i>
                         Error al cargar actividad del usuario.
                     </div>`;
@@ -492,7 +444,7 @@
             if (!todosUsuarios.length) return alert('No hay usuarios cargados.');
             const btn = event.currentTarget;
             btn.disabled = true;
-            btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin"></i> Generando ZIP...') : '<i class="fas fa-spinner fa-spin"></i> Generando ZIP...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando ZIP...';
 
             const zip = new JSZip();
             let ok = 0;
@@ -519,7 +471,7 @@
             }
 
             btn.disabled = false;
-            btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-file-pdf"></i> Descargar Todo') : '<i class="fas fa-file-pdf"></i> Descargar Todo';
+            btn.innerHTML = '<i class="fas fa-file-pdf"></i> Descargar Todo';
         }
     </script>
 </body>

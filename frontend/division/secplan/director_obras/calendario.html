@@ -871,7 +871,7 @@
                 icon = '<i class="fas fa-info-circle"></i>';
             }
             
-            notification.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`${icon}<span>${message}</span>`) : `${icon}<span>${message}</span>`;
+            notification.innerHTML = `${icon}<span>${message}</span>`;
             
             // Añadir al DOM
             document.body.appendChild(notification);

@@ -16,19 +16,7 @@ export class PrintWizard {
         overlay.id = 'print-wizard-overlay';
         overlay.className = 'fixed inset-0 z-[100] bg-slate-900/90 flex flex-col items-center justify-center text-white backdrop-blur-sm transition-opacity duration-300';
         overlay.style.opacity = '0';
-        overlay.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-            <div class="w-96 text-center space-y-6">
-                <div class="text-4xl animate-bounce">🖨️</div>
-                <div>
-                    <h3 class="text-2xl font-bold mb-1">Generando PDF</h3>
-                    <p id="print-action" class="text-gray-400 text-sm">Iniciando...</p>
-                </div>
-                <div class="w-full bg-slate-700 rounded-full h-4 overflow-hidden shadow-inner border border-slate-600">
-                    <div id="print-progress-bar" class="bg-orange-500 h-full transition-all duration-300 ease-out" style="width: 0%"></div>
-                </div>
-                <p class="text-xs text-slate-500">Por favor espere, procesando imágenes...</p>
-            </div>
-        `) : `
+        overlay.innerHTML = `
             <div class="w-96 text-center space-y-6">
                 <div class="text-4xl animate-bounce">🖨️</div>
                 <div>

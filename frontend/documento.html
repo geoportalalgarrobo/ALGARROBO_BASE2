@@ -73,7 +73,7 @@ async function cargarProyectos() {
 
     const proyectos = await res.json();
     const ul = document.getElementById("listaProyectos");
-    ul.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize("") : "";
+    ul.innerHTML = "";
 
     proyectos.forEach(p => {
         const li = document.createElement("li");

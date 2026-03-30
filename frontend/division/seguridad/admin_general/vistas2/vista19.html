@@ -199,11 +199,7 @@
         const findingsList = document.getElementById('v24_findings_list');
         const topCrimes = S.allDataHistory.filter(r => r[C.ID_SEMANA] === S.currentSemana).sort((a, b) => (b[C.CASOS_ACTUAL] || 0) - (a[C.CASOS_ACTUAL] || 0)).slice(0, 2);
 
-        findingsList.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize([
-            `El volumen total de delitos registra un comportamiento ${delta > 0 ? 'al alza' : 'a la baja'} respecto a la semana anterior.`,
-            `La tipolog�a con mayor impacto esta semana es <strong>${topCrimes[0]?.[C.DELITO] || '--'}</strong> con ${topCrimes[0]?.[C.CASOS_ACTUAL] || 0} casos.`,
-            `La comuna ocupa la posici�n <strong>${rank}</strong> en el ranking regional proyectado anual.`
-        ].map(txt => `<div style="display: flex) : [
+        findingsList.innerHTML = [
             `El volumen total de delitos registra un comportamiento ${delta > 0 ? 'al alza' : 'a la baja'} respecto a la semana anterior.`,
             `La tipolog�a con mayor impacto esta semana es <strong>${topCrimes[0]?.[C.DELITO] || '--'}</strong> con ${topCrimes[0]?.[C.CASOS_ACTUAL] || 0} casos.`,
             `La comuna ocupa la posici�n <strong>${rank}</strong> en el ranking regional proyectado anual.`
@@ -213,14 +209,13 @@
         const alertsContainer = document.getElementById('v24_critical_alerts');
         const critical = S.allDataHistory.filter(r => r[C.ID_SEMANA] === S.currentSemana && (r[C.CASOS_ACTUAL] > r[C.CASOS_ANT] * 1.2)).slice(0, 2);
         if (critical.length > 0) {
-            alertsContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(critical.map(a => `
-                <div style="background: #fef2f2) : critical.map(a => `
+            alertsContainer.innerHTML = critical.map(a => `
                 <div style="background: #fef2f2; padding: 10px; border-radius: 6px; border-left: 4px solid #ef4444; font-size: 0.85rem; font-weight: 700; color: #991b1b;">
                     ALZA EXPLOSIVA: ${a[C.DELITO]} (+${((a[C.CASOS_ACTUAL] - a[C.CASOS_ANT]) / a[C.CASOS_ANT] * 100).toFixed(0)}%)
                 </div>
             `).join('');
         } else {
-            alertsContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div style="font-size:0.85rem) : '<div style="font-size:0.85rem; color:#64748b;">No se detectan anomal�as cr�ticas espec�ficas.</div>';
+            alertsContainer.innerHTML = '<div style="font-size:0.85rem; color:#64748b;">No se detectan anomal�as cr�ticas espec�ficas.</div>';
         }
 
         // Mini Trend Chart

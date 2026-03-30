@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
 
                 const currentVal = select.value;
 
-                select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<option value="">${defaultText}</option>`) : `<option value="">${defaultText}</option>`;
+                select.innerHTML = `<option value="">${defaultText}</option>`;
                 data.forEach(item => {
                     const option = document.createElement('option');
                     option.value = item.id;
@@ -141,16 +141,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
         async function loadProjects() {
             try {
                 const tableBody = document.getElementById('projectsTableBody');
-                tableBody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <tr>
-                        <td colspan="8" class="text-center py-12">
-                            <div class="flex flex-col items-center justify-center">
-                                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
-                                <p class="text-gray-500 font-medium">Cargando proyectos...</p>
-                            </div>
-                        </td>
-                    </tr>
-                `) : `
+                tableBody.innerHTML = `
                     <tr>
                         <td colspan="8" class="text-center py-12">
                             <div class="flex flex-col items-center justify-center">
@@ -187,8 +178,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
         function populateFilters() {
             const rib = document.getElementById('filterRibbon');
             if (!rib) return;
-            rib.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(Object.keys(mapFilters).map(key => {
-                const count = currentFilters[key].length) : Object.keys(mapFilters).map(key => {
+            rib.innerHTML = Object.keys(mapFilters).map(key => {
                 const count = currentFilters[key].length;
                 const label = count === 0 ? labelFilters[key] : `${labelFilters[key]}: ${count}`;
                 const isActive = count > 0;
@@ -280,21 +270,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
 
         function renderSkeleton(container, rows = 5) {
             const visibilityClass = columnsVisible ? 'toggle-column-visible' : 'hidden';
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(Array(rows).fill(0).map(() => `
-                <tr class="animate-pulse bg-white">
-                    <td class="toggle-column ${visibilityClass} px-6 py-8"><div class="h-3 bg-slate-100 rounded w-8 mx-auto"></div></td>
-                    <td class="px-6 py-8">
-                        <div class="h-5 bg-slate-100 rounded w-3/4 mb-3"></div>
-                        <div class="h-3 bg-slate-50 rounded w-1/2"></div>
-                    </td>
-                    <td class="toggle-column ${visibilityClass} px-6 py-8"><div class="h-4 bg-slate-100 rounded w-full"></div></td>
-                    <td class="toggle-column ${visibilityClass} px-6 py-8"><div class="h-4 bg-slate-100 rounded w-20 mx-auto"></div></td>
-                    <td class="toggle-column ${visibilityClass} px-6 py-8"><div class="h-5 bg-slate-100 rounded w-24 ml-auto"></div></td>
-                    <td class="px-6 py-8"><div class="h-8 bg-slate-50 rounded-full w-28 mx-auto"></div></td>
-                    <td class="px-6 py-8"><div class="h-2 bg-slate-100 rounded-full w-full"></div></td>
-                    <td class="px-6 py-8"><div class="h-10 bg-slate-50 rounded-xl w-32 mx-auto"></div></td>
-                </tr>
-            `).join('')) : Array(rows).fill(0).map(() => `
+            container.innerHTML = Array(rows).fill(0).map(() => `
                 <tr class="animate-pulse bg-white">
                     <td class="toggle-column ${visibilityClass} px-6 py-8"><div class="h-3 bg-slate-100 rounded w-8 mx-auto"></div></td>
                     <td class="px-6 py-8">
@@ -314,15 +290,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
         function renderProyectos(proyectosToRender) {
             const tableBody = document.getElementById('projectsTableBody');
             if (proyectosToRender.length === 0) {
-                tableBody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <tr>
-                        <td colspan="8" class="text-center py-20 bg-slate-50/20">
-                            <i class="fas fa-ghost text-4xl text-slate-200 mb-4 block"></i>
-                            <p class="font-extrabold text-slate-400 uppercase tracking-widest text-[11px]">Cero coincidencias encontradas</p>
-                            <p class="text-sm text-gray-400 mt-2">Intenta ajustar los filtros de búsqueda</p>
-                        </td>
-                    </tr>
-                `) : `
+                tableBody.innerHTML = `
                     <tr>
                         <td colspan="8" class="text-center py-20 bg-slate-50/20">
                             <i class="fas fa-ghost text-4xl text-slate-200 mb-4 block"></i>
@@ -336,8 +304,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
 
             const visibilityClass = columnsVisible ? 'toggle-column-visible' : 'hidden';
 
-            tableBody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(proyectosToRender.map((proyecto, i) => {
-                let statusClass = utils.getStatusClass(proyecto.estado_nombre || '')) : proyectosToRender.map((proyecto, i) => {
+            tableBody.innerHTML = proyectosToRender.map((proyecto, i) => {
                 let statusClass = utils.getStatusClass(proyecto.estado_nombre || '');
                 let statusText = proyecto.estado_nombre || 'N/A';
                 let cStyle = proyecto.estado_color ? `background-color: ${proyecto.estado_color}10; color: ${proyecto.estado_color}; border: 1px solid ${proyecto.estado_color}30;` : '';
@@ -428,9 +395,9 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
             });
 
             if (columnsVisible) {
-                toggleBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-compress-arrows-alt mr-2"></i>Vista Compacta') : '<i class="fas fa-compress-arrows-alt mr-2"></i>Vista Compacta';
+                toggleBtn.innerHTML = '<i class="fas fa-compress-arrows-alt mr-2"></i>Vista Compacta';
             } else {
-                toggleBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-expand-arrows-alt mr-2"></i>Vista Expandida') : '<i class="fas fa-expand-arrows-alt mr-2"></i>Vista Expandida';
+                toggleBtn.innerHTML = '<i class="fas fa-expand-arrows-alt mr-2"></i>Vista Expandida';
             }
         }
 
@@ -481,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
             } catch (e) { }
 
             const detailsContainer = document.getElementById('viewProjectDetails');
-            detailsContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            detailsContainer.innerHTML = '';
 
             const formatDocProgress = (val) => {
                 if (!val) return '<span class="text-sm font-semibold text-gray-400">-</span>';
@@ -888,7 +855,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
                 </div >
                 `;
 
-            detailsContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+            detailsContainer.innerHTML = html;
 
             const btnDownload = document.getElementById('btnDownloadReport');
             if (btnDownload) {
@@ -1063,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
 
             try {
                 submitBtn.disabled = true;
-                submitText.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin mr-2"></i> Procesando...') : '<i class="fas fa-spinner fa-spin mr-2"></i> Procesando...';
+                submitText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Procesando...';
 
                 if (editingId) {
                     await api.put(`/proyectos/${editingId}`, data);
@@ -1079,7 +1046,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
                 showToast(error.message || 'Error al guardar el proyecto', 'error');
             } finally {
                 submitBtn.disabled = false;
-                submitText.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalText) : originalText;
+                submitText.innerHTML = originalText;
             }
         }
 
@@ -1116,7 +1083,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
 
             const label = event.target.previousElementSibling;
             const originalText = label.innerHTML;
-            label.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin"></i>') : '<i class="fas fa-spinner fa-spin"></i>';
+            label.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             label.classList.add('cursor-not-allowed', 'opacity-50');
 
             try {
@@ -1130,7 +1097,7 @@ document.addEventListener('DOMContentLoaded', () => createHelpButton('proyecto')
                 console.error(error);
                 showToast(error.message || 'Error al subir archivo', 'error');
             } finally {
-                label.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalText) : originalText;
+                label.innerHTML = originalText;
                 label.classList.remove('cursor-not-allowed', 'opacity-50');
                 event.target.value = '';
             }

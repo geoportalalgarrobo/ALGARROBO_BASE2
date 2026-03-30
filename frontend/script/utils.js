@@ -56,7 +56,7 @@ const utils = {
         if (!select) return;
 
         const currentValue = select.value;
-        select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<option value="">${placeholder}</option>`) : `<option value="">${placeholder}</option>`;
+        select.innerHTML = `<option value="">${placeholder}</option>`;
 
         items.forEach(item => {
             const option = document.createElement('option');

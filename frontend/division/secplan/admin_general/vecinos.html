@@ -728,7 +728,7 @@
 
                 const mapContainer = document.getElementById('map');
                 if (mapContainer) {
-                    mapContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<div class="flex justify-center items-center h-full text-center p-4"><p class="text-red-500 font-semibold">Error al cargar los reportes.</p><p class="text-gray-600">${error.message}</p></div>`) : `<div class="flex justify-center items-center h-full text-center p-4"><p class="text-red-500 font-semibold">Error al cargar los reportes.</p><p class="text-gray-600">${error.message}</p></div>`;
+                    mapContainer.innerHTML = `<div class="flex justify-center items-center h-full text-center p-4"><p class="text-red-500 font-semibold">Error al cargar los reportes.</p><p class="text-gray-600">${error.message}</p></div>`;
                 }
             }
         }
@@ -744,21 +744,21 @@
         function populateFilters() {
             // Categorías
             const categoriaSelect = document.getElementById('filterCategoria');
-            categoriaSelect.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="all">Todas</option>') : '<option value="all">Todas</option>';
+            categoriaSelect.innerHTML = '<option value="all">Todas</option>';
             categorias.forEach(cat => {
                 categoriaSelect.innerHTML += `<option value="${cat.id}">${cat.nombre}</option>`;
             });
 
             // Estados
             const estadoSelect = document.getElementById('filterEstado');
-            estadoSelect.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="all">Todos</option>') : '<option value="all">Todos</option>';
+            estadoSelect.innerHTML = '<option value="all">Todos</option>';
             estados.forEach(est => {
                 estadoSelect.innerHTML += `<option value="${est.id}">${est.nombre}</option>`;
             });
 
             // Gravedades
             const gravedadSelect = document.getElementById('filterGravedad');
-            gravedadSelect.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="all">Todas</option>') : '<option value="all">Todas</option>';
+            gravedadSelect.innerHTML = '<option value="all">Todas</option>';
             gravedades.forEach(grav => {
                 gravedadSelect.innerHTML += `<option value="${grav.id}">${grav.nombre}</option>`;
             });
@@ -848,7 +848,7 @@
 
             legend.onAdd = function (map) {
                 const div = L.DomUtil.create('div', 'legend');
-                div.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="legend-title">Estados de Reporte</div>') : '<div class="legend-title">Estados de Reporte</div>';
+                div.innerHTML = '<div class="legend-title">Estados de Reporte</div>';
 
                 Object.keys(estadoColors).forEach(estado => {
                     if (estado !== 'default') {
@@ -948,19 +948,14 @@
         function loadReportsList() {
             const listContainer = document.getElementById('reportsList');
             const countElement = document.getElementById('reportCount');
-            listContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            listContainer.innerHTML = '';
 
             const validReports = filteredReports.filter(report => report.latitud && report.longitud);
 
             countElement.textContent = `Mostrando ${validReports.length} de ${allReports.length} reportes`;
 
             if (validReports.length === 0) {
-                listContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="col-span-full text-center py-8 text-gray-500">
-                        <i class="fas fa-search text-4xl mb-4"></i>
-                        <p>No se encontraron reportes con los filtros seleccionados</p>
-                    </div>
-                `) : `
+                listContainer.innerHTML = `
                     <div class="col-span-full text-center py-8 text-gray-500">
                         <i class="fas fa-search text-4xl mb-4"></i>
                         <p>No se encontraron reportes con los filtros seleccionados</p>
@@ -976,10 +971,7 @@
                 reportCard.style.borderLeftColor = estadoColor;
                 reportCard.onclick = () => focusReportOnMap(report.id);
 
-                reportCard.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="flex items-start space-x-3">
-                        <div class="flex-shrink-0">
-                            <div style="background-color: ${estadoColor}) : `
+                reportCard.innerHTML = `
                     <div class="flex items-start space-x-3">
                         <div class="flex-shrink-0">
                             <div style="background-color: ${estadoColor}; width: 12px; height: 12px; border-radius: 50%; margin-top: 5px;"></div>
@@ -1043,66 +1035,7 @@
 
             if (editMode) {
                 // Modo edición
-                content.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="mb-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500">Editando Folio</span>
-                            <span class="text-lg font-bold text-amber-700">#${report.numero_folio || 'Sin folio'}</span>
-                        </div>
-                    </div>
-
-                    <form id="editReportForm" onsubmit="saveReportChanges(event, ${report.id})">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-                            <select name="categoria_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                ${categoriaOptions}
-                            </select>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                            <select name="estado_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                ${estadoOptions}
-                            </select>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Gravedad</label>
-                            <select name="gravedad_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                ${gravedadOptions}
-                            </select>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección de Referencia</label>
-                            <input type="text" name="direccion_referencia" value="${report.direccion_referencia || ''}" 
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                            <textarea name="descripcion" rows="4" 
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">${report.descripcion || ''}</textarea>
-                        </div>
-
-                        <div class="mb-6">
-                            <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" name="revisado" ${report.revisado ? 'checked' : ''} 
-                                    class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">Marcar como Revisado</span>
-                            </label>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                                <i class="fas fa-save mr-1"></i> Guardar Cambios
-                            </button>
-                            <button type="button" onclick="showReportDetails(${report.id}, false)" class="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
-                                <i class="fas fa-times mr-1"></i> Cancelar
-                            </button>
-                        </div>
-                    </form>
-                `) : `
+                content.innerHTML = `
                     <div class="mb-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl">
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-gray-500">Editando Folio</span>
@@ -1164,95 +1097,7 @@
                 `;
             } else {
                 // Modo visualización
-                content.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500">Folio</span>
-                            <span class="text-lg font-bold text-blue-700">#${report.numero_folio || 'Sin folio'}</span>
-                        </div>
-                    </div>
-
-                    <div class="detail-item">
-                        <span class="detail-label">Categoría</span>
-                        <p class="detail-value text-lg font-semibold">${report.categoria || 'Sin categoría'}</p>
-                    </div>
-
-                    <div class="detail-item">
-                        <span class="detail-label">Estado</span>
-                        <p class="detail-value">
-                            <span class="status-badge ${getStatusBadgeClass(report.estado)}">${report.estado || 'Sin estado'}</span>
-                        </p>
-                    </div>
-
-                    <div class="detail-item">
-                        <span class="detail-label">Gravedad</span>
-                        <p class="detail-value">
-                            <span class="gravedad-badge ${getGravedadBadgeClass(report.gravedad)}">${report.gravedad || 'Sin gravedad'}</span>
-                        </p>
-                    </div>
-
-                    <div class="detail-item">
-                        <span class="detail-label">Dirección de Referencia</span>
-                        <p class="detail-value">${report.direccion_referencia || 'No especificada'}</p>
-                    </div>
-
-                    <div class="detail-item">
-                        <span class="detail-label">Descripción</span>
-                        <p class="detail-value">${report.descripcion || 'Sin descripción'}</p>
-                    </div>
-
-                    <div class="detail-item">
-                        <span class="detail-label">Coordenadas</span>
-                        <p class="detail-value">
-                            <i class="fas fa-map-marker-alt text-red-500 mr-1"></i>
-                            ${report.latitud}, ${report.longitud}
-                        </p>
-                    </div>
-
-                    <div class="detail-item">
-                        <span class="detail-label">Fecha de Reporte</span>
-                        <p class="detail-value">${formatDate(report.fecha_reporte)}</p>
-                    </div>
-
-                    ${report.fecha_actualizacion ? `
-                    <div class="detail-item">
-                        <span class="detail-label">Última Actualización</span>
-                        <p class="detail-value">${formatDate(report.fecha_actualizacion)}</p>
-                    </div>
-                    ` : ''}
-
-                    <div class="detail-item">
-                        <span class="detail-label">Reportado Por</span>
-                        <p class="detail-value">
-                            <i class="fas fa-user text-gray-400 mr-1"></i>
-                            ${report.reportado_por_nombre || 'Anónimo'}
-                            ${report.reportado_por_email ? `<span class="text-sm text-gray-400">(${report.reportado_por_email})</span>` : ''}
-                        </p>
-                    </div>
-
-                    ${report.actualizado_por_nombre ? `
-                    <div class="detail-item">
-                        <span class="detail-label">Actualizado Por</span>
-                        <p class="detail-value">
-                            <i class="fas fa-user-edit text-gray-400 mr-1"></i>
-                            ${report.actualizado_por_nombre}
-                            ${report.actualizado_por_email ? `<span class="text-sm text-gray-400">(${report.actualizado_por_email})</span>` : ''}
-                        </p>
-                    </div>
-                    ` : ''}
-
-                    <div class="detail-item">
-                        <span class="detail-label">Revisado</span>
-                        <p class="detail-value">
-                            ${report.revisado ? '<i class="fas fa-check-circle text-green-500 mr-1"></i> Sí' : '<i class="fas fa-times-circle text-red-500 mr-1"></i> No'}
-                        </p>
-                    </div>
-
-                    <div class="mt-6 flex gap-2">
-                        <button onclick="showReportDetails(${report.id}, true)" class="flex-1 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">
-                            <i class="fas fa-edit mr-1"></i> Editar
-                        </button>
-                        <button onclick="focusReportOnMap(${report.id})) : `
+                content.innerHTML = `
                     <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-gray-500">Folio</span>

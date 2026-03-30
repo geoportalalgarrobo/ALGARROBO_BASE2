@@ -948,36 +948,7 @@ function showHelpModal(viewName) {
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'helpModal';
-        modal.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4" onclick="closeHelpModal(event)">
-                <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
-                    <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-6 text-white">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
-                                    <i id="helpModalIcon" class="fas ${content.icon} text-xl"></i>
-                                </div>
-                                <div>
-                                    <h2 class="text-2xl font-bold" id="helpModalTitle">${content.title}</h2>
-                                    <p class="text-white/80 text-sm">Guía de ayuda</p>
-                                </div>
-                            </div>
-                            <button onclick="closeHelpModal()" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="p-6 overflow-y-auto max-h-[60vh]" id="helpModalContent">
-                        <!-- Content will be inserted here -->
-                    </div>
-                    <div class="border-t border-gray-100 p-4 bg-gray-50 flex justify-end">
-                        <button onclick="closeHelpModal()" class="px-6 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors font-medium">
-                            <i class="fas fa-check mr-2"></i>Entendido
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `) : `
+        modal.innerHTML = `
             <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4" onclick="closeHelpModal(event)">
                 <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
                     <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-6 text-white">
@@ -1050,7 +1021,7 @@ function showHelpModal(viewName) {
         </div>
     `;
 
-    document.getElementById('helpModalContent').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(contentHtml) : contentHtml;
+    document.getElementById('helpModalContent').innerHTML = contentHtml;
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
 }
@@ -1075,12 +1046,7 @@ function createHelpButton(viewName) {
     const btn = document.createElement('button');
     btn.id = 'helpButton';
     btn.className = 'fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all z-[9998] flex items-center justify-center group';
-    btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-        <i class="fas fa-question text-xl"></i>
-            <span class="absolute right-full mr-3 bg-gray-800 text-white text-sm px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                Ayuda
-            </span>
-    `) : `
+    btn.innerHTML = `
         <i class="fas fa-question text-xl"></i>
             <span class="absolute right-full mr-3 bg-gray-800 text-white text-sm px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                 Ayuda

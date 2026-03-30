@@ -208,8 +208,7 @@
                 return { name: d.name, p1, p2, diff: p2 - p1 };
             });
 
-            table.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(structuralChanges.map(c => `
-                <div style="display: flex) : structuralChanges.map(c => `
+            table.innerHTML = structuralChanges.map(c => `
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f8fafc;">
                     <div style="flex: 1;">
                         <div style="font-size: 0.8rem; font-weight: 700; color: #475569;">${c.name}</div>
@@ -269,7 +268,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista7').then(txt => {
                 const el = document.getElementById('v7_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
     })();

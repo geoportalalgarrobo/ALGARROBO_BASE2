@@ -289,7 +289,7 @@
                 const options = [...new Set(availableProjects.map(p => p[dataKey]).filter(v => v))].sort();
 
                 // Preservar la opci�n "Todos"
-                select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="all">Todos / Todas</option>') : '<option value="all">Todos / Todas</option>';
+                select.innerHTML = '<option value="all">Todos / Todas</option>';
                 options.forEach(opt => {
                     const el = document.createElement('option');
                     el.value = opt;
@@ -376,18 +376,14 @@
             });
 
             const tbody = document.getElementById('sectorTableBody');
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tbody.innerHTML = '';
 
             // Ordenar sectores por nombre
             Object.keys(sectors).sort().forEach(sec => {
                 const row = document.createElement('tr');
                 row.className = 'transition-colors cursor-pointer';
                 row.onclick = () => focusSector(sec);
-                row.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <td class="font-medium text-gray-900">${sec}</td>
-                    <td class="text-center bg-gray-50/30">${sectors[sec].count}</td>
-                    <td class="text-right monto-col">${formatCurrency(sectors[sec].monto)}</td>
-                `) : `
+                row.innerHTML = `
                     <td class="font-medium text-gray-900">${sec}</td>
                     <td class="text-center bg-gray-50/30">${sectors[sec].count}</td>
                     <td class="text-right monto-col">${formatCurrency(sectors[sec].monto)}</td>

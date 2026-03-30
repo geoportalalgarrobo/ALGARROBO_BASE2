@@ -268,7 +268,7 @@
                     if (!response.ok) throw new Error(`sidebar2.html not found (${response.status})`);
                     const html = await response.text();
                     if (this.elements && this.elements.sidebar) {
-                        this.elements.sidebar.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+                        this.elements.sidebar.innerHTML = html;
                     }
                     this.initNavigation();
 

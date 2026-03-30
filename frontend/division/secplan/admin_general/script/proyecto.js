@@ -53,7 +53,7 @@
 
                 const currentVal = select.value;
 
-                select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<option value="">${defaultText}</option>`) : `<option value="">${defaultText}</option>`;
+                select.innerHTML = `<option value="">${defaultText}</option>`;
                 data.forEach(item => {
                     const option = document.createElement('option');
                     option.value = item.id;
@@ -126,16 +126,7 @@
         async function loadProjects() {
             try {
                 const tableBody = document.getElementById('projectsTableBody');
-                tableBody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <tr>
-                        <td colspan="8" class="text-center py-12">
-                            <div class="flex flex-col items-center justify-center">
-                                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
-                                <p class="text-gray-500 font-medium">Cargando proyectos...</p>
-                            </div>
-                        </td>
-                    </tr>
-                `) : `
+                tableBody.innerHTML = `
                     <tr>
                         <td colspan="8" class="text-center py-12">
                             <div class="flex flex-col items-center justify-center">
@@ -282,21 +273,7 @@
 
         function renderSkeleton(container, rows = 5) {
             const visibilityClass = columnsVisible ? 'toggle-column-visible' : 'hidden';
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(Array(rows).fill(0).map(() => `
-                <tr class="animate-pulse bg-white">
-                    <td class="toggle-column ${visibilityClass} px-6 py-8"><div class="h-3 bg-slate-100 rounded w-8 mx-auto"></div></td>
-                    <td class="px-6 py-8">
-                        <div class="h-5 bg-slate-100 rounded w-3/4 mb-3"></div>
-                        <div class="h-3 bg-slate-50 rounded w-1/2"></div>
-                    </td>
-                    <td class="toggle-column ${visibilityClass} px-6 py-8"><div class="h-4 bg-slate-100 rounded w-full"></div></td>
-                    <td class="toggle-column ${visibilityClass} px-6 py-8"><div class="h-4 bg-slate-100 rounded w-20 mx-auto"></div></td>
-                    <td class="toggle-column ${visibilityClass} px-6 py-8"><div class="h-5 bg-slate-100 rounded w-24 ml-auto"></div></td>
-                    <td class="px-6 py-8"><div class="h-8 bg-slate-50 rounded-full w-28 mx-auto"></div></td>
-                    <td class="px-6 py-8"><div class="h-2 bg-slate-100 rounded-full w-full"></div></td>
-                    <td class="px-6 py-8"><div class="h-10 bg-slate-50 rounded-xl w-32 mx-auto"></div></td>
-                </tr>
-            `).join('')) : Array(rows).fill(0).map(() => `
+            container.innerHTML = Array(rows).fill(0).map(() => `
                 <tr class="animate-pulse bg-white">
                     <td class="toggle-column ${visibilityClass} px-6 py-8"><div class="h-3 bg-slate-100 rounded w-8 mx-auto"></div></td>
                     <td class="px-6 py-8">
@@ -316,15 +293,7 @@
         function renderProyectos(proyectosToRender) {
             const tableBody = document.getElementById('projectsTableBody');
             if (proyectosToRender.length === 0) {
-                tableBody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <tr>
-                        <td colspan="8" class="text-center py-20 bg-slate-50/20">
-                            <i class="fas fa-ghost text-4xl text-slate-200 mb-4 block"></i>
-                            <p class="font-extrabold text-slate-400 uppercase tracking-widest text-[11px]">Cero coincidencias encontradas</p>
-                            <p class="text-sm text-gray-400 mt-2">Intenta ajustar los filtros de bÃºsqueda</p>
-                        </td>
-                    </tr>
-                `) : `
+                tableBody.innerHTML = `
                     <tr>
                         <td colspan="8" class="text-center py-20 bg-slate-50/20">
                             <i class="fas fa-ghost text-4xl text-slate-200 mb-4 block"></i>
@@ -429,9 +398,9 @@
             });
 
             if (columnsVisible) {
-                toggleBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-compress-arrows-alt mr-2"></i>Vista Compacta') : '<i class="fas fa-compress-arrows-alt mr-2"></i>Vista Compacta';
+                toggleBtn.innerHTML = '<i class="fas fa-compress-arrows-alt mr-2"></i>Vista Compacta';
             } else {
-                toggleBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-expand-arrows-alt mr-2"></i>Vista Expandida') : '<i class="fas fa-expand-arrows-alt mr-2"></i>Vista Expandida';
+                toggleBtn.innerHTML = '<i class="fas fa-expand-arrows-alt mr-2"></i>Vista Expandida';
             }
         }
 
@@ -482,7 +451,7 @@
             } catch (e) { }
 
             const detailsContainer = document.getElementById('viewProjectDetails');
-            detailsContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            detailsContainer.innerHTML = '';
 
             const formatDocProgress = (val) => {
                 if (!val) return '<span class="text-sm font-semibold text-gray-400">-</span>';
@@ -889,7 +858,7 @@
                 </div >
                 `;
 
-            detailsContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+            detailsContainer.innerHTML = html;
 
             const btnDownload = document.getElementById('btnDownloadReport');
             if (btnDownload) {
@@ -1096,7 +1065,7 @@
 
             try {
                 submitBtn.disabled = true;
-                submitText.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin mr-2"></i> Procesando...') : '<i class="fas fa-spinner fa-spin mr-2"></i> Procesando...';
+                submitText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Procesando...';
 
                 if (editingId) {
                     await api.put(`/proyectos/${editingId}`, data);
@@ -1112,7 +1081,7 @@
                 showToast(error.message || 'Error al guardar el proyecto', 'error');
             } finally {
                 submitBtn.disabled = false;
-                submitText.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalText) : originalText;
+                submitText.innerHTML = originalText;
             }
         }
 
@@ -1149,7 +1118,7 @@
 
             const label = event.target.previousElementSibling;
             const originalText = label.innerHTML;
-            label.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin"></i>') : '<i class="fas fa-spinner fa-spin"></i>';
+            label.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             label.classList.add('cursor-not-allowed', 'opacity-50');
 
             try {
@@ -1163,7 +1132,7 @@
                 console.error(error);
                 showToast(error.message || 'Error al subir archivo', 'error');
             } finally {
-                label.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalText) : originalText;
+                label.innerHTML = originalText;
                 label.classList.remove('cursor-not-allowed', 'opacity-50');
                 event.target.value = '';
             }
@@ -1190,14 +1159,14 @@
             const listContainer = document.getElementById('proximosPasosList');
             if (!listContainer) return;
 
-            listContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="text-center py-4 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando...</div>') : '<div class="text-center py-4 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando...</div>';
+            listContainer.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando...</div>';
 
             try {
                 const res = await api.get(`/proyectos/${pid}/proximos_pasos`);
                 const pasos = res.proximos_pasos || [];
 
                 if (pasos.length === 0) {
-                    listContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">No hay prÃ³ximos pasos registrados.</div>') : '<div class="text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">No hay prÃ³ximos pasos registrados.</div>';
+                    listContainer.innerHTML = '<div class="text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">No hay prÃ³ximos pasos registrados.</div>';
                     return;
                 }
 
@@ -1230,10 +1199,10 @@
                         </div>
                     `;
                 }).join('');
-                listContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(htmlContent) : htmlContent;
+                listContainer.innerHTML = htmlContent;
             } catch (error) {
                 console.error(error);
-                listContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="text-center py-4 bg-rose-50 rounded-lg text-rose-600 text-sm font-medium border border-rose-100">Error al cargar listado.</div>') : '<div class="text-center py-4 bg-rose-50 rounded-lg text-rose-600 text-sm font-medium border border-rose-100">Error al cargar listado.</div>';
+                listContainer.innerHTML = '<div class="text-center py-4 bg-rose-50 rounded-lg text-rose-600 text-sm font-medium border border-rose-100">Error al cargar listado.</div>';
             }
         }
 
@@ -1244,7 +1213,7 @@
             const btn = document.getElementById('pp_submitBtn');
             const originalText = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin"></i>') : '<i class="fas fa-spinner fa-spin"></i>';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             try {
                 const payload = {
@@ -1263,7 +1232,7 @@
                 showToast(error.message || 'Error al guardar el paso', 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalText) : originalText;
+                btn.innerHTML = originalText;
             }
         }
 
@@ -1315,7 +1284,7 @@
 
                 const select = document.getElementById('h_categoria');
                 if (select) {
-                    select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="" disabled selected>Selecciona una categorÃ­a...</option>') : '<option value="" disabled selected>Selecciona una categorÃ­a...</option>';
+                    select.innerHTML = '<option value="" disabled selected>Selecciona una categorÃ­a...</option>';
                     categoriasHitoCache.forEach(cat => {
                         const option = document.createElement('option');
                         option.value = cat.id; option.textContent = cat.nombre;
@@ -1340,13 +1309,13 @@
         async function loadHitos_edit(pid) {
             const list = document.getElementById('hitosList');
             if (!list) return;
-            list.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="text-center py-2 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando hitos...</div>') : '<div class="text-center py-2 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando hitos...</div>';
+            list.innerHTML = '<div class="text-center py-2 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando hitos...</div>';
 
             try {
                 const hitos = await api.get(`/proyectos/${pid}/hitos`);
 
                 if (!hitos || hitos.length === 0) {
-                    list.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">No hay hitos en el proyecto.</div>') : '<div class="text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">No hay hitos en el proyecto.</div>';
+                    list.innerHTML = '<div class="text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">No hay hitos en el proyecto.</div>';
                     return;
                 }
 
@@ -1362,10 +1331,10 @@
                         ${h.observacion ? `<span class="text-xs text-gray-600 pl-5">${h.observacion}</span>` : ''}
                     </div>`;
                 }).join('');
-                list.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(htmlContent) : htmlContent;
+                list.innerHTML = htmlContent;
             } catch (e) {
                 console.error(e);
-                list.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="text-center py-2 text-rose-500 text-xs text-medium">Error al cargar hitos</div>') : '<div class="text-center py-2 text-rose-500 text-xs text-medium">Error al cargar hitos</div>';
+                list.innerHTML = '<div class="text-center py-2 text-rose-500 text-xs text-medium">Error al cargar hitos</div>';
             }
         }
 
@@ -1375,7 +1344,7 @@
 
             const btn = document.getElementById('h_submitBtn');
             const originalText = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin"></i>') : '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             try {
                 const payload = {
@@ -1391,7 +1360,7 @@
             } catch (error) {
                 showToast(error.message, 'error');
             } finally {
-                btn.disabled = false; btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalText) : originalText;
+                btn.disabled = false; btn.innerHTML = originalText;
             }
         }
 
@@ -1411,14 +1380,14 @@
         async function loadObservaciones_edit(pid) {
             const list = document.getElementById('observacionesList');
             if (!list) return;
-            list.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="text-center py-2 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando observaciones...</div>') : '<div class="text-center py-2 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando observaciones...</div>';
+            list.innerHTML = '<div class="text-center py-2 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando observaciones...</div>';
 
             try {
                 const data = await api.get(`/proyectos/${pid}/observaciones`);
                 const observaciones = data.observaciones || [];
 
                 if (observaciones.length === 0) {
-                    list.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">No hay observaciones registradas.</div>') : '<div class="text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">No hay observaciones registradas.</div>';
+                    list.innerHTML = '<div class="text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">No hay observaciones registradas.</div>';
                     return;
                 }
 
@@ -1433,10 +1402,10 @@
                         <p class="text-sm text-gray-700 leading-snug break-words whitespace-pre-wrap">${o.observacion}</p>
                     </div>`;
                 }).join('');
-                list.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(htmlContent) : htmlContent;
+                list.innerHTML = htmlContent;
             } catch (e) {
                 console.error(e);
-                list.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="text-center py-2 text-rose-500 text-xs text-medium">Error al cargar observaciones</div>') : '<div class="text-center py-2 text-rose-500 text-xs text-medium">Error al cargar observaciones</div>';
+                list.innerHTML = '<div class="text-center py-2 text-rose-500 text-xs text-medium">Error al cargar observaciones</div>';
             }
         }
 
@@ -1446,7 +1415,7 @@
 
             const btn = document.getElementById('o_submitBtn');
             const originalText = btn.innerHTML;
-            btn.disabled = true; btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin"></i>') : '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             try {
                 const payload = {
@@ -1460,7 +1429,7 @@
             } catch (error) {
                 showToast(error.message, 'error');
             } finally {
-                btn.disabled = false; btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalText) : originalText;
+                btn.disabled = false; btn.innerHTML = originalText;
             }
         }
 
@@ -1470,7 +1439,7 @@
         async function loadDocumentos_edit(pid) {
             const container = document.getElementById('documentosList');
             if (!container) return;
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="col-span-1 md:col-span-2 text-center py-2 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando...</div>') : '<div class="col-span-1 md:col-span-2 text-center py-2 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando...</div>';
+            container.innerHTML = '<div class="col-span-1 md:col-span-2 text-center py-2 text-gray-400 text-sm italic"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando...</div>';
 
             try {
                 const response = await api.get(`/proyectos/${pid}/documentos`);
@@ -1478,7 +1447,7 @@
                 const docs = Array.isArray(response) ? response : (response.documentos || []);
 
                 if (!docs || docs.length === 0) {
-                    container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="col-span-1 md:col-span-2 text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">Sin archivos asociados.</div>') : '<div class="col-span-1 md:col-span-2 text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">Sin archivos asociados.</div>';
+                    container.innerHTML = '<div class="col-span-1 md:col-span-2 text-center py-4 bg-gray-50 rounded-lg text-gray-400 text-sm font-medium border border-gray-100">Sin archivos asociados.</div>';
                     return;
                 }
 
@@ -1500,10 +1469,10 @@
                         </div>
                     </div>`;
                 }).join('');
-                container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(htmlContent) : htmlContent;
+                container.innerHTML = htmlContent;
             } catch (e) {
                 console.error(e);
-                container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="col-span-2 text-center text-rose-500 text-xs font-bold py-2">Error al leer documentos.</div>') : '<div class="col-span-2 text-center text-rose-500 text-xs font-bold py-2">Error al leer documentos.</div>';
+                container.innerHTML = '<div class="col-span-2 text-center text-rose-500 text-xs font-bold py-2">Error al leer documentos.</div>';
             }
         }
 
@@ -1520,7 +1489,7 @@
             // Cambiar icon en el boton original temporalmente (opcional si hay UX)
             const label = e.target.parentElement;
             const originInner = label.innerHTML;
-            label.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin mr-1"></i> Subiendo...') : '<i class="fas fa-spinner fa-spin mr-1"></i> Subiendo...';
+            label.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Subiendo...';
             label.classList.add('cursor-not-allowed', 'opacity-70');
 
             try {
@@ -1531,7 +1500,7 @@
                 console.error(error);
                 showToast(error.message || 'Error en subida', 'error');
             } finally {
-                label.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originInner) : originInner;
+                label.innerHTML = originInner;
                 label.classList.remove('cursor-not-allowed', 'opacity-70');
                 e.target.value = ''; // clean val
             }
@@ -1569,7 +1538,7 @@
                         // Agregar un mensaje flotante cerca del campo
                         const helpText = document.createElement('div');
                         helpText.className = 'text-amber-600 text-xs font-bold mt-1 animate-bounce';
-                        helpText.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-exclamation-triangle mr-1"></i> Este campo requiere su atenciÃ³n segÃºn el reporte de auditorÃ­a.') : '<i class="fas fa-exclamation-triangle mr-1"></i> Este campo requiere su atenciÃ³n segÃºn el reporte de auditorÃ­a.';
+                        helpText.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Este campo requiere su atenciÃ³n segÃºn el reporte de auditorÃ­a.';
                         target.parentNode.appendChild(helpText);
 
                         // Remover highlight al enfocar o cambiar
@@ -1582,7 +1551,7 @@
                         const backBtn = document.createElement('button');
                         backBtn.id = 'auditBackBtn';
                         backBtn.className = 'fixed bottom-8 left-8 z-[100] px-6 py-4 bg-slate-900 text-white rounded-2xl shadow-2xl border-2 border-indigo-500 font-black text-sm uppercase tracking-widest animate-fade-in flex items-center gap-3 hover:bg-slate-800 transition-all transform hover:-translate-y-1';
-                        backBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-arrow-left"></i> Volver al Reporte PDF') : '<i class="fas fa-arrow-left"></i> Volver al Reporte PDF';
+                        backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Volver al Reporte PDF';
                         backBtn.onclick = () => {
                             if (window.history.length > 1) window.history.back();
                             else window.close();

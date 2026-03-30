@@ -156,19 +156,19 @@
         maChange.style.color = maVar > 2 ? '#ef4444' : maVar < -2 ? '#10b981' : '#64748b';
 
         if (maVar > 3) {
-            trendIcon.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fa-solid fa-arrow-trend-up"></i>') : '<i class="fa-solid fa-arrow-trend-up"></i>';
+            trendIcon.innerHTML = '<i class="fa-solid fa-arrow-trend-up"></i>';
             trendIcon.style.background = 'rgba(239, 68, 68, 0.1)';
             trendIcon.style.color = '#ef4444';
             trendText.textContent = 'Expansión Delictual';
             trendText.style.color = '#ef4444';
         } else if (maVar < -3) {
-            trendIcon.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fa-solid fa-arrow-trend-down"></i>') : '<i class="fa-solid fa-arrow-trend-down"></i>';
+            trendIcon.innerHTML = '<i class="fa-solid fa-arrow-trend-down"></i>';
             trendIcon.style.background = 'rgba(16, 185, 129, 0.1)';
             trendIcon.style.color = '#10b981';
             trendText.textContent = 'Contracción / Mejora';
             trendText.style.color = '#10b981';
         } else {
-            trendIcon.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fa-solid fa-minus"></i>') : '<i class="fa-solid fa-minus"></i>';
+            trendIcon.innerHTML = '<i class="fa-solid fa-minus"></i>';
             trendIcon.style.background = 'rgba(100, 116, 139, 0.1)';
             trendIcon.style.color = '#64748b';
             trendText.textContent = 'Estabilidad Relativa';
@@ -291,7 +291,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista2').then(txt => {
                 const el = document.getElementById('v2_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
 

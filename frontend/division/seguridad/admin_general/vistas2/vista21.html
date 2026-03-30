@@ -177,15 +177,14 @@
             const el = document.getElementById(id);
             if (!el) return;
             if (list.length > 0) {
-                el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(list.map(item => `
-                    <div style="font-size: 0.8rem) : list.map(item => `
+                el.innerHTML = list.map(item => `
                     <div style="font-size: 0.8rem; font-weight: 600; color: #334155; border-bottom: 1px solid rgba(0,0,0,0.05); padding: 4px 0; display: flex; justify-content: space-between;">
                         <span>${item.delito}</span>
                         <span style="color: ${color}; font-weight: 800;">${symbol}${item.val}</span>
                     </div>
                 `).join('');
             } else {
-                el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<span style="font-size: 0.8rem) : '<span style="font-size: 0.8rem; color: #94a3b8; font-style: italic;">Ninguno</span>';
+                el.innerHTML = '<span style="font-size: 0.8rem; color: #94a3b8; font-style: italic;">Ninguno</span>';
             }
         };
 
@@ -243,7 +242,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista21').then(txt => {
                 const el = document.getElementById('v21_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
 

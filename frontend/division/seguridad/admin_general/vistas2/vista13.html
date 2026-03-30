@@ -190,13 +190,13 @@
         const populateList = (listId, categoryKey) => {
             const container = document.getElementById(listId);
             if (!container) return;
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            container.innerHTML = '';
 
             const groupData = stats[categoryKey];
             const sortedCrimes = Object.entries(groupData.crimes).sort((a, b) => b[1] - a[1]);
 
             if (sortedCrimes.length === 0) {
-                container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<li style="color: #94a3b8) : '<li style="color: #94a3b8; font-style: italic;">Sin registros esta semana</li>';
+                container.innerHTML = '<li style="color: #94a3b8; font-style: italic;">Sin registros esta semana</li>';
                 return;
             }
 
@@ -204,7 +204,7 @@
                 const pct = groupData.total > 0 ? (count / groupData.total * 100).toFixed(1) : 0;
 
                 const li = document.createElement('li');
-                li.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<strong>${name}</strong>: ${count} <span style="color: #64748b) : `<strong>${name}</strong>: ${count} <span style="color: #64748b;">(${pct}%)</span>`;
+                li.innerHTML = `<strong>${name}</strong>: ${count} <span style="color: #64748b;">(${pct}%)</span>`;
                 container.appendChild(li);
             });
         };
@@ -340,7 +340,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista18').then(txt => {
                 const el = document.getElementById('v18_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
 

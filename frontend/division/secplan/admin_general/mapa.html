@@ -352,7 +352,7 @@
 
                 const mapContainer = document.getElementById('map');
                 if (mapContainer) {
-                    mapContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<div class="flex justify-center items-center h-full text-center p-4"><p class="text-red-500 font-semibold">Error al cargar los proyectos.</p><p class="text-gray-600">${error.message}</p></div>`) : `<div class="flex justify-center items-center h-full text-center p-4"><p class="text-red-500 font-semibold">Error al cargar los proyectos.</p><p class="text-gray-600">${error.message}</p></div>`;
+                    mapContainer.innerHTML = `<div class="flex justify-center items-center h-full text-center p-4"><p class="text-red-500 font-semibold">Error al cargar los proyectos.</p><p class="text-gray-600">${error.message}</p></div>`;
                 }
 
                 if (error.message.includes('No autorizado') || error.message.includes('Token de autenticación no encontrado')) {
@@ -429,7 +429,7 @@
 
         function createFilterButtons() {
             const filterContainer = document.getElementById('mapFilters');
-            filterContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            filterContainer.innerHTML = '';
 
             const allButton = document.createElement('button');
             allButton.textContent = 'Todos';
@@ -471,7 +471,7 @@
 
             legend.onAdd = function (map) {
                 const div = L.DomUtil.create('div', 'legend');
-                div.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="legend-title">Áreas de Proyecto</div>') : '<div class="legend-title">Áreas de Proyecto</div>';
+                div.innerHTML = '<div class="legend-title">Áreas de Proyecto</div>';
 
                 const uniqueAreas = [...new Set(allProjects.map(p => p.area_nombre))].sort();
 
@@ -547,7 +547,7 @@
 
         function loadMapProjectsList(filterArea = 'all') {
             const listContainer = document.getElementById('mapProjectsList');
-            listContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            listContainer.innerHTML = '';
 
             let filteredProjects = allProjects;
             if (filterArea !== 'all') {
@@ -564,10 +564,7 @@
 
                 const areaColor = getAreaColor(project.area_nombre);
 
-                projectCard.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="flex items-start space-x-3">
-                        <div class="flex-shrink-0">
-                            <div style="background-color: ${areaColor}) : `
+                projectCard.innerHTML = `
                     <div class="flex items-start space-x-3">
                         <div class="flex-shrink-0">
                             <div style="background-color: ${areaColor}; width: 12px; height: 12px; border-radius: 50%; margin-top: 5px;"></div>
@@ -609,7 +606,7 @@
             const panel = document.getElementById('projectDetailsPanel');
             const content = document.getElementById('projectDetailsContent');
 
-            content.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            content.innerHTML = '';
 
             const title = document.createElement('h3');
             title.className = 'text-lg font-bold mb-4';

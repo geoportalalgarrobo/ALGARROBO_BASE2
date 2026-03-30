@@ -25,7 +25,7 @@
             if (!file) return;
 
             const output = document.getElementById("output");
-            output.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize("") : "";
+            output.innerHTML = "";
 
             const extension = file.name.split('.').pop().toLowerCase();
 
@@ -49,7 +49,7 @@
                     });
                     table += "</table>";
 
-                    output.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(table) : table;
+                    output.innerHTML = table;
                 };
                 reader.readAsArrayBuffer(file);
 
@@ -58,16 +58,16 @@
                 reader.onload = function(event) {
                     mammoth.extractRawText({ arrayBuffer: event.target.result })
                         .then(result => {
-                            output.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize("<pre>" + result.value + "</pre>") : "<pre>" + result.value + "</pre>";
+                            output.innerHTML = "<pre>" + result.value + "</pre>";
                         })
                         .catch(err => {
-                            output.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize("Error al leer el archivo Word") : "Error al leer el archivo Word";
+                            output.innerHTML = "Error al leer el archivo Word";
                         });
                 };
                 reader.readAsArrayBuffer(file);
 
             } else {
-                output.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize("Formato no soportado") : "Formato no soportado";
+                output.innerHTML = "Formato no soportado";
             }
         });
     </script>

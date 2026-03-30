@@ -431,7 +431,7 @@
                     </tr>`;
 
                 const finalHtml = STATE.filtered.length ? html : emptyState;
-                document.getElementById('tbl-body').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(finalHtml) : finalHtml;
+                document.getElementById('tbl-body').innerHTML = finalHtml;
 
                 // Update KPIs
                 document.getElementById('kpi-total').textContent = STATE.filtered.length;
@@ -497,16 +497,11 @@
 
             renderResults: (arr) => {
                 if(arr.length === 0) {
-                    PROJECT_SEARCH.elements.results.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<div class="search-select-empty">No se encontraron proyectos</div>`) : `<div class="search-select-empty">No se encontraron proyectos</div>`;
+                    PROJECT_SEARCH.elements.results.innerHTML = `<div class="search-select-empty">No se encontraron proyectos</div>`;
                     return;
                 }
                 
-                PROJECT_SEARCH.elements.results.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(arr.map(p => `
-                    <div class="search-select-item" onclick="PROJECT_SEARCH.select(${p.id}, '${p.nombre.replace(/'/g, "\\'")}')">
-                        <span class="name">${p.nombre}</span>
-                        <span class="id">ID: ${p.id}</span>
-                    </div>
-                `).join('')) : arr.map(p => `
+                PROJECT_SEARCH.elements.results.innerHTML = arr.map(p => `
                     <div class="search-select-item" onclick="PROJECT_SEARCH.select(${p.id}, '${p.nombre.replace(/'/g, "\\'")}')">
                         <span class="name">${p.nombre}</span>
                         <span class="id">ID: ${p.id}</span>
@@ -528,7 +523,7 @@
 
                 if(exists) {
                     alertEl.style.display = 'block';
-                    alertEl.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fas fa-exclamation-triangle mr-2"></i><strong>CONFLICTO DE WORKFLOW:</strong> El proyecto ya tiene una licitación vigente: "<em>${exists.nombre_licitacion}</em>". No es posible iniciar una nueva hasta cerrar la anterior.`) : `<i class="fas fa-exclamation-triangle mr-2"></i><strong>CONFLICTO DE WORKFLOW:</strong> El proyecto ya tiene una licitación vigente: "<em>${exists.nombre_licitacion}</em>". No es posible iniciar una nueva hasta cerrar la anterior.`;
+                    alertEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i><strong>CONFLICTO DE WORKFLOW:</strong> El proyecto ya tiene una licitación vigente: "<em>${exists.nombre_licitacion}</em>". No es posible iniciar una nueva hasta cerrar la anterior.`;
                     btnSubmit.disabled = true; 
                     btnSubmit.style.opacity = '0.5';
                     btnSubmit.style.cursor = 'not-allowed';
@@ -571,13 +566,13 @@
 
             const btn = document.getElementById('btnSubmit');
             btn.disabled = true;
-            btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fas fa-circle-notch fa-spin mr-2"></i> Procesando...`) : `<i class="fas fa-circle-notch fa-spin mr-2"></i> Procesando...`;
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin mr-2"></i> Procesando...`;
 
             try {
                 const res = await api.post('/licitaciones', data);
                 if(res.id) {
                     // Animación de éxito previa a redirección
-                    btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fas fa-check mr-2"></i> ¡Creado con éxito!`) : `<i class="fas fa-check mr-2"></i> ¡Creado con éxito!`;
+                    btn.innerHTML = `<i class="fas fa-check mr-2"></i> ¡Creado con éxito!`;
                     btn.style.background = '#22c55e';
                     setTimeout(() => {
                         window.location.href = `seguimiento.html?id=${res.id}`;
@@ -586,7 +581,7 @@
             } catch(err) { 
                 alert(err.message || 'Error Inesperado'); 
                 btn.disabled = false;
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fas fa-magic mr-2"></i> Crear & Iniciar Workflow`) : `<i class="fas fa-magic mr-2"></i> Crear & Iniciar Workflow`;
+                btn.innerHTML = `<i class="fas fa-magic mr-2"></i> Crear & Iniciar Workflow`;
             }
         });
 

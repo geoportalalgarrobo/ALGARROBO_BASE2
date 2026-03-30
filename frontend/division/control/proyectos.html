@@ -198,17 +198,10 @@
         function renderListaProyectos(lista) {
             const el = document.getElementById('listaProyectos');
             if (!lista.length) {
-                el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<p class="text-xs text-gray-400 px-2 py-2">Sin resultados</p>') : '<p class="text-xs text-gray-400 px-2 py-2">Sin resultados</p>';
+                el.innerHTML = '<p class="text-xs text-gray-400 px-2 py-2">Sin resultados</p>';
                 return;
             }
-            el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(lista.map(p => `
-                <div class="proj-list-item" id="pitem-${p.id}" onclick="cargarDetalleProyecto(${p.id})">
-                    <div class="flex-1">
-                        <p class="text-sm font-semibold truncate">${p.nombre || '—'}</p>
-                        <p class="text-[10px] text-gray-400">ID: ${p.id} · ${p.estado_nombre || ''}</p>
-                    </div>
-                </div>
-            `).join('')) : lista.map(p => `
+            el.innerHTML = lista.map(p => `
                 <div class="proj-list-item" id="pitem-${p.id}" onclick="cargarDetalleProyecto(${p.id})">
                     <div class="flex-1">
                         <p class="text-sm font-semibold truncate">${p.nombre || '—'}</p>
@@ -222,10 +215,7 @@
             document.querySelectorAll('.proj-list-item').forEach(e => e.classList.remove('active'));
             document.getElementById(`pitem-${pid}`)?.classList.add('active');
 
-            document.getElementById('detalleProyecto').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                <div class="section-card text-center py-8 text-gray-400">
-                    <i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i><p>Cargando historial…</p>
-                </div>`) : `
+            document.getElementById('detalleProyecto').innerHTML = `
                 <div class="section-card text-center py-8 text-gray-400">
                     <i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i><p>Cargando historial…</p>
                 </div>`;
@@ -234,30 +224,7 @@
                 const res = await api.get(`/control/actividad/proyecto/${pid}`);
                 const { proyecto, actividad } = res;
 
-                document.getElementById('detalleProyecto').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="section-card">
-                        <h2 class="text-xl font-bold">${proyecto?.nombre || 'Proyecto #' + pid}</h2>
-                        <p class="text-gray-400 text-xs mb-4">Total de acciones registradas: ${actividad.length}</p>
-                        ${actividad.length === 0
-                        ? '<p class="text-sm text-gray-400 text-center py-6">Sin actividad registrada aún para este proyecto.</p>'
-                        : `<div style="overflow-x:auto">
-                                <table class="activity-table">
-                                    <thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Estado</th></tr></thead>
-                                    <tbody>
-                                        ${actividad.slice(0, 100).map(r => `
-                                            <tr>
-                                                <td class="text-gray-400 text-xs whitespace-nowrap">${new Date(r.fecha).toLocaleString('es-CL')}</td>
-                                                <td><a href="usuarios.html?uid=${r.user_id}" class="text-indigo-600 font-medium">${r.nombre_usuario || r.user_id}</a></td>
-                                                <td><span class="badge ${r.accion.includes('ver') ? 'badge-ver' : 'badge-editar'}">${r.accion}</span></td>
-                                                <td><span class="text-[10px] font-bold ${r.exitoso ? 'text-green-600' : 'text-red-600'}">${r.exitoso ? 'OK' : 'FAIL'}</span></td>
-                                            </tr>
-                                        `).join('')}
-                                    </tbody>
-                                </table>
-                            </div>`
-                    }
-                    </div>
-                `) : `
+                document.getElementById('detalleProyecto').innerHTML = `
                     <div class="section-card">
                         <h2 class="text-xl font-bold">${proyecto?.nombre || 'Proyecto #' + pid}</h2>
                         <p class="text-gray-400 text-xs mb-4">Total de acciones registradas: ${actividad.length}</p>
@@ -282,7 +249,7 @@
                     </div>
                 `;
             } catch (e) {
-                document.getElementById('detalleProyecto').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<div class="section-card text-center py-8 text-red-400">Error cargando historial del proyecto.</div>`) : `<div class="section-card text-center py-8 text-red-400">Error cargando historial del proyecto.</div>`;
+                document.getElementById('detalleProyecto').innerHTML = `<div class="section-card text-center py-8 text-red-400">Error cargando historial del proyecto.</div>`;
             }
         }
     </script>

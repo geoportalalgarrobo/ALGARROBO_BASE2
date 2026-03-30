@@ -1128,7 +1128,7 @@
 
         function cargarTitulosBoton(rawData) {
           const titulo = document.getElementById("titulo_principal");
-          if (titulo && rawData.length > 0) titulo.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fas fa-chart-line"></i>Personas ${rawData[0].organismo_nombre} y Edad`) : `<i class="fas fa-chart-line"></i>Personas ${rawData[0].organismo_nombre} y Edad`;
+          if (titulo && rawData.length > 0) titulo.innerHTML = `<i class="fas fa-chart-line"></i>Personas ${rawData[0].organismo_nombre} y Edad`;
         }
 
         let rawData = [];
@@ -1155,17 +1155,17 @@
             loadingEl.style.display = "none"; tableEl.style.display = "table";
           } catch (error) {
             console.error("Error:", error);
-            loadingEl.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fas fa-exclamation-triangle"></i> Error al cargar: ${error.message}`) : `<i class="fas fa-exclamation-triangle"></i> Error al cargar: ${error.message}`;
+            loadingEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Error al cargar: ${error.message}`;
           }
         }
 
         function populateFilters() {
           const bf = document.getElementById("base-filter"), hf = document.getElementById("homologado-filter"), sf = document.getElementById("sexo-filter"), yf = document.getElementById("year-filter");
           if (!bf || !hf || !sf || !yf || !data.length) return;
-          bf.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="">Todas las bases</option>') : '<option value="">Todas las bases</option>';
-          hf.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="">Todos los homologados</option>') : '<option value="">Todos los homologados</option>';
-          sf.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="">Todos los sexos</option>') : '<option value="">Todos los sexos</option>';
-          yf.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<option value="">Todos los años</option>') : '<option value="">Todos los años</option>';
+          bf.innerHTML = '<option value="">Todas las bases</option>';
+          hf.innerHTML = '<option value="">Todos los homologados</option>';
+          sf.innerHTML = '<option value="">Todos los sexos</option>';
+          yf.innerHTML = '<option value="">Todos los años</option>';
           [...new Set(data.map(i => i.base))].filter(Boolean).sort().forEach(v => bf.appendChild(new Option(v, v)));
           [...new Set(data.map(i => i.homologado).filter(v => v != null && v !== "" && v !== "null"))].sort().forEach(v => hf.appendChild(new Option(v, v)));
           [...new Set(data.map(i => i.sexo).filter(v => v != null && v !== "" && v !== "null"))].sort().forEach(v => sf.appendChild(new Option(v, v)));
@@ -1201,12 +1201,12 @@
         }
 
         function renderTable() {
-          const table = document.getElementById("data-table"); table.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize("") : "";
+          const table = document.getElementById("data-table"); table.innerHTML = "";
           const header = document.createElement("thead"), headerRow = document.createElement("tr");
-          const thOrg = document.createElement("th"); thOrg.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-building"></i> Organismo') : '<i class="fas fa-building"></i> Organismo'; headerRow.appendChild(thOrg);
-          const thEdad = document.createElement("th"); thEdad.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-user-clock"></i> Grupo de Edad') : '<i class="fas fa-user-clock"></i> Grupo de Edad'; headerRow.appendChild(thEdad);
+          const thOrg = document.createElement("th"); thOrg.innerHTML = '<i class="fas fa-building"></i> Organismo'; headerRow.appendChild(thOrg);
+          const thEdad = document.createElement("th"); thEdad.innerHTML = '<i class="fas fa-user-clock"></i> Grupo de Edad'; headerRow.appendChild(thEdad);
           filteredMonths.forEach(m => { const th = document.createElement("th"); th.textContent = m.replace("_", " "); headerRow.appendChild(th); });
-          const thAvg = document.createElement("th"); thAvg.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-calculator"></i> Promedio') : '<i class="fas fa-calculator"></i> Promedio'; headerRow.appendChild(thAvg);
+          const thAvg = document.createElement("th"); thAvg.innerHTML = '<i class="fas fa-calculator"></i> Promedio'; headerRow.appendChild(thAvg);
           header.appendChild(headerRow); table.appendChild(header);
 
           const body = document.createElement("tbody");
@@ -1222,7 +1222,7 @@
             let sum = 0, count = 0; const values = [];
             filteredMonths.forEach(m => {
               const val = row[m], td = document.createElement("td");
-              if (val === 0) { td.classList.add("sin-registro"); td.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-times"></i> Sin datos') : '<i class="fas fa-times"></i> Sin datos'; }
+              if (val === 0) { td.classList.add("sin-registro"); td.innerHTML = '<i class="fas fa-times"></i> Sin datos'; }
               else if (val) {
                 td.style.cursor = "pointer";
                 if (isPercentageMode && columnTotals[m] > 0) {
@@ -1273,15 +1273,7 @@
           const modalFilters = document.getElementById("modal-filters");
           const edadFilter = row.age_label || "";
 
-          modalFilters.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-        <div class="filter-tag"><i class="fas fa-building"></i><span>Organismo: ${row.organismo_nombre}</span></div>
-        <div class="filter-tag"><i class="fas fa-user-clock"></i><span>Edad: ${edadFilter}</span></div>
-        <div class="filter-tag"><i class="fas fa-calendar-alt"></i><span>Período: ${month.replace("_", " ")}</span></div>
-        ${bf ? `<div class="filter-tag"><i class="fas fa-layer-group"></i><span>Base: ${bf}</span></div>` : ''}
-        ${hf ? `<div class="filter-tag"><i class="fas fa-graduation-cap"></i><span>Homologado: ${hf}</span></div>` : ''}
-        ${sf ? `<div class="filter-tag"><i class="fas fa-venus-mars"></i><span>Sexo: ${sf}</span></div>` : ''}
-        ${yf ? `<div class="filter-tag"><i class="fas fa-calendar"></i><span>Año: ${yf}</span></div>` : ''}
-      `) : `
+          modalFilters.innerHTML = `
         <div class="filter-tag"><i class="fas fa-building"></i><span>Organismo: ${row.organismo_nombre}</span></div>
         <div class="filter-tag"><i class="fas fa-user-clock"></i><span>Edad: ${edadFilter}</span></div>
         <div class="filter-tag"><i class="fas fa-calendar-alt"></i><span>Período: ${month.replace("_", " ")}</span></div>
@@ -1291,7 +1283,7 @@
         ${yf ? `<div class="filter-tag"><i class="fas fa-calendar"></i><span>Año: ${yf}</span></div>` : ''}
       `;
           document.getElementById("modal-loading").style.display = "flex";
-          document.getElementById("modal-table-container").innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize("") : "";
+          document.getElementById("modal-table-container").innerHTML = "";
           loadDetailedData(row.organismo_nombre, month, bf, sf, hf, edadFilter);
         }
 
@@ -1336,14 +1328,14 @@
           } catch (error) {
             console.error("Error al cargar datos detallados:", error);
             document.getElementById("modal-loading").style.display = "none";
-            document.getElementById("modal-table-container").innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="no-data"><i class="fas fa-exclamation-triangle"></i> Error al cargar los datos detallados</div>') : '<div class="no-data"><i class="fas fa-exclamation-triangle"></i> Error al cargar los datos detallados</div>';
+            document.getElementById("modal-table-container").innerHTML = '<div class="no-data"><i class="fas fa-exclamation-triangle"></i> Error al cargar los datos detallados</div>';
           }
         }
 
         function displayDetailedData(data) {
           const container = document.getElementById("modal-table-container");
           if (!data || data.length === 0) {
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="no-data"><i class="fas fa-info-circle"></i> No se encontraron registros con los filtros seleccionados</div>') : '<div class="no-data"><i class="fas fa-info-circle"></i> No se encontraron registros con los filtros seleccionados</div>';
+            container.innerHTML = '<div class="no-data"><i class="fas fa-info-circle"></i> No se encontraron registros con los filtros seleccionados</div>';
             return;
           }
           const startIndex = (currentPage - 1) * rowsPerPage;
@@ -1361,7 +1353,7 @@
           ];
           columns.forEach(col => {
             const th = document.createElement("th"); th.textContent = col.label;
-            if (col.sortable) { th.dataset.sort = col.key; th.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`${col.label} <i class="fas fa-sort"></i>`) : `${col.label} <i class="fas fa-sort"></i>`; }
+            if (col.sortable) { th.dataset.sort = col.key; th.innerHTML = `${col.label} <i class="fas fa-sort"></i>`; }
             headerRow.appendChild(th);
           });
           header.appendChild(headerRow); table.appendChild(header);
@@ -1376,7 +1368,7 @@
             });
             body.appendChild(tr);
           });
-          table.appendChild(body); container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize("") : ""; container.appendChild(table); updatePagination();
+          table.appendChild(body); container.innerHTML = ""; container.appendChild(table); updatePagination();
         }
 
         function updatePagination() {
@@ -1423,7 +1415,7 @@
             processAndDisplayData(data.filter(row => (bf.value === "" || row.base === bf.value) && (hf.value === "" || row.homologado === hf.value) && (sf.value === "" || row.sexo === sf.value)));
           };
           bf.addEventListener("change", aplicar); hf.addEventListener("change", aplicar); sf.addEventListener("change", aplicar); yf.addEventListener("change", aplicar);
-          tp.addEventListener("click", () => { isPercentageMode = !isPercentageMode; tp.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(isPercentageMode ? 'Ver Valores Absolutos' : 'Ver Porcentajes') : isPercentageMode ? 'Ver Valores Absolutos' : 'Ver Porcentajes'; tp.classList.toggle("percentage-mode", isPercentageMode); renderTable(); });
+          tp.addEventListener("click", () => { isPercentageMode = !isPercentageMode; tp.innerHTML = isPercentageMode ? 'Ver Valores Absolutos' : 'Ver Porcentajes'; tp.classList.toggle("percentage-mode", isPercentageMode); renderTable(); });
 
           const modal = document.getElementById("detailsModal");
           const closeBtn = document.getElementsByClassName("close")[0];

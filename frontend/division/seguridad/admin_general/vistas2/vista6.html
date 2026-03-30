@@ -117,15 +117,14 @@
         const critical = allCrimes.filter(d => d.delta >= 20 && d.act >= 2);
 
         if (critical.length > 0) {
-            alertsContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(critical.slice(0, 4).map(d => `
-                <div style="background: #fef2f2) : critical.slice(0, 4).map(d => `
+            alertsContainer.innerHTML = critical.slice(0, 4).map(d => `
                 <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-circle-exclamation" style="color: #ef4444;"></i>
                     <span style="font-size: 0.75rem; font-weight: 700; color: #991b1b;">${d.delito}: +${d.delta.toFixed(0)}%</span>
                 </div>
             `).join('');
         } else {
-            alertsContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            alertsContainer.innerHTML = '';
         }
 
         // --- Worst (Top Increases) ---
@@ -133,8 +132,7 @@
         // Fix to Top 5 as requested
         const top5Worst = allCrimes.slice(0, 5);
 
-        vWorst.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(top5Worst.length > 0 ? top5Worst.map(d => `
-            <div style="display: grid) : top5Worst.length > 0 ? top5Worst.map(d => `
+        vWorst.innerHTML = top5Worst.length > 0 ? top5Worst.map(d => `
             <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 10px 16px; background: #fff; border-bottom: 1px solid #fdf2f2; margin-bottom: 6px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
                 <div>
                     <div style="font-size: 0.95rem; font-weight: 700; color: #334155; margin-bottom: 4px;">${d.delito}</div>
@@ -154,8 +152,7 @@
         // Filter only negative or zero deltas for "Descensos"
         const decreases = bestSorted.filter(d => d.delta <= 0).slice(0, 5);
 
-        vBest.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(decreases.length > 0 ? decreases.map(d => `
-            <div style="display: grid) : decreases.length > 0 ? decreases.map(d => `
+        vBest.innerHTML = decreases.length > 0 ? decreases.map(d => `
             <div style="display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 10px 16px; background: #fff; border-bottom: 1px solid #f0fdf4; margin-bottom: 6px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
                 <div>
                     <div style="font-size: 0.95rem; font-weight: 700; color: #334155; margin-bottom: 4px;">${d.delito}</div>
@@ -249,7 +246,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista6').then(txt => {
                 const el = document.getElementById('v6_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
 

@@ -290,8 +290,7 @@
                 .map(([name, val]) => ({ name, v: typeof val === 'number' ? val : val.v }))
                 .sort((a, b) => b.v - a.v);
 
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(sorted.map(item => {
-                const pct = total > 0 ? (item.v / total * 100) : 0) : sorted.map(item => {
+            container.innerHTML = 0) : sorted.map(item => {
                 const pct = total > 0 ? (item.v / total * 100) : 0;
                 const color = colors[item.name] || '#cbd5e1';
                 return `
@@ -317,7 +316,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista23').then(txt => {
                 const el = document.getElementById('v23_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
     })();

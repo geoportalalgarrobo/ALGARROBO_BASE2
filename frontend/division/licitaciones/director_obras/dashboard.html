@@ -90,11 +90,10 @@
                 const data = await api.get('/licitaciones');
                 const table = document.getElementById('licitacionesTable');
                 if (data.length === 0) {
-                    table.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<tr><td colspan="4" class="px-6 py-12 text-center text-gray-400">No hay obras bajo licitación.</td></tr>`) : `<tr><td colspan="4" class="px-6 py-12 text-center text-gray-400">No hay obras bajo licitación.</td></tr>`;
+                    table.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-gray-400">No hay obras bajo licitación.</td></tr>`;
                     return;
                 }
-                table.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(data.map(l => {
-                    const progress = (l.pasos_completados / 32) * 100) : data.map(l => {
+                table.innerHTML = data.map(l => {
                     const progress = (l.pasos_completados / 32) * 100;
                     return `
                         <tr class="hover:bg-gray-50 transition-colors">

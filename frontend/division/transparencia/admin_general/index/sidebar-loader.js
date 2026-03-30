@@ -27,7 +27,7 @@
                 return response.text();
             })
             .then(html => {
-                sidebarContainer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+                sidebarContainer.innerHTML = html;
 
                 // Define destination links
                 const links = {

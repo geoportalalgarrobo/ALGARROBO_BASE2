@@ -666,7 +666,7 @@
                 });
 
                 html += '</div>';
-                container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+                container.innerHTML = html;
             }
         }
 
@@ -705,8 +705,8 @@
 
         function handleGroupByChange() {
             if (!filteredProjects || filteredProjects.length === 0) {
-                document.getElementById('categoryFilters1').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<p class="text-sm text-gray-500">No hay datos</p>') : '<p class="text-sm text-gray-500">No hay datos</p>';
-                document.getElementById('categoryFilters2').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<p class="text-sm text-gray-500">No hay datos</p>') : '<p class="text-sm text-gray-500">No hay datos</p>';
+                document.getElementById('categoryFilters1').innerHTML = '<p class="text-sm text-gray-500">No hay datos</p>';
+                document.getElementById('categoryFilters2').innerHTML = '<p class="text-sm text-gray-500">No hay datos</p>';
                 updateChart();
                 return;
             }
@@ -715,7 +715,7 @@
                 const groupBy = document.getElementById(dimId).value;
                 const categories = [...new Set(allProjects.map(p => String(p[groupBy] || 'Sin especificar')))].sort();
                 const container = document.getElementById(containerId);
-                container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+                container.innerHTML = '';
 
                 categories.forEach((cat, index) => {
                     // Solo mostramos chips con datos bajo filtros ribbon
@@ -840,14 +840,14 @@
             const tbody = document.getElementById('tableBody');
 
             tableDiv.classList.remove('hidden');
-            document.getElementById('th-dim1').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`${label1.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`) : `${label1.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`;
-            document.getElementById('th-dim2').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`${label2.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`) : `${label2.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`;
-            document.getElementById('th-value').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`${metricLabel.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`) : `${metricLabel.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`;
+            document.getElementById('th-dim1').innerHTML = `${label1.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`;
+            document.getElementById('th-dim2').innerHTML = `${label2.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`;
+            document.getElementById('th-value').innerHTML = `${metricLabel.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`;
 
             const isCurrency = metric.includes('monto') || metric.includes('ejecutado');
             const isPercent = metric.includes('avance');
 
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tbody.innerHTML = '';
 
             // Calcular Gran Total para participación
             let grandTotal = 0;
@@ -887,16 +887,7 @@
 
                         const formattedValue = isCurrency ? formatCurrency(value) : `${value.toLocaleString('es-CL', { maximumFractionDigits: 1 })}${isPercent ? '%' : ''}`;
 
-                        row.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                            <td class="px-6 py-4 font-medium text-gray-700">${v1}</td>
-                            <td class="px-6 py-4 text-gray-600">${v2}</td>
-                            <td class="px-6 py-4 text-right font-mono font-bold text-indigo-700">${formattedValue}</td>
-                            <td class="px-6 py-4 text-right">
-                                <span class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-md font-bold text-xs">
-                                    ${participation.toFixed(1)}%
-                                </span>
-                            </td>
-                        `) : `
+                        row.innerHTML = `
                             <td class="px-6 py-4 font-medium text-gray-700">${v1}</td>
                             <td class="px-6 py-4 text-gray-600">${v2}</td>
                             <td class="px-6 py-4 text-right font-mono font-bold text-indigo-700">${formattedValue}</td>
@@ -968,7 +959,7 @@
                     : String(valB).localeCompare(String(valA));
             });
 
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tbody.innerHTML = '';
             sortedRows.forEach(row => tbody.appendChild(row));
         }
 

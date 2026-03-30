@@ -353,7 +353,7 @@
             // Re-render select options
             let opts = `<option value="">Todos los Proyectos</option>`;
             proyectos.forEach(p => opts += `<option value="${escapeHTML(p)}">${escapeHTML(p)}</option>`);
-            select.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(opts) : opts;
+            select.innerHTML = opts;
             select.value = state.filters.proyecto;
         }
 
@@ -412,7 +412,7 @@
                 gridHTML += generateDayHTML(i, true, false, null);
             }
 
-            grid.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(gridHTML) : gridHTML;
+            grid.innerHTML = gridHTML;
         }
 
         function generateDayHTML(day, isOtherMonth, isToday, dateStr) {
@@ -534,7 +534,7 @@
         function renderGantt() {
             const list = document.getElementById('ganttList');
             if (state.filteredEvents.length === 0) {
-                list.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<div class="p-8 text-center text-slate-400 font-bold">No hay eventos que coincidan.</div>`) : `<div class="p-8 text-center text-slate-400 font-bold">No hay eventos que coincidan.</div>`;
+                list.innerHTML = `<div class="p-8 text-center text-slate-400 font-bold">No hay eventos que coincidan.</div>`;
                 return;
             }
 
@@ -551,8 +551,7 @@
                 grouped[ev.licitacion_id].eventos.push(ev);
             });
 
-            list.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(Object.values(grouped).map(g => {
-                g.eventos.sort((a, b) => parseStandardDate(a.fecha_real || a.fecha_planificada) - parseStandardDate(b.fecha_real || b.fecha_planificada))) : Object.values(grouped).map(g => {
+            list.innerHTML = Object.values(grouped).map(g => {
                 g.eventos.sort((a, b) => parseStandardDate(a.fecha_real || a.fecha_planificada) - parseStandardDate(b.fecha_real || b.fecha_planificada));
 
                 let prevTime = null;

@@ -170,7 +170,7 @@ const ChartEnhancer = {
             if (!container.querySelector('.chart-source-footer')) {
                 const footer = document.createElement('div');
                 footer.className = 'chart-source-footer';
-                footer.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(ChartHelper.getSourceFooterHtml(source).replace('<div class="chart-source-footer">', '').replace('</div>', '')) : ChartHelper.getSourceFooterHtml(source).replace('<div class="chart-source-footer">', '').replace('</div>', '');
+                footer.innerHTML = ChartHelper.getSourceFooterHtml(source).replace('<div class="chart-source-footer">', '').replace('</div>', '');
                 container.appendChild(footer);
             }
         });

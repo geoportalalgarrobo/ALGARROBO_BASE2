@@ -200,7 +200,7 @@
                 const t = document.getElementById('licitacionesTable');
 
                 if (!data.length) {
-                    t.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<tr><td colspan="5" style="text-align:center) : `<tr><td colspan="5" style="text-align:center; padding: 2rem;">Matriz vacía.</td></tr>`;
+                    t.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 2rem;">Matriz vacía.</td></tr>`;
                     return;
                 }
 
@@ -208,8 +208,7 @@
                 document.getElementById('statPublicacion').textContent = data.filter(l => l.estado_licitacion === 'Publicada').length || 0;
                 document.getElementById('statAdjudicadas').textContent = data.filter(l => l.estado_licitacion === 'Adjudicada').length || 0;
 
-                t.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(data.map(l => {
-                    const prog = (l.pasos_completados / 32) * 100) : data.map(l => {
+                t.innerHTML = data.map(l => {
                     const prog = (l.pasos_completados / 32) * 100;
                     const isOpen = (l.estado_licitacion || 'Abierta') === 'Abierta';
                     const bgBadge = isOpen ? 'open' : 'closed';

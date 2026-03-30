@@ -154,23 +154,7 @@
                 allPasos = data;
                 const table = document.getElementById('pasosMaestroTable');
 
-                table.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(data.map(p => `
-                    <tr class="row-hover transition-colors">
-                        <td class="px-6 py-4 font-mono text-blue-600 font-bold">${p.orden}</td>
-                        <td class="px-6 py-4">
-                            <p class="font-bold text-gray-800">${p.nombre}</p>
-                            <p class="text-xs text-gray-500">${p.descripcion || 'Sin descripción'}</p>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="text-sm text-gray-600 italic">${p.documento_requerido || 'No especificado'}</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <button onclick="openEditModal(${p.id_paso})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('')) : data.map(p => `
+                table.innerHTML = data.map(p => `
                     <tr class="row-hover transition-colors">
                         <td class="px-6 py-4 font-mono text-blue-600 font-bold">${p.orden}</td>
                         <td class="px-6 py-4">

@@ -108,8 +108,7 @@
 
         const container = document.getElementById('v9_critical_container');
         if (critical.length > 0) {
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(critical.map(d => `
-                <div style="background: white) : critical.map(d => `
+            container.innerHTML = critical.map(d => `
                 <div style="background: white; border: 1px solid #fee2e2; border-radius: 12px; padding: 1.25rem; border-top: 6px solid #ef4444; position: relative;">
                     <div style="font-size: 0.7rem; font-weight: 800; color: #ef4444; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.05em;">PUNTO CRÍTICO</div>
                     <div style="font-size: 1rem; font-weight: 800; color: #1e293b; margin-bottom: 10px; min-height: 2.4rem; line-height: 1.2;">${d[C.DELITO]}</div>
@@ -121,7 +120,7 @@
                 </div>
             `).join('');
         } else {
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="text-muted" style="grid-column: 1/-1) : '<div class="text-muted" style="grid-column: 1/-1; padding: 2rem; border: 2px dashed #f1f5f9; border-radius: 12px; text-align: center;">No se registran tipologías en rangos críticos regionales o nacionales esta semana.</div>';
+            container.innerHTML = '<div class="text-muted" style="grid-column: 1/-1; padding: 2rem; border: 2px dashed #f1f5f9; border-radius: 12px; text-align: center;">No se registran tipologías en rangos críticos regionales o nacionales esta semana.</div>';
         }
 
         // --- Histogram Chart ---
@@ -216,7 +215,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista9').then(txt => {
                 const el = document.getElementById('v9_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
 

@@ -224,11 +224,7 @@
                 console.error(err);
                 if (err.detail) {
                     const grid = document.getElementById('docsGrid');
-                    grid.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<div class="col-span-full p-8 text-center bg-red-50 text-red-600 rounded-2xl border border-red-100">
-                        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
-                        <p class="font-bold">Error de conexión con la base de datos</p>
-                        <p class="text-xs opacity-75">${err.detail}</p>
-                    </div>`) : `<div class="col-span-full p-8 text-center bg-red-50 text-red-600 rounded-2xl border border-red-100">
+                    grid.innerHTML = `<div class="col-span-full p-8 text-center bg-red-50 text-red-600 rounded-2xl border border-red-100">
                         <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
                         <p class="font-bold">Error de conexión con la base de datos</p>
                         <p class="text-xs opacity-75">${err.detail}</p>
@@ -250,23 +246,7 @@
                     </div>
                 </div>`;
 
-            grid.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(uploadBtn + filtered.map(d => `
-                <div class="glass-card p-5 rounded-2xl shadow-sm file-card flex items-start space-x-4">
-                    <div class="w-12 h-12 ${getDocColor(d.archivo_extension)} rounded-xl flex items-center justify-center flex-shrink-0">
-                        <i class="fas ${getDocIcon(d.archivo_extension)} text-xl"></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-gray-800 truncate" title="${d.nombre}">${d.nombre}</h4>
-                        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-tighter">${d.tipo}</p>
-                        <p class="text-[10px] text-gray-400 mt-1">${safeDateString(d.fecha_subida)}</p>
-                        <div class="mt-3 flex items-center space-x-3">
-                            <a href="${API_CONFIG.BASE_URL}${d.url}" target="_blank" class="text-blue-600 text-xs font-bold hover:underline flex items-center gap-1">
-                                <i class="fas fa-download"></i> VER DOCUMENTO
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            `).join('')) : uploadBtn + filtered.map(d => `
+            grid.innerHTML = uploadBtn + filtered.map(d => `
                 <div class="glass-card p-5 rounded-2xl shadow-sm file-card flex items-start space-x-4">
                     <div class="w-12 h-12 ${getDocColor(d.archivo_extension)} rounded-xl flex items-center justify-center flex-shrink-0">
                         <i class="fas ${getDocIcon(d.archivo_extension)} text-xl"></i>
@@ -287,15 +267,7 @@
 
         function renderRecent() {
             const list = document.getElementById('recentDocs');
-            list.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(allDocs.slice(0, 5).map(d => `
-                <div class="p-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-file-alt text-gray-300"></i>
-                        <span class="text-sm text-gray-600 font-medium">${d.nombre}</span>
-                    </div>
-                    <span class="text-[10px] font-bold text-gray-300 uppercase">${safeDateString(d.fecha_subida)}</span>
-                </div>
-            `).join('')) : allDocs.slice(0, 5).map(d => `
+            list.innerHTML = allDocs.slice(0, 5).map(d => `
                 <div class="p-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-file-alt text-gray-300"></i>
@@ -352,7 +324,7 @@
             const originalHTML = btn.innerHTML;
 
             try {
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin mr-2"></i> Subiendo...') : '<i class="fas fa-spinner fa-spin mr-2"></i> Subiendo...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Subiendo...';
                 btn.disabled = true;
 
                 await api.post('/licitaciones/biblioteca', formData);
@@ -361,7 +333,7 @@
             } catch (err) {
                 alert('Error al subir: ' + (err.detail || err.message));
             } finally {
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalHTML) : originalHTML;
+                btn.innerHTML = originalHTML;
                 btn.disabled = false;
             }
         });

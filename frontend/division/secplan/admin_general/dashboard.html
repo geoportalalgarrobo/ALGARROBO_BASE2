@@ -1039,11 +1039,7 @@
             if (!container) return;
 
             if (!activities || activities.length === 0) {
-                container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div class="flex items-center justify-center py-8 text-gray-400">
-                        <i class="fas fa-inbox text-3xl mr-3"></i>
-                        <span>No hay actividad reciente registrada</span>
-                    </div>`) : `
+                container.innerHTML = `
                     <div class="flex items-center justify-center py-8 text-gray-400">
                         <i class="fas fa-inbox text-3xl mr-3"></i>
                         <span>No hay actividad reciente registrada</span>
@@ -1070,8 +1066,7 @@
                 'default': { bg: 'from-gray-500 to-gray-600', icon: 'fa-bell' }
             };
 
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(activities.map((act, idx) => {
-                const estado = act.estado_nombre || 'Sin estado') : activities.map((act, idx) => {
+            container.innerHTML = activities.map((act, idx) => {
                 const estado = act.estado_nombre || 'Sin estado';
                 const area = act.area_nombre || 'Sin área';
                 const monto = act.monto ? utils.formatCompactNumber(parseFloat(act.monto)) : '$0';
@@ -1108,8 +1103,7 @@
             }).join('');
         }
     </script>
-    <script src="../../../script/help.js"></script>
-    <script>setTimeout(() => { if (typeof createHelpButton === 'function') createHelpButton('secplan_dashboard'); }, 500);</script>
+
 </body>
 
 </html>

@@ -624,7 +624,7 @@
                     pill.classList.remove('active');
                 } else {
                     const str = currentVals.length === 1 ? currentVals[0] : `${currentVals.length} sel.`;
-                    labelElement.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`${filterLabels[filterKey]}: <span class="text-indigo-700">${str}</span>`) : `${filterLabels[filterKey]}: <span class="text-indigo-700">${str}</span>`;
+                    labelElement.innerHTML = `${filterLabels[filterKey]}: <span class="text-indigo-700">${str}</span>`;
                     pill.classList.add('active');
                 }
 
@@ -661,7 +661,7 @@
                 });
 
                 html += '</div>';
-                container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : html;
+                container.innerHTML = html;
             }
         }
 
@@ -721,7 +721,7 @@
             const categories = [...new Set(allProjects.map(p => p[groupBy] || 'Sin especificar'))].sort();
 
             const container = document.getElementById('categoryFilters');
-            container.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            container.innerHTML = '';
 
             categories.forEach((cat, index) => {
                 // Solo mostramos chips que tengan datos bajo el filtrado del RIBBON actual
@@ -838,8 +838,8 @@
             const summaryText = document.getElementById('tableSummaryText');
 
             tableDiv.classList.remove('hidden');
-            thCategory.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`${categoryLabel.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`) : `${categoryLabel.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`;
-            thValue.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`${metricLabel.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`) : `${metricLabel.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`;
+            thCategory.innerHTML = `${categoryLabel.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`;
+            thValue.innerHTML = `${metricLabel.toUpperCase()} <i class="fas fa-sort sort-icon"></i>`;
             if (summaryText) {
                 summaryText.textContent = `Total de ${data.length} categorías analizadas`;
             }
@@ -852,7 +852,7 @@
             const valueSuffix = isPercent ? '%' : (isAntiguedad ? ' años' : (isCount ? ' proy.' : ''));
             const valuePrefix = isCurrency ? '$' : '';
 
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tbody.innerHTML = '';
             data.forEach(item => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-indigo-50/30 transition-colors';
@@ -860,18 +860,7 @@
                 const formattedValue = isCurrency ? formatCurrency(item.y) : `${item.y.toLocaleString('es-CL', { maximumFractionDigits: 1 })}${valueSuffix}`;
                 const progressBarColor = item.percentage > 50 ? 'bg-indigo-500' : (item.percentage > 20 ? 'bg-indigo-400' : 'bg-indigo-300');
 
-                row.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <td class="px-6 py-4 font-medium text-gray-900">${item.name}</td>
-                    <td class="px-6 py-4 text-right font-mono font-bold text-indigo-700">${formattedValue}</td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                <div class="${progressBarColor} h-full rounded-full" style="width: ${item.percentage}%"></div>
-                            </div>
-                            <span class="text-xs font-bold text-gray-600 min-w-[40px] text-right">${item.percentage.toFixed(1)}%</span>
-                        </div>
-                    </td>
-                `) : `
+                row.innerHTML = `
                     <td class="px-6 py-4 font-medium text-gray-900">${item.name}</td>
                     <td class="px-6 py-4 text-right font-mono font-bold text-indigo-700">${formattedValue}</td>
                     <td class="px-6 py-4">
@@ -941,7 +930,7 @@
                     : String(valB).localeCompare(String(valA));
             });
 
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tbody.innerHTML = '';
             sortedRows.forEach(row => tbody.appendChild(row));
         }
 

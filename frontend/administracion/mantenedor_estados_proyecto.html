@@ -187,7 +187,7 @@
             const emptyState = document.getElementById('emptyState');
             const tableBody = document.getElementById('tableBody');
 
-            tableBody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tableBody.innerHTML = '';
             loading.classList.remove('hidden');
             emptyState.classList.add('hidden');
 
@@ -206,7 +206,7 @@
             const tableBody = document.getElementById('tableBody');
             const emptyState = document.getElementById('emptyState');
 
-            tableBody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tableBody.innerHTML = '';
 
             if (data.length === 0) {
                 emptyState.classList.remove('hidden');
@@ -223,29 +223,7 @@
                     '<span class="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-bold uppercase border border-emerald-100/50">Activo</span>' :
                     '<span class="px-2.5 py-1 bg-slate-100 text-slate-400 rounded-lg text-[10px] font-bold uppercase border border-slate-200/50">Inactivo</span>';
 
-                tr.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <td class="p-4 text-xs font-mono font-bold text-slate-400">#${item.orden || 0}</td>
-                    <td class="p-4">
-                        <div class="font-bold text-slate-700">${item.nombre}</div>
-                    </td>
-                    <td class="p-4">
-                        <div class="flex items-center gap-2">
-                             <div class="h-6 w-6 rounded-full border border-slate-200 shadow-sm" style="background-color: ${item.color || '#ccc'}"></div>
-                             <span class="text-[10px] font-mono text-slate-400 uppercase">${item.color || '-'}</span>
-                        </div>
-                    </td>
-                    <td class="p-4 text-center">${statusBadge}</td>
-                    <td class="p-4 text-right">
-                        <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick='editItem(${JSON.stringify(item)})' class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-800 hover:text-white transition-all">
-                                <i class="fas fa-edit text-xs"></i>
-                            </button>
-                            <button onclick="deleteItem(${item.id})" class="w-8 h-8 flex items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all">
-                                <i class="fas fa-trash-alt text-xs"></i>
-                            </button>
-                        </div>
-                    </td>
-                `) : `
+                tr.innerHTML = `
                     <td class="p-4 text-xs font-mono font-bold text-slate-400">#${item.orden || 0}</td>
                     <td class="p-4">
                         <div class="font-bold text-slate-700">${item.nombre}</div>
@@ -281,7 +259,7 @@
             document.getElementById('activo').checked = item.activo;
 
             formTitle.textContent = 'Editar Estado';
-            submitBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-save mr-2"></i> Actualizar') : '<i class="fas fa-save mr-2"></i> Actualizar';
+            submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Actualizar';
             cancelBtn.classList.remove('hidden');
 
             document.getElementById('nombre').focus();
@@ -292,7 +270,7 @@
             form.reset();
             document.getElementById('itemId').value = '';
             formTitle.textContent = 'Nuevo Estado';
-            submitBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-save mr-2"></i> Guardar Cambios') : '<i class="fas fa-save mr-2"></i> Guardar Cambios';
+            submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Guardar Cambios';
             cancelBtn.classList.add('hidden');
         }
 
@@ -303,7 +281,7 @@
 
             try {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin"></i>') : '<i class="fas fa-spinner fa-spin"></i>';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
                 const formData = utils.serializeForm(e.target);
                 const body = {
@@ -327,7 +305,7 @@
                 showToast(error.message, 'error');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalHTML) : originalHTML;
+                submitBtn.innerHTML = originalHTML;
             }
         }
 

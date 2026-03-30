@@ -203,7 +203,7 @@
 
         function renderUsers(usersToRender = users) {
             const tbody = document.getElementById('usersTableBody');
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tbody.innerHTML = '';
 
             usersToRender.forEach(user => {
                 const tr = document.createElement('tr');
@@ -213,35 +213,7 @@
                     ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Activo</span>'
                     : '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">Inactivo</span>';
 
-                tr.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                                ${user.nombre?.charAt(0).toUpperCase() || 'U'}
-                            </div>
-                            <div>
-                                <p class="font-medium text-gray-800">${user.nombre}</p>
-                                <p class="text-xs text-gray-500">${user.email}</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${user.division_nombre || '-'}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${user.nivel_acceso != null ? 'Nivel ' + user.nivel_acceso : '-'}</td>
-                    <td class="px-6 py-4 text-center">${statusBadge}</td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center justify-center gap-2">
-                            <button onclick="editUser(${user.user_id})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="toggleUserStatus(${user.user_id})" class="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition" title="Cambiar Estado">
-                                <i class="fas fa-power-off"></i>
-                            </button>
-                            <button onclick="deleteUser(${user.user_id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Eliminar">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </td>
-                `) : `
+                tr.innerHTML = `
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
@@ -325,7 +297,7 @@
 
             try {
                 btn.disabled = true;
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin mr-2"></i> Guardando...') : '<i class="fas fa-spinner fa-spin mr-2"></i> Guardando...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Guardando...';
 
                 if (editingUserId) {
                     if (!formData.password) delete formData.password;

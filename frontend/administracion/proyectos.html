@@ -449,7 +449,7 @@
             const countEl = document.getElementById('proyectoCount');
             const montoEl = document.getElementById('totalMonto');
 
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tbody.innerHTML = '';
             loading.classList.remove('hidden');
             emptyState.classList.add('hidden');
 
@@ -473,7 +473,7 @@
             const tbody = document.getElementById('proyectosBody');
             const emptyState = document.getElementById('emptyState');
 
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('') : '';
+            tbody.innerHTML = '';
 
             if (data.length === 0) {
                 emptyState.classList.remove('hidden');
@@ -488,43 +488,7 @@
 
                 const progressWidth = (p.avance_total_porcentaje > 1 ? p.avance_total_porcentaje : p.avance_total_porcentaje * 100) || 0;
 
-                tr.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <td class="p-4">
-                        <div class="text-[10px] font-bold text-slate-400 uppercase">#${p.id}</div>
-                        <div class="text-xs font-mono font-bold text-blue-600">${p.codigo || 'SIN CÓDIGO'}</div>
-                    </td>
-                    <td class="p-4">
-                        <div class="font-bold text-slate-700 leading-tight">${p.nombre}</div>
-                        <div class="text-[10px] text-slate-400 mt-1 uppercase font-medium line-clamp-1">${p.area || 'Sin área'}</div>
-                    </td>
-                    <td class="p-4">
-                        <div class="flex flex-col gap-1">
-                            <span class="text-[10px] font-bold text-slate-600">${p.estado_proyecto || '-'}</span>
-                            <span class="text-[9px] text-slate-400 uppercase font-medium">${p.etapa_proyecto || '-'}</span>
-                        </div>
-                    </td>
-                    <td class="p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-emerald-500 rounded-full" style="width: ${progressWidth}%"></div>
-                            </div>
-                            <span class="text-xs font-bold text-slate-600">${progressWidth.toFixed(1)}%</span>
-                        </div>
-                    </td>
-                    <td class="p-4 font-bold text-slate-700 text-sm">
-                        ${utils.formatCurrency(p.monto)}
-                    </td>
-                    <td class="p-4 text-right">
-                        <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick='editItem(${JSON.stringify(p)})' class="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all">
-                                <i class="fas fa-edit text-xs"></i>
-                            </button>
-                            <button onclick="deleteItem(${p.id})" class="w-8 h-8 flex items-center justify-center rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all">
-                                <i class="fas fa-trash-alt text-xs"></i>
-                            </button>
-                        </div>
-                    </td>
-                `) : `
+                tr.innerHTML = `
                     <td class="p-4">
                         <div class="text-[10px] font-bold text-slate-400 uppercase">#${p.id}</div>
                         <div class="text-xs font-mono font-bold text-blue-600">${p.codigo || 'SIN CÓDIGO'}</div>
@@ -610,7 +574,7 @@
 
             try {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fas fa-spinner fa-spin"></i>') : '<i class="fas fa-spinner fa-spin"></i>';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
                 const formData = utils.serializeForm(e.target);
 
@@ -639,7 +603,7 @@
                 showToast(error.message, 'error');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalHTML) : originalHTML;
+                submitBtn.innerHTML = originalHTML;
             }
         }
 

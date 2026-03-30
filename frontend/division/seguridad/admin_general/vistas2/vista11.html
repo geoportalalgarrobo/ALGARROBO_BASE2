@@ -236,8 +236,7 @@
                 el.style.alignItems = 'center';
                 el.style.gap = '8px';
 
-                el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-                    <div style="font-size: 0.65rem) : `
+                el.innerHTML = `
                     <div style="font-size: 0.65rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">
                         <i class="fa-solid ${icon}"></i> ${label}
                     </div>
@@ -343,8 +342,7 @@
             const heatmap = document.getElementById('v13_heatmap_years');
 
             let lastAvg = null;
-            heatmap.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(years.map(yr => {
-                const rows = S.allDataHistory_total.filter(r => r[C.ANIO] === yr)) : years.map(yr => {
+            heatmap.innerHTML = years.map(yr => {
                 const rows = S.allDataHistory_total.filter(r => r[C.ANIO] === yr);
                 if (rows.length === 0) return '';
 
@@ -392,7 +390,7 @@
             if (typeof IAModule !== 'undefined') {
                 IAModule.getInterpretation('vista13').then(txt => {
                     const el = document.getElementById('v13_ia_analysis');
-                    if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                    if (el) el.innerHTML = txt;
                 });
             }
 

@@ -475,7 +475,7 @@
                 const el = document.getElementById(id);
                 if (!el) return;
                 const prevVal = el.value;
-                el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<option value="">${label}</option>`) : `<option value="">${label}</option>`;
+                el.innerHTML = `<option value="">${label}</option>`;
                 (options || []).forEach(opt => {
                     const val = typeof opt === 'object' ? opt[valueKey] : opt;
                     const txt = typeof opt === 'object' ? opt[textKey] : opt;
@@ -513,15 +513,7 @@
             if (!lotes?.length) return;
             // Tabla
             const tbody = document.getElementById('tablaLotes');
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(lotes.map(l => `
-                <tr>
-                    <td><span class="font-bold text-indigo-600">#${l.id}</span></td>
-                    <td>${fmtDate(l.fecha_ejecucion)}</td>
-                    <td><span class="font-semibold">${l.total_proyectos_auditados}</span></td>
-                    <td>${scoreBadge(l.promedio)}</td>
-                    <td class="text-slate-500 text-xs">${l.usuario_ejecutor || 'SISTEMA'}</td>
-                </tr>
-            `).join('')) : lotes.map(l => `
+            tbody.innerHTML = lotes.map(l => `
                 <tr>
                     <td><span class="font-bold text-indigo-600">#${l.id}</span></td>
                     <td>${fmtDate(l.fecha_ejecucion)}</td>
@@ -632,27 +624,10 @@
         function renderTopCriticos(rows) {
             const tbody = document.getElementById('tablaCriticos');
             if (!rows?.length) {
-                tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<tr><td colspan="9" class="text-center py-8 text-slate-400">Sin datos disponibles</td></tr>') : '<tr><td colspan="9" class="text-center py-8 text-slate-400">Sin datos disponibles</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-slate-400">Sin datos disponibles</td></tr>';
                 return;
             }
-            tbody.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(rows.map((r, i) => `
-                <tr>
-                    <td>${i+1}</td>
-                    <td class="font-semibold text-slate-800 max-w-[200px] truncate" title="${r.nombre}">${r.nombre}</td>
-                    <td class="text-xs text-slate-500">${r.area_nombre || '—'}</td>
-                    <td class="text-xs">${r.etapa || '—'}</td>
-                    <td><div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div style="width:${r.avance_declarado||0}%;background:#6366f1" class="h-full rounded-full"></div></div><span class="text-xs text-slate-500">${r.avance_declarado||0}%</span></td>
-                    <td>${scoreBadge(r.puntaje_general)}</td>
-                    <td class="text-center"><span class="font-bold text-red-600">${r.alertas_criticas}</span></td>
-                    <td class="text-center"><span class="font-bold text-orange-500">${r.alertas_altas}</span></td>
-                    <td>
-                        <button onclick="openPdf(${r.id}, '${escHtml(r.nombre)}')"
-                            class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition">
-                            <i class="fas fa-file-pdf mr-1"></i>Ver PDF
-                        </button>
-                    </td>
-                </tr>
-            `).join('')) : rows.map((r, i) => `
+            tbody.innerHTML = rows.map((r, i) => `
                 <tr>
                     <td>${i+1}</td>
                     <td class="font-semibold text-slate-800 max-w-[200px] truncate" title="${r.nombre}">${r.nombre}</td>
@@ -681,7 +656,7 @@
                 applyReporteFilters();
             } catch (e) {
                 console.error('Reportes error:', e);
-                document.getElementById('reportesList').innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<p class="text-center py-8 text-slate-400">Error cargando reportes</p>') : '<p class="text-center py-8 text-slate-400">Error cargando reportes</p>';
+                document.getElementById('reportesList').innerHTML = '<p class="text-center py-8 text-slate-400">Error cargando reportes</p>';
             }
         }
 
@@ -711,24 +686,10 @@
         function renderReportesList(items) {
             const el = document.getElementById('reportesList');
             if (!items.length) {
-                el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div class="text-center py-12 text-slate-400"><i class="fas fa-search text-3xl mb-3 block opacity-30"></i><p class="font-semibold">Sin resultados para los filtros seleccionados</p></div>') : '<div class="text-center py-12 text-slate-400"><i class="fas fa-search text-3xl mb-3 block opacity-30"></i><p class="font-semibold">Sin resultados para los filtros seleccionados</p></div>';
+                el.innerHTML = '<div class="text-center py-12 text-slate-400"><i class="fas fa-search text-3xl mb-3 block opacity-30"></i><p class="font-semibold">Sin resultados para los filtros seleccionados</p></div>';
                 return;
             }
-            el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(items.map(r => `
-                <div class="pdf-item">
-                    <div class="w-11 h-11 rounded-xl bg-red-50 text-red-500 flex items-center justify-center flex-shrink-0 text-lg">
-                        <i class="fas fa-file-pdf"></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="font-bold text-slate-800 text-sm truncate">${r.nombre || 'Proyecto ' + r.proyecto_id}</p>
-                        <div class="flex items-center gap-3 mt-0.5 flex-wrap">
-                            <span class="text-xs text-slate-400">${r.area_nombre || '—'}</span>
-                            <span class="text-xs text-slate-400">·</span>
-                            <span class="text-xs text-slate-400">${r.etapa_nombre || '—'}</span>
-                            <span class="text-xs text-slate-400">·</span>
-                            <span class="text-xs text-slate-400">${r.profesional_1 || 'Sin profesional'}</span>
-                        </div>
-                        <p class="text-xs text-slate-300 mt-0.5">${r.modificado ? 'Generado: ' + fmtDate(r.modificado) : ''} · ${r.size_kb} KB</p>
+            el.innerHTML = ''} · ${r.size_kb} KB</p>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
                         ${r.puntaje_general !== undefined ? scoreBadge(r.puntaje_general) : ''}

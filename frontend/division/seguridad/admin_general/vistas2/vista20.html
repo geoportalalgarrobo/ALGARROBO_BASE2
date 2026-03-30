@@ -117,15 +117,14 @@
 
             const listStop = document.getElementById('v20_list_stop');
             if (stopSuccess.length > 0) {
-                listStop.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(stopSuccess.map(r => `
-                    <div style="display: flex) : stopSuccess.map(r => `
+                listStop.innerHTML = stopSuccess.map(r => `
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0fdf4; padding-bottom: 8px;">
                         <span style="font-weight: 700; color: #1e293b; font-size: 0.85rem;">${r[C_STOP.DELITO]}</span>
                         <span style="font-weight: 800; color: #10b981; font-size: 0.85rem;">${r.delta.toFixed(0)}%</span>
                     </div>
                 `).join('');
             } else {
-                listStop.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div style="color: #94a3b8) : '<div style="color: #94a3b8; font-size: 0.8rem; font-style: italic; text-align: center; padding: 1rem;">No se registran disminuciones significativas esta semana.</div>';
+                listStop.innerHTML = '<div style="color: #94a3b8; font-size: 0.8rem; font-style: italic; text-align: center; padding: 1rem;">No se registran disminuciones significativas esta semana.</div>';
             }
         }
 
@@ -144,8 +143,7 @@
 
         const listCead = document.getElementById('v20_list_cead');
         if (success.length > 0) {
-            listCead.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(success.map(r => `
-                <div style="display: flex) : success.map(r => `
+            listCead.innerHTML = success.map(r => `
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eff6ff; padding-bottom: 8px;">
                      <span style="font-weight: 700; color: #1e293b; font-size: 0.85rem;">
                         ${r.stop_delito || r[C.DELITO]}
@@ -154,7 +152,7 @@
                 </div>
             `).join('');
         } else {
-            listCead.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<div style="color: #94a3b8) : '<div style="color: #94a3b8; font-size: 0.8rem; font-style: italic; text-align: center; padding: 1rem;">No se registran tipologías con disipación estructural (Z < -0.5).</div>';
+            listCead.innerHTML = '<div style="color: #94a3b8; font-size: 0.8rem; font-style: italic; text-align: center; padding: 1rem;">No se registran tipologías con disipación estructural (Z < -0.5).</div>';
         }
 
 
@@ -162,7 +160,7 @@
         if (typeof IAModule !== 'undefined') {
             IAModule.getInterpretation('vista20').then(txt => {
                 const el = document.getElementById('v20_ia_analysis');
-                if (el) el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(txt) : txt;
+                if (el) el.innerHTML = txt;
             });
         }
 

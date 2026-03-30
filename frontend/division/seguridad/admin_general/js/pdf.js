@@ -664,8 +664,7 @@ const PDFModule = {
             backdrop-filter: blur(8px);
         `;
 
-        overlay.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`
-            <div style="background: white) : `
+        overlay.innerHTML = `
             <div style="background: white; padding: 2.5rem 3rem; border-radius: 20px; max-width: 520px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
                 <!-- Header -->
                 <div style="text-align: center; margin-bottom: 1.5rem;">
@@ -834,7 +833,7 @@ const PDFModule = {
         const originalText = btn ? btn.innerHTML : '';
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fa-solid fa-spinner fa-spin"></i> Generando...') : '<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
         }
 
         try {
@@ -867,7 +866,7 @@ const PDFModule = {
         } finally {
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalText) : originalText;
+                btn.innerHTML = originalText;
             }
         }
     },
@@ -1155,7 +1154,7 @@ const PDFModule = {
 
         // Update button state
         const originalBtnText = btn.innerHTML;
-        btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fa-solid fa-spinner fa-spin"></i> Preparando...') : '<i class="fa-solid fa-spinner fa-spin"></i> Preparando...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparando...';
         btn.disabled = true;
 
         // Filter to include only STOP views (vista1 to vista20)
@@ -1186,7 +1185,7 @@ const PDFModule = {
 
                 // #44 - Update detailed progress
                 this.updateProgress(i, `Capturando ${viewName}...`);
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fa-solid fa-spinner fa-spin"></i> ${i + 1}/${stopViews.length}`) : `<i class="fa-solid fa-spinner fa-spin"></i> ${i + 1}/${stopViews.length}`;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${i + 1}/${stopViews.length}`;
 
                 // Destroy previous charts
                 App.destroyAllCharts();
@@ -1281,7 +1280,7 @@ const PDFModule = {
 
             // Restore state
             this.hideEnhancedOverlay();
-            btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalBtnText) : originalBtnText;
+            btn.innerHTML = originalBtnText;
             btn.disabled = false;
             App.state.isExporting = false;
             App.loadView(originalView);
@@ -1311,7 +1310,7 @@ const PDFModule = {
 
         // Update button state
         const originalBtnText = btn.innerHTML;
-        btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fa-solid fa-spinner fa-spin"></i> Preparando...') : '<i class="fa-solid fa-spinner fa-spin"></i> Preparando...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparando...';
         btn.disabled = true;
 
         // USE ALL CONFIGURED VIEWS
@@ -1335,7 +1334,7 @@ const PDFModule = {
 
                 // #44 - Update progress
                 this.updateProgress(i, `Capturando ${viewName}...`);
-                btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(`<i class="fa-solid fa-spinner fa-spin"></i> ${i + 1}/${viewsToExport.length}`) : `<i class="fa-solid fa-spinner fa-spin"></i> ${i + 1}/${viewsToExport.length}`;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${i + 1}/${viewsToExport.length}`;
 
                 // Destroy previous charts
                 App.destroyAllCharts();
@@ -1425,7 +1424,7 @@ const PDFModule = {
             if (typeof Chart !== 'undefined') Chart.defaults.animation = true;
 
             this.hideEnhancedOverlay();
-            btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalBtnText) : originalBtnText;
+            btn.innerHTML = originalBtnText;
             btn.disabled = false;
             App.state.isExporting = false;
             App.loadView(originalView);
@@ -1441,7 +1440,7 @@ const PDFModule = {
         App.state.isExporting = true;
         const btn = document.getElementById('btnExportSingle');
         const originalBtnText = btn.innerHTML;
-        btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fa-solid fa-spinner fa-spin"></i> Generando...') : '<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
         btn.disabled = true;
 
         try {
@@ -1497,7 +1496,7 @@ const PDFModule = {
             console.error('Error exporting single page:', error);
             alert('Error al exportar. Por favor intente nuevamente.');
         } finally {
-            btn.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(originalBtnText) : originalBtnText;
+            btn.innerHTML = originalBtnText;
             btn.disabled = false;
             App.state.isExporting = false;
         }

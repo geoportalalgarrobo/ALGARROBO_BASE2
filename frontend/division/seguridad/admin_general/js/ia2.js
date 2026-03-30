@@ -329,7 +329,7 @@ No agregues encabezados ni despedidas.`;
             if (el) {
                 const parent = el.closest('.alert');
                 if (isError) {
-                    el.innerHTML = typeof DOMPurify !== "undefined" ? DOMPurify.sanitize('<i class="fa-solid fa-triangle-exclamation"></i> Servicio de IA no disponible. Verifique conexión.') : '<i class="fa-solid fa-triangle-exclamation"></i> Servicio de IA no disponible. Verifique conexión.';
+                    el.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Servicio de IA no disponible. Verifique conexión.';
                     if (parent) {
                         parent.classList.remove('alert--info');
                         parent.classList.add('alert--danger');
