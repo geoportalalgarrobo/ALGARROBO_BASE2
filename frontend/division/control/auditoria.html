@@ -330,6 +330,23 @@
     <!-- Toast -->
     <div id="toast"><i id="toastIcon" class="fas fa-check-circle text-emerald-500 text-lg"></i><span id="toastMsg">OK</span></div>
 
+    <!-- Custom Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all scale-95 opacity-0" id="confirmModalBox">
+            <div class="p-6">
+                <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-4 mx-auto">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="text-center font-bold text-slate-800 text-lg mb-2" id="confirmModalTitle">¿Confirmar acción?</h3>
+                <p class="text-center text-slate-500 text-sm mb-6" id="confirmModalText"></p>
+                <div class="flex gap-3">
+                    <button id="btnConfirmCancel" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition">Cancelar</button>
+                    <button id="btnConfirmOk" class="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="../../script/layout.js"></script>
     <script>
         // ── Globals ──
@@ -689,30 +706,7 @@
                 el.innerHTML = '<div class="text-center py-12 text-slate-400"><i class="fas fa-search text-3xl mb-3 block opacity-30"></i><p class="font-semibold">Sin resultados para los filtros seleccionados</p></div>';
                 return;
             }
-            el.innerHTML = ''} · ${r.size_kb} KB</p>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        ${r.puntaje_general !== undefined ? scoreBadge(r.puntaje_general) : ''}
-                        <div class="flex flex-col gap-1">
-                            ${r.has_calidad ? `
-                            <button onclick="openPdf(${r.proyecto_id}, '${escHtml(r.nombre)}', 'calidad')"
-                                class="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-700 transition">
-                                <i class="fas fa-search"></i> CALIDAD
-                            </button>
-                            <button onclick="enviarCorreoIndividual(${r.proyecto_id})"
-                                class="flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-lg text-[10px] font-bold hover:bg-emerald-700 transition mt-1">
-                                <i class="fas fa-paper-plane"></i> ENVIAR EMAIL
-                            </button>` : ''}
-                            ${r.has_cambios ? `
-                            <button onclick="openPdf(${r.proyecto_id}, '${escHtml(r.nombre)}', 'cambios')"
-                                class="flex items-center gap-1.5 px-3 py-1 bg-amber-500 text-white rounded-lg text-[10px] font-bold hover:bg-amber-600 transition">
-                                <i class="fas fa-history"></i> CAMBIOS
-                            </button>` : ''}
-
-                        </div>
-                    </div>
-                </div>
-            `).join('')) : items.map(r => `
+            el.innerHTML = items.map(r => `
                 <div class="pdf-item">
                     <div class="w-11 h-11 rounded-xl bg-red-50 text-red-500 flex items-center justify-center flex-shrink-0 text-lg">
                         <i class="fas fa-file-pdf"></i>
@@ -726,7 +720,7 @@
                             <span class="text-xs text-slate-400">·</span>
                             <span class="text-xs text-slate-400">${r.profesional_1 || 'Sin profesional'}</span>
                         </div>
-                        <p class="text-xs text-slate-300 mt-0.5">${r.modificado ? 'Generado: ' + fmtDate(r.modificado) : ''} · ${r.size_kb} KB</p>
+                        <p class="text-xs text-slate-300 mt-0.5">${r.modificado ? 'Generado: ' + fmtDate(r.modificado) : ''} <!--SIZE_KB_PLACEHOLDER--></p>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
                         ${r.puntaje_general !== undefined ? scoreBadge(r.puntaje_general) : ''}
@@ -745,7 +739,6 @@
                                 class="flex items-center gap-1.5 px-3 py-1 bg-amber-500 text-white rounded-lg text-[10px] font-bold hover:bg-amber-600 transition">
                                 <i class="fas fa-history"></i> CAMBIOS
                             </button>` : ''}
-
                         </div>
                     </div>
                 </div>
@@ -827,8 +820,42 @@
         }
 
         /* ───────────────────────────── ENVÍO CORREOS ───────────────────────── */
+        function showCustomConfirm(title, text) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirmModal');
+                const box = document.getElementById('confirmModalBox');
+                document.getElementById('confirmModalTitle').textContent = title;
+                document.getElementById('confirmModalText').textContent = text;
+                
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => {
+                    box.classList.remove('scale-95', 'opacity-0');
+                    box.classList.add('scale-100', 'opacity-100');
+                }, 10);
+
+                const cleanUp = () => {
+                    box.classList.remove('scale-100', 'opacity-100');
+                    box.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }, 200);
+                    document.getElementById('btnConfirmOk').onclick = null;
+                    document.getElementById('btnConfirmCancel').onclick = null;
+                };
+
+                document.getElementById('btnConfirmOk').onclick = () => { cleanUp(); resolve(true); };
+                document.getElementById('btnConfirmCancel').onclick = () => { cleanUp(); resolve(false); };
+            });
+        }
+
         async function enviarAuditoriaLote() {
-            if (!confirm('¿Desea enviar los reportes de calidad del último lote a todos los responsables configurados?')) return;
+            const confirmed = await showCustomConfirm(
+                'Enviar Reportes en Lote', 
+                '¿Desea enviar los reportes de calidad del último lote a todos los responsables configurados?'
+            );
+            if (!confirmed) return;
             
             const btn = document.getElementById('btnEnviarLote');
             const icon = document.getElementById('iconEnviarLote');
@@ -847,7 +874,11 @@
         }
 
         async function enviarCorreoIndividual(projectId) {
-            if (!confirm(`¿Enviar reporte del proyecto #${projectId} a sus responsables?`)) return;
+            const confirmed = await showCustomConfirm(
+                'Enviar Reporte Individual', 
+                `¿Enviar reporte del proyecto #${projectId} a sus responsables?`
+            );
+            if (!confirmed) return;
             
             try {
                 toast('Enviando correo...', 'ok');
@@ -881,16 +912,19 @@
         }
 
         function destroyChart(id) {
+            // Eliminar con Chart.getChart
             const existing = Chart.getChart(id);
             if (existing) {
                 existing.destroy();
             }
-            // También limpiar nuestra referencia interna si existe
-            for (let key in charts) {
-                if (charts[key].canvas && charts[key].canvas.id === id) {
+            // Limpiar profundamente de nuestra memoria interna
+            Object.keys(charts).forEach(key => {
+                const c = charts[key];
+                if (c && typeof c.destroy === 'function' && c.canvas && c.canvas.id === id) {
+                    c.destroy();
                     delete charts[key];
                 }
-            }
+            });
         }
 
         function scoreBadge(val) {
