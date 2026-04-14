@@ -1,58 +1,29 @@
-# 🚀 Railway Master Dockerfile (Backend Modular Optimized)
-# ---------------------------------------------------
-# Optimizado para:
-# - Carga ultra-rápida (Multi-stage build)
-# - Persistencia en volumen /data
-# - Despliegue del backend únicamente
+# Usar Python 3.10 slim como imagen base
+FROM python:3.10-slim
 
-# ETAPA 1: Builder (Compilación de librerías pesadas)
-FROM python:3.11-slim as builder
-WORKDIR /build
-
-# Herramientas de compilación esenciales
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Instalación de requerimientos
-COPY backend/requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
-
-
-# ETAPA 2: Runtime (Imagen final liviana)
-FROM python:3.11-slim
+# Establecer directorio de trabajo en /app
 WORKDIR /app
 
-# Dependencias de ejecución esenciales
-# - antiword y tesseract para extracción de documentos
-# - libpq5 para PostgreSQL
+# Instalar dependencias del sistema requeridas
 RUN apt-get update && apt-get install -y \
-    antiword \
+    libpq-dev \
+    gcc \
+    poppler-utils \
     tesseract-ocr \
-    tesseract-ocr-spa \
-    libpq5 \
-    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiamos paquetes instalados del builder (ahorra tiempo masivo)
-COPY --from=builder /install /usr/local
+# Crear el directorio /data que será montado por el volumen de Railway
+RUN mkdir -p /data
 
-# Copiamos TODO el backend
-COPY backend/ .
+# Copiar los requerimientos que ahora están en backend/
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Variables de entorno runtime
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
-# Definimos el volumen /data como base para reportes
-ENV AUDIT_OUT_DIR=/data/auditoria_reportes
+# Copiar el backend a la estructura del contenedor
+COPY backend/ ./backend/
 
-# Aseguramos que existan las carpetas base (si no están en volumen)
-RUN mkdir -p docs fotos_reportes auditoria_reportes
+# Posicionarnos directamente en backend para un inicio limpio y en contexto
+WORKDIR /app/backend
 
-# Exponemos el puerto (aunque Railway lo inyecta dinámicamente)
-EXPOSE 8000
-
-# Inicio del servidor con Gunicorn (Optimizado para Railway)
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$PORT --timeout 120 --workers 2 --threads 4 app_railway:app"]
+# Comando de inicio usando gunicorn (evaluará automáticamente la variable PORT)
+CMD gunicorn app_railway:app --bind 0.0.0.0:${PORT:-8000} --workers 4 --threads 2 --timeout 120
