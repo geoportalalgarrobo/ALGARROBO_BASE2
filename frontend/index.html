@@ -231,8 +231,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
+            // Rescatar usuario recordado antes de limpiar la caché
             const rememberedUser = localStorage.getItem('rememberUser');
+            
+            // Limpiar caché local y de sesión por seguridad y control de estados
+            localStorage.clear();
+            sessionStorage.clear();
+
             if (rememberedUser) {
+                // Volver a guardar el usuario si existía
+                localStorage.setItem('rememberUser', rememberedUser);
                 document.getElementById('username').value = rememberedUser;
                 document.getElementById('remember').checked = true;
             }
