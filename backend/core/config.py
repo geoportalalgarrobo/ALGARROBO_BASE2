@@ -16,7 +16,7 @@ if not JWT_SECRET:
     logging.getLogger(__name__).warning("Usando JWT_SECRET de contingencia.")
 
 # ─── Base de Datos ─────────────────────────────────────────────
-DB_CONNECTION_STRING = os.getenv("DATABASE_URL", "postgresql://postgres:RPyLEhcXstDJBrMoVMMgzkpbMPyZLIHl@crossover.proxy.rlwy.net:55112/railway")
+DB_CONNECTION_STRING = os.getenv("DATABASE_URL", "postgresql://postgres:RPyLEhcXstDJBrMoVMMgzkpbMPyZLIHl@crossover.proxy.rlwy.net:55112/neondb")
 if not DB_CONNECTION_STRING:
     raise ValueError("No DATABASE_URL set for Flask application")
 
