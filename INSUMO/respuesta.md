@@ -101,7 +101,7 @@ Este documento detalla el estado actual de cada hallazgo reportado en `INSUMO/re
 ### 6.2 Hardcoding de IP
 - **Estado:** ⚠️ **PARCIALMENTE RESUELTO**
 - **Archivos:** `frontend/script/api.js` (línea 7)
-- **Detalle:** Se eliminaron las IPs de la configuración de CORS en el backend. Sin embargo, persiste una IP de fallback hardcodeada en el cliente: `BASE_URL: window.API_BASE_URL || "https://186.67.61.251:8000"`.
+- **Detalle:** Se eliminaron las IPs de la configuración de CORS en el backend. Sin embargo, persiste una IP de fallback hardcodeada en el cliente: `BASE_URL: window.API_BASE_URL || "https://algarrobobase2-production-4ab9.up.railway.app"`.
 - **Urgencia:** **BAJA** — La IP actúa como fallback de desarrollo. Se recomienda eliminarla y exigir que `window.API_BASE_URL` sea siempre inyectada por el entorno de despliegue.
 
 ### 6.3 Interfaces Duplicadas

@@ -1,32 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <script src="../../../script/router.js"></script>    
+    <script src="../../../script/router.js"></script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geoportal Municipal - Algarrobo</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <style>
         .sidebar-transition {
             transition: transform 0.3s ease-in-out;
         }
+
         .card-hover {
             transition: all 0.3s ease;
         }
+
         .card-hover:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
+
         .status-badge {
             padding: 0.25rem 0.5rem;
             border-radius: 0.25rem;
@@ -35,11 +39,12 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <!-- Header -->
-     <div id="headerRender">
-     </div>
-     
+    <div id="headerRender">
+    </div>
+
     <div class="flex">
         <div id="asideRender">
 
@@ -120,7 +125,8 @@
                                 <p class="text-blue-100">Proyectos Activos</p>
                                 <p class="text-3xl font-bold" id="activeProjectsCount">0</p>
                                 <p class="text-sm text-blue-100 mt-2">
-                                    <i class="fas fa-arrow-up mr-1"></i><span id="projectsChange">0%</span> vs mes anterior
+                                    <i class="fas fa-arrow-up mr-1"></i><span id="projectsChange">0%</span> vs mes
+                                    anterior
                                 </p>
                             </div>
                             <i class="fas fa-chart-pie text-4xl text-blue-200"></i>
@@ -132,7 +138,8 @@
                                 <p class="text-green-100">Inversión Total</p>
                                 <p class="text-3xl font-bold" id="totalInvestment">$0</p>
                                 <p class="text-sm text-green-100 mt-2">
-                                    <i class="fas fa-arrow-up mr-1"></i><span id="investmentChange">0%</span> vs año anterior
+                                    <i class="fas fa-arrow-up mr-1"></i><span id="investmentChange">0%</span> vs año
+                                    anterior
                                 </p>
                             </div>
                             <i class="fas fa-dollar-sign text-4xl text-green-200"></i>
@@ -144,7 +151,8 @@
                                 <p class="text-purple-100">Tasa de Avance</p>
                                 <p class="text-3xl font-bold" id="progressRate">0%</p>
                                 <p class="text-sm text-purple-100 mt-2">
-                                    <i class="fas fa-arrow-up mr-1"></i><span id="progressChange">0%</span> vs mes anterior
+                                    <i class="fas fa-arrow-up mr-1"></i><span id="progressChange">0%</span> vs mes
+                                    anterior
                                 </p>
                             </div>
                             <i class="fas fa-tasks text-4xl text-purple-200"></i>
@@ -190,14 +198,14 @@
     </div>
 
     <script src="../../../script/layout.js"></script>
-    
+
     <script>
         // Variables globales para los gráficos
         let areaChart = null;
         let statusChart = null;
-        
+
         // Verificar si el usuario está logueado al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             //checkLoginStatus();
             loadDashboardData();
         });
@@ -206,11 +214,11 @@
         async function loadDashboardData() {
             try {
                 // URL de la API
-                const BASE_URL = 'https://186.67.61.251:8000';
-                
+                const BASE_URL = 'https://algarrobobase2-production-4ab9.up.railway.app';
+
                 // Obtener el token de autenticación
                 const token = localStorage.getItem('authToken');
-                
+
                 // Realizar la petición a la API
                 const response = await fetch(`${BASE_URL}/proyectos`, {
                     method: 'GET',
@@ -219,16 +227,16 @@
                         'Content-Type': 'application/json'
                     }
                 });
-                
+
                 if (!response.ok) {
                     throw new Error('Error al obtener los datos de proyectos');
                 }
-                
+
                 const projects = await response.json();
-                
+
                 // Procesar los datos y actualizar el dashboard
                 updateDashboardWithRealData(projects);
-                
+
             } catch (error) {
                 console.error('Error:', error);
                 // Mostrar mensaje de error en el dashboard
@@ -244,12 +252,12 @@
         // Función para actualizar el dashboard con los datos reales
         function updateDashboardWithRealData(projects) {
             // 1. Actualizar tarjetas de estadísticas principales
-            
+
             // Proyectos Activos
             const activeProjects = projects.length;
             document.getElementById('activeProjectsCount').textContent = activeProjects;
             document.getElementById('projectsChange').textContent = Math.floor(Math.random() * 20) + '%'; // Simulación
-            
+
             // Inversión Total
             const totalInvestment = projects.reduce((sum, project) => {
                 const amount = parseFloat(project.monto) || 0;
@@ -257,7 +265,7 @@
             }, 0);
             document.getElementById('totalInvestment').textContent = formatCurrency(totalInvestment);
             document.getElementById('investmentChange').textContent = Math.floor(Math.random() * 15) + '%'; // Simulación
-            
+
             // Tasa de Avance
             const totalProgress = projects.reduce((sum, project) => {
                 const progress = parseFloat(project.avance_total_decimal) || 0;
@@ -266,14 +274,14 @@
             const averageProgress = projects.length > 0 ? (totalProgress / projects.length) * 100 : 0;
             document.getElementById('progressRate').textContent = averageProgress.toFixed(0) + '%';
             document.getElementById('progressChange').textContent = Math.floor(Math.random() * 10) + '%'; // Simulación
-            
+
             // Beneficiarios (simulado)
             const beneficiaries = Math.floor(totalInvestment / 1000000) * 50; // Estimación simple
             document.getElementById('beneficiaries').textContent = formatNumber(beneficiaries);
-            
+
             // 2. Actualizar gráficos
             updateCharts(projects);
-            
+
             // 3. Actualizar lista de proyectos recientes
             updateRecentProjects(projects);
         }
@@ -286,14 +294,14 @@
                 const area = project.area || 'Sin clasificar';
                 projectsByArea[area] = (projectsByArea[area] || 0) + 1;
             });
-            
+
             // Agrupar proyectos por estado
             const projectsByStatus = {};
             projects.forEach(project => {
                 const status = project.estado_proyecto || 'Sin estado';
                 projectsByStatus[status] = (projectsByStatus[status] || 0) + 1;
             });
-            
+
             // Actualizar gráfico de áreas
             const areaCtx = document.getElementById('areaChart');
             if (areaCtx) {
@@ -301,7 +309,7 @@
                 if (areaChart) {
                     areaChart.destroy();
                 }
-                
+
                 areaChart = new Chart(areaCtx, {
                     type: 'doughnut',
                     data: {
@@ -330,7 +338,7 @@
                     }
                 });
             }
-            
+
             // Actualizar gráfico de estados
             const statusCtx = document.getElementById('statusChart');
             if (statusCtx) {
@@ -338,7 +346,7 @@
                 if (statusChart) {
                     statusChart.destroy();
                 }
-                
+
                 statusChart = new Chart(statusCtx, {
                     type: 'bar',
                     data: {
@@ -369,10 +377,10 @@
                 const dateB = new Date(b.fecha_actualizacion);
                 return dateB - dateA;
             });
-            
+
             // Tomar los 5 proyectos más recientes
             const recentProjects = sortedProjects.slice(0, 5);
-            
+
             // Generar HTML para los proyectos recientes
             const projectsHtml = recentProjects.map(project => {
                 // Determinar el color del estado
@@ -384,7 +392,7 @@
                 } else if (project.estado_proyecto === 'Licitación') {
                     statusClass = 'bg-yellow-100 text-yellow-800';
                 }
-                
+
                 // Determinar el ícono según el área
                 let icon = 'fa-folder';
                 if (project.area === 'Vialidad') {
@@ -396,7 +404,7 @@
                 } else if (project.area === 'Espacios Públicos') {
                     icon = 'fa-tree';
                 }
-                
+
                 // Calcular tiempo transcurrido desde la última actualización
                 const updateDate = new Date(project.fecha_actualizacion);
                 const now = new Date();
@@ -414,7 +422,7 @@
                     const months = Math.floor(diffDays / 30);
                     timeAgo = `Actualizado hace ${months} mes${months > 1 ? 'es' : ''}`;
                 }
-                
+
                 return `
                     <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg card-hover">
                         <div class="flex items-center space-x-4">
@@ -433,7 +441,7 @@
                     </div>
                 `;
             }).join('');
-            
+
             // Actualizar el DOM
             document.getElementById('recentProjects').innerHTML = projectsHtml;
         }
@@ -460,7 +468,7 @@
             }
         }
 
-        
+
 
         // User menu
         function toggleUserMenu() {
@@ -482,12 +490,12 @@
             console.log(localStorage)
             // Guardar el rol en localStorage
             localStorage.setItem('userRole', role);
-            
+
             // Aquí se implementaría la lógica para cambiar la vista según el rol
             if (role === 'public') {
                 alert('Modo público activado - Se ocultará información sensible');
             }
-            
+
             // Recargar los datos con el nuevo rol
             loadDashboardData();
         }
@@ -499,14 +507,15 @@
         }
 
         // Close menus when clicking outside
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const userMenu = document.getElementById('userMenu');
             const userButton = event.target.closest('button[onclick="toggleUserMenu()"]');
-            
+
             if (!userButton && !userMenu.contains(event.target)) {
                 userMenu.classList.add('hidden');
             }
         });
     </script>
 </body>
+
 </html>

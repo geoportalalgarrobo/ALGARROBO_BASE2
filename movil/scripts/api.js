@@ -3,7 +3,7 @@
 // ==========================================
 
 // Backend en servidor público
-const API_BASE = 'https://186.67.61.251:8000';
+const API_BASE = 'https://algarrobobase2-production-4ab9.up.railway.app';
 
 const api = {
     // Token JWT almacenado

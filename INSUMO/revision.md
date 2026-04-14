@@ -615,10 +615,10 @@ El Dockerfile usa multi-stage build (positivo para reducción de superficie). No
 - **Evidencia:**
   ```javascript
   // frontend/script/api.js — Línea 5
-  BASE_URL: window.API_BASE_URL || "https://186.67.61.251:8000",
+  BASE_URL: window.API_BASE_URL || "https://algarrobobase2-production-4ab9.up.railway.app",
   
   // frontend/documento.html
-  const BASE_URL = "https://186.67.61.251:8000";
+  const BASE_URL = "https://algarrobobase2-production-4ab9.up.railway.app";
   
   // Archivos adicionales: frontend/division/secplan/admin_general/chat.html,
   // frontend/division/secplan/admin_general/mapa.html, y 10+ archivos más
@@ -743,7 +743,7 @@ El Dockerfile usa multi-stage build (positivo para reducción de superficie). No
 - **Evidencia:**
   ```bash
   # frontend/promp (archivo de texto sin extensión)
-  "tengo un endpoint https://186.67.61.251:8000/proyectos"
+  "tengo un endpoint https://algarrobobase2-production-4ab9.up.railway.app/proyectos"
   ```
   Archivos: `frontend/division/secplan/admin_general/test.js`, `frontend/promp`, y otros
 

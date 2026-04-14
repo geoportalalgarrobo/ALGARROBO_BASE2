@@ -1,32 +1,35 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <script src="../../../script/router.js"></script> 
+    <script src="../../../script/router.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geoportal Municipal - Algarrobo</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <style>
         .sidebar-transition {
             transition: transform 0.3s ease-in-out;
         }
+
         .card-hover {
             transition: all 0.3s ease;
         }
+
         .card-hover:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Estilos para el modal */
         .modal {
             display: none;
@@ -135,7 +138,9 @@
             transition: all 0.2s;
         }
 
-        input:focus, textarea:focus, select:focus {
+        input:focus,
+        textarea:focus,
+        select:focus {
             outline: none;
             border-color: #4f46e5;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
@@ -186,9 +191,17 @@
             transform: translateX(0);
         }
 
-        .toast.success { border-left: 4px solid #10b981; }
-        .toast.error { border-left: 4px solid #ef4444; }
-        .toast.warning { border-left: 4px solid #f59e0b; }
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast.warning {
+            border-left: 4px solid #f59e0b;
+        }
 
         .loading {
             display: inline-block;
@@ -207,18 +220,40 @@
             border-radius: 4px;
             overflow: hidden;
         }
+
         .progress-fill {
             height: 100%;
             background: #10b981;
             transition: width 0.3s;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         .status-badge {
             display: inline-block;
@@ -228,26 +263,45 @@
             font-weight: 500;
             white-space: nowrap;
         }
-        .status-active { background: #dcfce7; color: #166534; }
-        .status-inactive { background: #fee2e2; color: #991b1b; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .priority-badge { background: #fbbf24; color: #78350f; }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .priority-badge {
+            background: #fbbf24;
+            color: #78350f;
+        }
 
         /* Estilos para ocultar/mostrar columnas */
         .toggle-column {
             display: none;
         }
+
         .toggle-column-visible {
-            display: revert; /* O 'table-cell' para ser más específico */
+            display: revert;
+            /* O 'table-cell' para ser más específico */
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <!-- Header -->
-     <!-- Header -->
-     <div id="headerRender">
-     </div>
-     
+    <!-- Header -->
+    <div id="headerRender">
+    </div>
+
     <div class="flex">
         <div id="asideRender">
         </div>
@@ -259,7 +313,8 @@
                 <!-- Page Header -->
                 <div class="mb-6">
                     <h2 class="text-2xl font-bold text-gray-800">Gestión de Proyectos</h2>
-                    <p class="text-gray-600">Cartera de proyectos SECPLAC - Actualizado: <span id="lastUpdate">01/09/2025</span></p>
+                    <p class="text-gray-600">Cartera de proyectos SECPLAC - Actualizado: <span
+                            id="lastUpdate">01/09/2025</span></p>
                 </div>
 
                 <!-- KPI Cards -->
@@ -316,13 +371,16 @@
                         <h3 class="text-lg font-semibold text-gray-800">Lista de Proyectos</h3>
                         <div class="flex items-center space-x-2">
                             <span id="proyectoCount" class="text-sm text-gray-500"></span>
-                            <button id="toggleColumnsBtn" onclick="toggleColumns()" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">
+                            <button id="toggleColumnsBtn" onclick="toggleColumns()"
+                                class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">
                                 <i class="fas fa-eye mr-2"></i>Mostrar más
                             </button>
-                            <button onclick="exportData()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                            <button onclick="exportData()"
+                                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
                                 <i class="fas fa-download mr-2"></i>Exportar
                             </button>
-                            <button onclick="showAddProjectModal()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                            <button onclick="showAddProjectModal()"
+                                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                                 <i class="fas fa-plus mr-2"></i>Nuevo Proyecto
                             </button>
                         </div>
@@ -331,14 +389,30 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">N°</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">Área</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">Financiamiento</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">Monto</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">Estado</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">Avance</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">
+                                        N°</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Nombre</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">
+                                        Área</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">
+                                        Financiamiento</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">
+                                        Monto</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">
+                                        Estado</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider toggle-column">
+                                        Avance</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="projectsTableBody" class="bg-white divide-y divide-gray-200">
@@ -350,7 +424,7 @@
             </div>
         </main>
     </div>
-    
+
     <!-- Modal para crear/editar proyectos -->
     <div id="proyectoModal" class="modal">
         <div class="modal-content">
@@ -413,7 +487,8 @@
                         </div>
                         <div class="form-group">
                             <label for="avance_total_porcentaje">Avance Total (%)</label>
-                            <input type="number" id="avance_total_porcentaje" name="avance_total_porcentaje" step="0.01" min="0" max="100">
+                            <input type="number" id="avance_total_porcentaje" name="avance_total_porcentaje" step="0.01"
+                                min="0" max="100">
                         </div>
                         <div class="form-group">
                             <div class="checkbox-group">
@@ -443,13 +518,15 @@
                         </div>
                         <div class="form-group">
                             <div class="checkbox-group">
-                                <input type="checkbox" id="financiamiento_municipal" name="financiamiento_municipal" value="SI">
-                                <label for="financiamiento_municipal" style="margin-bottom: 0;">¿Financiamiento Municipal?</label>
+                                <input type="checkbox" id="financiamiento_municipal" name="financiamiento_municipal"
+                                    value="SI">
+                                <label for="financiamiento_municipal" style="margin-bottom: 0;">¿Financiamiento
+                                    Municipal?</label>
                             </div>
                         </div>
                     </div>
                 </fieldset>
-                
+
                 <fieldset>
                     <legend>Fechas y Plazos</legend>
                     <div class="form-grid">
@@ -515,7 +592,7 @@
                         </div>
                     </div>
                 </fieldset>
-                
+
                 <fieldset>
                     <legend>Documentación y Técnica</legend>
                     <div class="form-grid">
@@ -559,8 +636,11 @@
                 </fieldset>
 
                 <div class="modal-footer">
-                    <button type="button" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition" onclick="closeModal()">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition" id="submitBtn">
+                    <button type="button"
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                        onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                        id="submitBtn">
                         <span id="submitText">Guardar</span>
                     </button>
                 </div>
@@ -579,7 +659,8 @@
                 <!-- Los detalles del proyecto se cargarán aquí dinámicamente -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition" onclick="closeViewModal()">
+                <button type="button" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition"
+                    onclick="closeViewModal()">
                     Cerrar
                 </button>
             </div>
@@ -592,10 +673,10 @@
     </div>
 
     <script src="../../../script/layout.js"></script>
-    
+
     <script>
         // Configuración
-        const API_BASE = 'https://186.67.61.251:8000';
+        const API_BASE = 'https://algarrobobase2-production-4ab9.up.railway.app';
         let proyectos = [];
         let editingId = null;
         let columnsVisible = false; // Estado para las columnas visibles
@@ -615,7 +696,7 @@
         }
 
         // Verificar si el usuario está logueado al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             checkLoginStatus();
             loadProjects();
             document.getElementById('proyectoForm').addEventListener('submit', handleSubmit);
@@ -647,13 +728,13 @@
                 renderProyectos(proyectos);
                 updateKPIs(proyectos);
                 updateCount(proyectos.length);
-                
+
                 // Actualizar fecha de última actualización
                 const today = new Date();
-                const formattedDate = today.toLocaleDateString('es-ES', { 
-                    day: '2-digit', 
-                    month: '2-digit', 
-                    year: 'numeric' 
+                const formattedDate = today.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
                 });
                 document.getElementById('lastUpdate').textContent = formattedDate;
             } catch (error) {
@@ -667,7 +748,7 @@
         // Renderizar proyectos en la tabla
         function renderProyectos(proyectosToRender) {
             const tableBody = document.getElementById('projectsTableBody');
-            
+
             if (proyectosToRender.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
@@ -686,7 +767,7 @@
                 else if (proyecto.estado_proyecto === 'Licitación') statusClass = 'bg-yellow-100 text-yellow-800';
                 else if (proyecto.estado_proyecto === 'Diseño') statusClass = 'bg-blue-100 text-blue-800';
                 else statusClass = 'bg-gray-100 text-gray-800';
-                
+
                 // Determinar el color de la barra de progreso
                 let progressClass = '';
                 const progress = proyecto.avance_total_porcentaje ? parseFloat(proyecto.avance_total_porcentaje) * 100 : 0;
@@ -694,7 +775,7 @@
                 else if (progress < 50) progressClass = 'bg-yellow-500';
                 else if (progress < 75) progressClass = 'bg-blue-500';
                 else progressClass = 'bg-green-500';
-                
+
                 return `
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 toggle-column">${proyecto.id || ''}</td>
@@ -729,18 +810,18 @@
         function updateKPIs(proyectosData) {
             // Total de proyectos
             document.getElementById('totalProjects').textContent = proyectosData.length;
-            
+
             // Proyectos en ejecución
             const executionCount = proyectosData.filter(p => p.estado_proyecto === 'Ejecución').length;
             document.getElementById('executionProjects').textContent = executionCount;
-            
+
             // Monto total
             const totalAmount = proyectosData.reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
             document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
-            
+
             // Avance promedio
-            const avgProgress = proyectosData.length > 0 
-                ? proyectosData.reduce((sum, p) => sum + (parseFloat(p.avance_total_porcentaje) || 0), 0) / proyectosData.length 
+            const avgProgress = proyectosData.length > 0
+                ? proyectosData.reduce((sum, p) => sum + (parseFloat(p.avance_total_porcentaje) || 0), 0) / proyectosData.length
                 : 0;
             document.getElementById('averageProgress').textContent = (avgProgress * 100).toFixed(1) + '%';
         }
@@ -777,7 +858,7 @@
                 showToast('Proyecto no encontrado', 'error');
                 return;
             }
-            
+
             const detailsContainer = document.getElementById('viewProjectDetails');
             detailsContainer.innerHTML = ''; // Limpiar contenido anterior
 
@@ -829,7 +910,7 @@
                 } else if (key === 'avance_total_porcentaje' && value) {
                     value = `${(parseFloat(value) * 100).toFixed(2)}%`;
                 }
-                
+
                 // Manejar valores nulos o vacíos
                 const displayValue = (value === null || value === undefined || value === '') ? '-' : value;
 
@@ -901,13 +982,13 @@
             if (proyecto) {
                 title.textContent = 'Editar Proyecto';
                 editingId = proyecto.id;
-                
+
                 // Llenar el formulario con los datos del proyecto
                 Object.keys(proyecto).forEach(key => {
                     const input = form.elements[key];
                     if (input) {
                         if (input.type === 'checkbox') {
-                             // Manejo específico para checkboxes
+                            // Manejo específico para checkboxes
                             input.checked = (proyecto[key] === 'SI' || proyecto[key] === true);
                         } else {
                             input.value = proyecto[key] || '';
@@ -929,7 +1010,7 @@
             document.getElementById('proyectoForm').reset();
             editingId = null;
         }
-        
+
         // Función para cerrar el modal de ver detalles
         function closeViewModal() {
             const modal = document.getElementById('viewProjectModal');
@@ -939,7 +1020,7 @@
         // Manejar envío del formulario
         async function handleSubmit(e) {
             e.preventDefault();
-            
+
             const formData = new FormData(e.target);
             const data = {};
             // Convertir FormData a un objeto simple y manejar checkboxes
@@ -950,7 +1031,7 @@
                     data[key] = value;
                 }
             }
-            
+
             // Eliminar campos vacíos para no enviarlos innecesariamente
             Object.keys(data).forEach(key => {
                 if (data[key] === '' || data[key] === null) {
@@ -963,7 +1044,7 @@
 
             try {
                 showLoading(true, 'Guardando...');
-                
+
                 let response;
                 if (editingId) {
                     response = await fetch(`${API_BASE}/proyectos/${editingId}`, {
@@ -1002,7 +1083,7 @@
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userRole');
             localStorage.removeItem('authToken');
-            
+
             // Redirigir a la página de login
             window.location.href = '../../index.html';
         }
@@ -1023,10 +1104,10 @@
             };
             document.getElementById('currentRole').textContent = roleNames[role];
             document.getElementById('userMenu').classList.add('hidden');
-            
+
             // Guardar el rol en localStorage
             localStorage.setItem('userRole', role);
-            
+
             // Aquí se implementaría la lógica para cambiar la vista según el rol
             if (role === 'public') {
                 showToast('Modo público activado - Se ocultará información sensible', 'warning');
@@ -1040,10 +1121,10 @@
         }
 
         // Close menus when clicking outside
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const userMenu = document.getElementById('userMenu');
             const userButton = event.target.closest('button[onclick="toggleUserMenu()"]');
-            
+
             if (!userButton && !userMenu.contains(event.target)) {
                 userMenu.classList.add('hidden');
             }
@@ -1053,7 +1134,7 @@
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
-            
+
             toast.className = `toast ${type}`;
             toastMessage.textContent = message;
             toast.classList.add('show');
@@ -1067,7 +1148,7 @@
         function showLoading(show, message = 'Guardando...') {
             const submitBtn = document.getElementById('submitBtn');
             const submitText = document.getElementById('submitText');
-            
+
             if (show) {
                 submitBtn.disabled = true;
                 submitText.innerHTML = `<span class="loading"></span> ${message}`;
@@ -1084,7 +1165,7 @@
         }
 
         // Cerrar modales al hacer clic fuera
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const editModal = document.getElementById('proyectoModal');
             const viewModal = document.getElementById('viewProjectModal');
             if (event.target === editModal) {
@@ -1096,7 +1177,7 @@
         }
 
         // Manejar tecla Escape para cerrar modales
-        document.addEventListener('keydown', function(event) {
+        document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 closeModal();
                 closeViewModal();
@@ -1104,4 +1185,5 @@
         });
     </script>
 </body>
+
 </html>

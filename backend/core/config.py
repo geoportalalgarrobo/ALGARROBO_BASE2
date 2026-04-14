@@ -21,7 +21,9 @@ if not DB_CONNECTION_STRING:
     raise ValueError("No DATABASE_URL set for Flask application")
 
 # ─── Servidor ──────────────────────────────────────────────────
-APP_HOST = "186.67.61.251"
+# APP_HOST se usa de forma interna y externa. En Railway, las rutas públicas ya no llevan puerto, es HTTPS (443).
+APP_HOST = os.getenv("APP_HOST", "algarrobobase2-production-4ab9.up.railway.app")
+# En tu backend, este puerto será solo interno. Gunicorn se enlazará usando os.getenv("PORT")
 APP_PORT = int(os.getenv("PORT", 8000))
 # SEGURIDAD [H-06]: Debug OFF por defecto en producción
 DEBUG = os.getenv("FLASK_DEBUG", "False").lower() in ("1", "true", "yes")
