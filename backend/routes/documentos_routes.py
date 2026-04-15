@@ -90,7 +90,7 @@ def upload_documento(current_user_id, pid):
         file_path = os.path.join(proyecto_dir, unique_name)
         file.save(file_path)
         file_size = os.path.getsize(file_path)
-        file_url = f"/docs/{pid}/{unique_name}"
+        file_url = f"/api/docs/{pid}/{unique_name}"
 
         conn = get_db_connection()
         if not conn:

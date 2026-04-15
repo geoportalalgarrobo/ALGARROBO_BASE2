@@ -2,17 +2,18 @@
 Blueprint: API Mobile – Registro, Login, Reportes, Fotos, Perfil,
            Categorías, Comentarios, Maestros, Admin (Crear Funcionario),
            Migración de Volumen
-Rutas: /api/mobile/*, /api/admin/*, /fotos_reportes/*, /api/volume/*
+Rutas: /api/mobile/*, /api/admin/*, /api/volume/*
 """
 import os
 import io
 import time
+import tempfile
 import zipfile
 import traceback
 import bcrypt
 import psycopg2.extras
 from datetime import datetime
-from flask import Blueprint, request, jsonify, send_from_directory, send_file
+from flask import Blueprint, request, jsonify, send_from_directory, send_file, after_this_request
 from werkzeug.utils import secure_filename
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
@@ -80,16 +81,10 @@ def extraer_gps(data):
         return {}
 
 
-# ─── Servir fotos ──────────────────────────────────────────────
-
-@mobile_bp.route('/fotos_reportes/<path:filename>')
-def servir_foto_reporte(filename):
-    return send_from_directory(FOTOS_DIR, filename)
-
 
 # ─── REGISTRO ─────────────────────────────────────────────────
 
-@mobile_bp.route("/api/mobile/auth/register", methods=["POST"])
+@mobile_bp.route("/mobile/auth/register", methods=["POST"])
 def registrar():
     conn = None
     try:
@@ -134,7 +129,7 @@ def registrar():
 
 # ─── ADMIN: CREAR FUNCIONARIO ─────────────────────────────────
 
-@mobile_bp.route("/api/admin/crear-funcionario", methods=["POST"])
+@mobile_bp.route("/admin/crear-funcionario", methods=["POST"])
 @admin_required
 def crear_funcionario(current_user_id):
     conn = None
@@ -181,7 +176,7 @@ def crear_funcionario(current_user_id):
 
 # ─── LOGIN MOBILE ─────────────────────────────────────────────
 
-@mobile_bp.route("/api/mobile/auth/login", methods=["POST"])
+@mobile_bp.route("/mobile/auth/login", methods=["POST"])
 def login_mobile():
     conn = None
     try:
@@ -220,7 +215,7 @@ def login_mobile():
 
 # ─── MAESTROS MOBILE ──────────────────────────────────────────
 
-@mobile_bp.route("/api/mobile/divisiones", methods=["GET"])
+@mobile_bp.route("/mobile/divisiones", methods=["GET"])
 def get_divisiones_mobile():
     conn = None
     try:
@@ -238,7 +233,7 @@ def get_divisiones_mobile():
         if conn: release_db_connection(conn)
 
 
-@mobile_bp.route("/api/mobile/roles", methods=["GET"])
+@mobile_bp.route("/mobile/roles", methods=["GET"])
 def get_roles_mobile():
     conn = None
     try:
@@ -256,7 +251,7 @@ def get_roles_mobile():
         if conn: release_db_connection(conn)
 
 
-@mobile_bp.route("/api/mobile/estados", methods=["GET"])
+@mobile_bp.route("/mobile/estados", methods=["GET"])
 def get_estados_mobile():
     conn = None
     try:
@@ -273,7 +268,7 @@ def get_estados_mobile():
         if conn: release_db_connection(conn)
 
 
-@mobile_bp.route("/api/mobile/gravedades", methods=["GET"])
+@mobile_bp.route("/mobile/gravedades", methods=["GET"])
 def get_gravedades_mobile():
     conn = None
     try:
@@ -290,7 +285,7 @@ def get_gravedades_mobile():
         if conn: release_db_connection(conn)
 
 
-@mobile_bp.route("/api/mobile/categorias", methods=["GET"])
+@mobile_bp.route("/mobile/categorias", methods=["GET"])
 def get_categorias_mobile():
     conn = None
     try:
@@ -309,7 +304,7 @@ def get_categorias_mobile():
 
 # ─── PERFIL & ESTADÍSTICAS ────────────────────────────────────
 
-@mobile_bp.route("/api/mobile/perfil", methods=["GET"])
+@mobile_bp.route("/mobile/perfil", methods=["GET"])
 @session_required
 def get_perfil(current_user_id):
     conn = None
@@ -339,7 +334,7 @@ def get_perfil(current_user_id):
         if conn: release_db_connection(conn)
 
 
-@mobile_bp.route("/api/mobile/perfil", methods=["PUT"])
+@mobile_bp.route("/mobile/perfil", methods=["PUT"])
 @session_required
 def update_perfil(current_user_id):
     conn = None
@@ -376,7 +371,7 @@ def update_perfil(current_user_id):
 
 # ─── REPORTES CIUDADANOS ──────────────────────────────────────
 
-@mobile_bp.route("/api/mobile/reportes", methods=["POST"])
+@mobile_bp.route("/mobile/reportes", methods=["POST"])
 @session_required
 def crear_reporte(current_user_id):
     conn = None
@@ -410,7 +405,7 @@ def crear_reporte(current_user_id):
         if conn: release_db_connection(conn)
 
 
-@mobile_bp.route("/api/mobile/reportes/<int:rid>", methods=["GET"])
+@mobile_bp.route("/mobile/reportes/<int:rid>", methods=["GET"])
 @session_required
 def get_reporte_detalle(current_user_id, rid):
     conn = None
@@ -445,7 +440,7 @@ def get_reporte_detalle(current_user_id, rid):
         if conn: release_db_connection(conn)
 
 
-@mobile_bp.route("/api/mobile/reportes/todos", methods=["GET"])
+@mobile_bp.route("/mobile/reportes/todos", methods=["GET"])
 def get_todos_reportes():
     conn = None
     try:
@@ -476,7 +471,7 @@ def get_todos_reportes():
         if conn: release_db_connection(conn)
 
 
-@mobile_bp.route("/api/mobile/reportes/mis-reportes", methods=["GET"])
+@mobile_bp.route("/mobile/reportes/mis-reportes", methods=["GET"])
 @session_required
 def mis_reportes(current_user_id):
     conn = None
@@ -504,7 +499,7 @@ def mis_reportes(current_user_id):
 
 # ─── COMENTARIOS ──────────────────────────────────────────────
 
-@mobile_bp.route("/api/mobile/reportes/<int:rid>/comentarios", methods=["GET"])
+@mobile_bp.route("/mobile/reportes/<int:rid>/comentarios", methods=["GET"])
 def get_comentarios(rid):
     conn = None
     try:
@@ -526,7 +521,7 @@ def get_comentarios(rid):
         if conn: release_db_connection(conn)
 
 
-@mobile_bp.route("/api/mobile/reportes/<int:rid>/comentarios", methods=["POST"])
+@mobile_bp.route("/mobile/reportes/<int:rid>/comentarios", methods=["POST"])
 @session_required
 def add_comentario(current_user_id, rid):
     conn = None
@@ -555,7 +550,7 @@ def add_comentario(current_user_id, rid):
 
 # ─── ACTUALIZACIÓN ESTADO/GRAVEDAD ────────────────────────────
 
-@mobile_bp.route("/api/mobile/reportes/<int:rid>/actualizar", methods=["POST"])
+@mobile_bp.route("/mobile/reportes/<int:rid>/actualizar", methods=["POST"])
 @session_required
 def actualizar_reporte(current_user_id, rid):
     conn = None
@@ -600,7 +595,7 @@ def actualizar_reporte(current_user_id, rid):
         if conn: release_db_connection(conn)
 
 
-@mobile_bp.route("/api/mobile/reportes/<int:rid>/verificar", methods=["POST"])
+@mobile_bp.route("/mobile/reportes/<int:rid>/verificar", methods=["POST"])
 @session_required
 def verificar_reporte(current_user_id, rid):
     return actualizar_reporte(current_user_id, rid)
@@ -608,7 +603,7 @@ def verificar_reporte(current_user_id, rid):
 
 # ─── FOTOS ────────────────────────────────────────────────────
 
-@mobile_bp.route("/api/mobile/reportes/<int:rid>/fotos", methods=["GET"])
+@mobile_bp.route("/mobile/reportes/<int:rid>/fotos", methods=["GET"])
 def ver_fotos_reporte(rid):
     conn = None
     try:
@@ -627,7 +622,7 @@ def ver_fotos_reporte(rid):
         if conn: release_db_connection(conn)
 
 
-@mobile_bp.route("/api/mobile/reportes/<int:rid>/fotos", methods=["POST"])
+@mobile_bp.route("/mobile/reportes/<int:rid>/fotos", methods=["POST"])
 @session_required
 def subir_fotos(current_user_id, rid):
     conn = None
@@ -671,71 +666,26 @@ def subir_fotos(current_user_id, rid):
 
 # ─── MIGRACIÓN DE VOLUMEN ─────────────────────────────────────
 
-def _check_admin(current_user_id):
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as cur:
-            cur.execute("SELECT nivel_acceso FROM users WHERE user_id = %s", (current_user_id,))
-            res = cur.fetchone()
-            return res and res[0] >= 10
-    finally:
-        release_db_connection(conn)
-
-
-@mobile_bp.route('/api/volume/gui', methods=['GET'])
-@session_required
-def volume_gui(current_user_id):
-    if not _check_admin(current_user_id):
-        return "Acceso denegado", 403
-    html = """
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <title>Control de Migración - Municipal</title>
-        <style>
-            body { font-family: sans-serif; background: #f0f2f5; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-            .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 400px; text-align: center; }
-            h2 { color: #1a73e8; }
-            button { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 10px 0; width: 100%; }
-            button:hover { background: #1557b0; }
-            .status { margin-top: 15px; font-size: 13px; color: #5f6368; }
-            .upload-form { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
-        </style>
-    </head>
-    <body>
-        <div class="card">
-            <h2>Gestión de Datos</h2>
-            <p style="font-size: 14px; color: #666;">Carpeta: <b>{docs_folder}</b></p>
-            <a href="/api/volume/export" target="_blank"><button>📥 EXPORTAR TODO A ZIP</button></a>
-            <div class="upload-form">
-                <p style="font-size: 13px; font-weight: bold;">Importar Datos (ZIP):</p>
-                <form action="/api/volume/import" method="post" enctype="multipart/form-data">
-                    <input type="file" name="file" accept=".zip" required style="margin-bottom: 15px; font-size: 12px;">
-                    <button type="submit" onclick="return confirm('¿Está seguro?')">📤 Cargar e Importar</button>
-                </form>
-            </div>
-            <div class="status">Herramienta de migración entre servidores.</div>
-        </div>
-    </body>
-    </html>
-    """.replace("{docs_folder}", DOCS_FOLDER)
-    return html
-
-
-@mobile_bp.route('/api/volume/export', methods=['GET'])
-@session_required
+@mobile_bp.route('/volume/export', methods=['GET'])
+@admin_required
 def volume_export(current_user_id):
-    if not _check_admin(current_user_id):
-        return "Acceso denegado", 403
+    """
+    Genera un ZIP de todos los assets del servidor y lo devuelve como descarga.
+    Escribe a archivo temporal para no agotar la RAM con datasets grandes.
+    Requiere nivel_acceso >= 10 (@admin_required).
+    """
+    tmp_path = None
     try:
         items_to_backup = {
             "docs": DOCS_FOLDER,
             "auditoria_reportes": AUDIT_OUT_DIR,
-            "fotos_reportes": FOTOS_OUT_DIR
+            "fotos_reportes": FOTOS_OUT_DIR,
         }
-        memory_file = io.BytesIO()
-        with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+
+        tmp_fd, tmp_path = tempfile.mkstemp(suffix='.zip')
+        os.close(tmp_fd)
+
+        with zipfile.ZipFile(tmp_path, 'w', zipfile.ZIP_DEFLATED) as zf:
             for folder_name, full_path in items_to_backup.items():
                 if os.path.exists(full_path) and os.path.isdir(full_path):
                     for root, dirs, files in os.walk(full_path):
@@ -743,36 +693,100 @@ def volume_export(current_user_id):
                             file_path = os.path.join(root, file)
                             arcname = os.path.join(folder_name, os.path.relpath(file_path, full_path))
                             zf.write(file_path, arcname)
-        memory_file.seek(0)
-        return send_file(memory_file, mimetype='application/zip', as_attachment=True,
-                         download_name=f"full_backup_{datetime.now().strftime('%Y%m%d_%H%M')}.zip")
+
+        log_auditoria(current_user_id, "volume_export",
+                      f"Exportación de volumen completa desde {request.remote_addr}")
+
+        @after_this_request
+        def _remove_tmp(response):
+            try:
+                os.unlink(tmp_path)
+            except Exception:
+                pass
+            return response
+
+        return send_file(
+            tmp_path,
+            mimetype='application/zip',
+            as_attachment=True,
+            download_name=f"backup_{datetime.now().strftime('%Y%m%d_%H%M')}.zip",
+        )
     except Exception as e:
-        logger.error(f"Error en exportación: {e}")
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.unlink(tmp_path)
+            except Exception:
+                pass
+        logger.error(f"Error en exportación de volumen: {e}")
         return jsonify({"message": "Error interno"}), 500
 
 
-@mobile_bp.route('/api/volume/import', methods=['POST'])
-@session_required
+@mobile_bp.route('/volume/import', methods=['POST'])
+@admin_required
 def volume_import(current_user_id):
-    if not _check_admin(current_user_id):
-        return "Acceso denegado", 403
+    """
+    Importa un ZIP de assets al servidor extrayendo archivo por archivo
+    para prevenir path traversal y evitar symlinks maliciosos.
+    Requiere nivel_acceso >= 10 (@admin_required).
+    """
     if 'file' not in request.files:
-        return "No hay archivo", 400
+        return jsonify({"message": "No hay archivo"}), 400
+
     file = request.files['file']
+    if not file.filename.lower().endswith('.zip'):
+        return jsonify({"message": "Solo se aceptan archivos ZIP"}), 400
+
     try:
         BASE_TARGET = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        if os.path.exists("/data"):
+        if os.path.exists("/data") and os.path.isdir("/data"):
             BASE_TARGET = "/data"
 
-        # SEGURIDAD [H-08]: Validar cada archivo contra Zip Slip
-        with zipfile.ZipFile(file) as zf:
-            for member in zf.namelist():
-                member_path = os.path.realpath(os.path.join(BASE_TARGET, member))
-                if not member_path.startswith(os.path.realpath(BASE_TARGET)):
-                    return "Archivo ZIP contiene rutas maliciosas", 400
-            zf.extractall(BASE_TARGET)
+        base_real = os.path.realpath(BASE_TARGET)
+        ALLOWED_FOLDERS = {"docs", "auditoria_reportes", "fotos_reportes"}
+        extracted = 0
 
-        return "Importación completada con éxito.", 200
+        with zipfile.ZipFile(file) as zf:
+            for info in zf.infolist():
+                member = info.filename
+                clean_member = member.replace("\\", "/").strip("/")
+                parts = clean_member.split("/")
+
+                # Rechazar path traversal
+                if ".." in parts or not parts[0]:
+                    return jsonify({"message": f"Ruta no permitida detectada: {member}"}), 400
+
+                # Rechazar carpetas fuera de la lista blanca
+                if parts[0] not in ALLOWED_FOLDERS:
+                    return jsonify({
+                        "message": f"Carpeta no permitida: '{parts[0]}'. Permitidas: {', '.join(sorted(ALLOWED_FOLDERS))}"
+                    }), 400
+
+                # Ignorar entradas de directorio
+                if member.endswith("/"):
+                    continue
+
+                # Ignorar symlinks dentro del ZIP
+                if (info.external_attr >> 16) == 0o120777:
+                    logger.warning(f"Symlink ignorado en ZIP: {member}")
+                    continue
+
+                # Verificar que la ruta final quede dentro del árbol permitido
+                target_path = os.path.realpath(os.path.join(BASE_TARGET, clean_member))
+                if not target_path.startswith(base_real + os.sep):
+                    return jsonify({"message": f"Ruta maliciosa detectada: {member}"}), 400
+
+                os.makedirs(os.path.dirname(target_path), exist_ok=True)
+                with zf.open(info) as src, open(target_path, 'wb') as dst:
+                    dst.write(src.read())
+                extracted += 1
+
+        log_auditoria(current_user_id, "volume_import",
+                      f"Importación de {extracted} archivos desde {request.remote_addr}")
+        logger.info(f"Importación completada por user_id={current_user_id}: {extracted} archivos en {BASE_TARGET}")
+        return jsonify({"message": f"Importación completada: {extracted} archivos procesados."}), 200
+
+    except zipfile.BadZipFile:
+        return jsonify({"message": "El archivo no es un ZIP válido"}), 400
     except Exception as e:
-        logger.error(f"Error en importación: {e}")
-        return f"Error: {str(e)}", 500
+        logger.error(f"Error en importación de volumen: {e}", exc_info=True)
+        return jsonify({"message": "Error durante la importación. Revise los logs del servidor."}), 500

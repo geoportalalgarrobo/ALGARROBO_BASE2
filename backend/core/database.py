@@ -3,6 +3,7 @@ Gestión del pool de conexiones a PostgreSQL.
 Encapsula init, get, release y cleanup del pool de conexiones.
 """
 import threading
+from contextlib import contextmanager
 import psycopg2
 import psycopg2.pool
 from core.config import DB_CONNECTION_STRING, logger
@@ -106,3 +107,30 @@ def cleanup_pool():
                 logger.info("Pool de conexiones cerrado correctamente")
     except Exception as e:
         logger.error(f"Error al cerrar el pool de conexiones: {e}")
+
+
+@contextmanager
+def get_db():
+    """
+    Context manager que obtiene una conexión del pool y la libera al salir.
+
+    Uso:
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute(...)
+            conn.commit()
+
+    Si se lanza una excepción dentro del bloque, hace rollback automático
+    antes de re-lanzar, evitando el boilerplate try/except/finally en cada ruta.
+    """
+    conn = get_db_connection()
+    try:
+        yield conn
+    except Exception:
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        raise
+    finally:
+        release_db_connection(conn)

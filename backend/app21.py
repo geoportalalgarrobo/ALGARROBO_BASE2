@@ -33,12 +33,13 @@ from flask_cors import CORS
 # ─── Módulos Core ──────────────────────────────────────────────
 from core.config import (
     logger, APP_HOST, APP_PORT, DEBUG,
-    ALLOWED_ORIGINS, DOCS_FOLDER
+    ALLOWED_ORIGINS, DOCS_FOLDER, FOTOS_DIR
 )
 from core.database import (
     init_connection_pool, get_db_connection,
     release_db_connection, cleanup_pool, connection_pool
 )
+from core.limiter import limiter
 
 # ─── Blueprints ────────────────────────────────────────────────
 from routes.auth_routes import auth_bp
@@ -61,6 +62,9 @@ app.config['MAX_CONTENT_LENGTH'] = 1000 * 1024 * 1024  # 1GB para migración ZIP
 
 # CORS restrictivo
 CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}}, supports_credentials=True)
+
+# Rate limiter
+limiter.init_app(app)
 
 
 # ─── Middleware ─────────────────────────────────────────────────
@@ -107,6 +111,12 @@ def home():
 def serve_docs(filename):
     """Servir archivos estáticos de documentos de proyectos."""
     return send_from_directory(DOCS_FOLDER, filename)
+
+
+@app.route("/fotos_reportes/<path:filename>")
+def serve_fotos(filename):
+    """Servir fotos de reportes ciudadanos (sin prefijo /api para compatibilidad con URLs guardadas)."""
+    return send_from_directory(FOTOS_DIR, filename)
 
 
 @app.route("/health")

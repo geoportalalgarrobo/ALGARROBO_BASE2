@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Volumen – Municipal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../script/router.js"></script>
+    <script src="../script/api.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg); color: var(--text);
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; margin: 0; padding: 1rem;
+        }
+        .card {
+            background: var(--card); padding: 2.5rem; border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            width: 100%; max-width: 480px; text-align: center;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .icon-wrapper {
+            width: 64px; height: 64px; background: #eff6ff; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem; color: var(--primary); font-size: 24px;
+        }
+        h2 { margin: 0 0 0.5rem; color: #0f172a; font-weight: 700; }
+        .subtitle { font-size: 0.9rem; color: #64748b; margin-bottom: 2rem; }
+        .btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: var(--primary); color: white; border: none;
+            padding: 12px 24px; border-radius: 12px; cursor: pointer;
+            font-size: 15px; font-weight: 600; width: 100%;
+            text-decoration: none; transition: all 0.2s; font-family: inherit;
+        }
+        .btn:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: #f1f5f9; color: #475569; margin-top: 1rem; }
+        .btn-secondary:hover:not(:disabled) { background: #e2e8f0; color: #1e293b; }
+        .upload-section {
+            margin-top: 2rem; padding-top: 2rem;
+            border-top: 1px solid #f1f5f9; text-align: left;
+        }
+        .upload-section label {
+            display: block; font-size: 13px; font-weight: 700;
+            margin-bottom: 0.75rem; color: #475569;
+            text-transform: uppercase; letter-spacing: 0.025em;
+        }
+        .file-drop {
+            width: 100%; padding: 12px; background: #f8fafc;
+            border: 2px dashed #e2e8f0; border-radius: 12px;
+            margin-bottom: 1rem; cursor: pointer;
+            font-family: inherit; font-size: 14px;
+        }
+        .toast {
+            display: none; margin-top: 1rem; padding: 12px 16px;
+            border-radius: 10px; font-size: 14px; font-weight: 500; text-align: left;
+        }
+        .toast.ok  { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .toast.err { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .toast.info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+        .footer-info { margin-top: 2rem; font-size: 12px; color: #94a3b8; }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: #64748b; font-size: 13px; text-decoration: none; margin-bottom: 1.5rem;
+        }
+        .back-link:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+<div class="card">
+    <a href="index2.html" class="back-link">
+        <i class="fa-solid fa-arrow-left"></i> Volver al portal
+    </a>
+    <div class="icon-wrapper"><i class="fa-solid fa-server"></i></div>
+    <h2>Gestión de Volumen</h2>
+    <p class="subtitle">Herramienta de migración de documentos y activos entre entornos.</p>
+
+    <button id="btnExport" class="btn" onclick="doExport()">
+        <i class="fa-solid fa-cloud-arrow-down"></i> Exportar Assets (ZIP)
+    </button>
+
+    <div class="upload-section">
+        <label>Importar Paquete de Datos</label>
+        <input type="file" id="zipFile" class="file-drop" accept=".zip">
+        <button id="btnImport" class="btn btn-secondary" onclick="doImport()">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Cargar e Importar
+        </button>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <div class="footer-info">
+        <i class="fa-solid fa-shield-halved"></i> Acceso restringido a administradores de sistema.
+    </div>
+</div>
+
+<script>
+    // ─── Auth guard ────────────────────────────────────────────
+    (function () {
+        const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+        const userStr = localStorage.getItem('userData') || localStorage.getItem('user_data');
+        if (!token) { window.location.href = '../index.html'; return; }
+        try {
+            const user = JSON.parse(userStr || '{}');
+            if (parseInt(user.nivel_acceso) < 10) {
+                alert('Acceso denegado. Se requiere nivel de administrador.');
+                window.location.href = 'index2.html';
+            }
+        } catch (e) {
+            window.location.href = '../index.html';
+        }
+    })();
+
+    function getToken() {
+        return localStorage.getItem('authToken') || localStorage.getItem('token') || '';
+    }
+
+    function showToast(msg, type) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast ' + type;
+        t.style.display = 'block';
+    }
+
+    function setLoading(btnId, loading, defaultHtml) {
+        const btn = document.getElementById(btnId);
+        btn.disabled = loading;
+        btn.innerHTML = loading
+            ? '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...'
+            : defaultHtml;
+    }
+
+    // ─── Exportar ──────────────────────────────────────────────
+    async function doExport() {
+        const ICON = '<i class="fa-solid fa-cloud-arrow-down"></i> Exportar Assets (ZIP)';
+        setLoading('btnExport', true, ICON);
+        showToast('Generando backup, esto puede tardar unos segundos...', 'info');
+        try {
+            const res = await fetch(API_CONFIG.BASE_URL + '/api/volume/export', {
+                headers: { 'Authorization': 'Bearer ' + getToken() }
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(function () { return {}; });
+                throw new Error(err.message || ('Error ' + res.status));
+            }
+            const disposition = res.headers.get('Content-Disposition') || '';
+            const match = disposition.match(/filename="?([^";]+)"?/);
+            const ts = new Date().toISOString().slice(0, 16).replace('T', '_');
+            const filename = match ? match[1] : ('backup_' + ts + '.zip');
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Backup descargado correctamente.', 'ok');
+        } catch (e) {
+            showToast('Error al exportar: ' + e.message, 'err');
+        } finally {
+            setLoading('btnExport', false, ICON);
+        }
+    }
+
+    // ─── Importar ──────────────────────────────────────────────
+    async function doImport() {
+        const ICON = '<i class="fa-solid fa-cloud-arrow-up"></i> Cargar e Importar';
+        const fileInput = document.getElementById('zipFile');
+        if (!fileInput.files.length) {
+            showToast('Seleccione un archivo ZIP antes de importar.', 'err');
+            return;
+        }
+        if (!confirm('Esta accion puede sobrescribir archivos existentes en el servidor.\nConfirma la importacion?')) return;
+
+        setLoading('btnImport', true, ICON);
+        showToast('Subiendo e importando archivos...', 'info');
+        try {
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            const res = await fetch(API_CONFIG.BASE_URL + '/api/volume/import', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + getToken() },
+                body: formData
+            });
+            const data = await res.json().catch(function () { return { message: 'Error ' + res.status }; });
+            if (!res.ok) throw new Error(data.message || ('Error ' + res.status));
+            showToast(data.message || 'Importacion completada.', 'ok');
+            fileInput.value = '';
+        } catch (e) {
+            showToast('Error al importar: ' + e.message, 'err');
+        } finally {
+            setLoading('btnImport', false, ICON);
+        }
+    }
+</script>
+</body>
+</html>

@@ -197,69 +197,85 @@ def get_proyectos_chat(current_user_id):
 @proyectos_bp.route("/proyectos", methods=["GET"])
 @session_required
 def get_proyectos(current_user_id):
+    """
+    Lista proyectos con paginación opcional.
+    Query params:
+      - page (int): número de página (base 1). Si se omite, devuelve todo.
+      - per_page (int): registros por página (default 50, máx 200).
+    """
     conn = None
     try:
+        page = request.args.get('page', type=int)
+        per_page = min(request.args.get('per_page', 50, type=int), 200)
+
+        base_query = """
+            SELECT
+                p.*,
+                GREATEST(
+                    p.fecha_actualizacion,
+                    (SELECT MAX(creado_en) FROM proyectos_hitos WHERE proyecto_id = p.id),
+                    (SELECT MAX(creado_en) FROM proyectos_observaciones WHERE proyecto_id = p.id),
+                    (SELECT MAX(fecha_subida) FROM proyectos_documentos WHERE proyecto_id = p.id),
+                    (SELECT MAX(fecha_creacion) FROM proyectos_geomapas WHERE proyecto_id = p.id)
+                ) AS ult_modificacion,
+                u.nombre AS user_nombre,
+                ua.nombre AS actualizado_por_nombre,
+                a.id AS area_id, a.nombre AS area_nombre,
+                le.id AS lineamiento_id, le.nombre AS lineamiento_nombre,
+                le.nombre AS lineamiento_estrategico_nombre,
+                f.id AS financiamiento_id,
+                COALESCE(f.fuente, f.nombre) AS financiamiento_nombre,
+                ep.id AS etapa_id, ep.nombre AS etapa_nombre,
+                es.id AS estado_id, es.nombre AS estado_nombre, es.color AS estado_color,
+                epost.id AS estado_postulacion_id, epost.nombre AS estado_postulacion_nombre,
+                s.id AS sector_id, s.nombre AS sector_nombre,
+                COALESCE(
+                    json_agg(
+                        DISTINCT jsonb_build_object(
+                            'id', h.id, 'fecha', h.fecha, 'observacion', h.observacion,
+                            'creado_por', h.creado_por, 'nombre_creador', hu.nombre,
+                            'creado_en', h.creado_en
+                        )
+                    ) FILTER (WHERE h.id IS NOT NULL), '[]'
+                ) AS hitos_lista,
+                COALESCE(
+                    json_agg(
+                        DISTINCT jsonb_build_object(
+                            'id', o.id, 'fecha', o.fecha, 'observacion', o.observacion,
+                            'creado_por', o.creado_por, 'nombre_creador', ou.nombre,
+                            'creado_en', o.creado_en
+                        )
+                    ) FILTER (WHERE o.id IS NOT NULL), '[]'
+                ) AS observaciones_lista
+            FROM proyectos p
+            INNER JOIN users u ON u.user_id = p.user_id
+            LEFT JOIN users ua ON ua.user_id = p.actualizado_por
+            LEFT JOIN areas a ON a.id = p.area_id
+            LEFT JOIN lineamientos_estrategicos le ON le.id = p.lineamiento_estrategico_id
+            LEFT JOIN financiamientos f ON f.id = p.financiamiento_id
+            LEFT JOIN etapas_proyecto ep ON ep.id = p.etapa_proyecto_id
+            LEFT JOIN estados_proyecto es ON es.id = p.estado_proyecto_id
+            LEFT JOIN estados_postulacion epost ON epost.id = p.estado_postulacion_id
+            LEFT JOIN sectores s ON s.id = p.sector_id
+            LEFT JOIN proyectos_hitos h ON h.proyecto_id = p.id
+            LEFT JOIN users hu ON hu.user_id = h.creado_por
+            LEFT JOIN proyectos_observaciones o ON o.proyecto_id = p.id
+            LEFT JOIN users ou ON ou.user_id = o.creado_por
+            GROUP BY p.id, u.nombre, ua.nombre, a.id, le.id, f.id, ep.id, es.id, epost.id, s.id
+            ORDER BY p.fecha_actualizacion DESC NULLS LAST
+        """
         conn = get_db_connection()
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-            cur.execute("""
-                SELECT
-                    p.*,
-                    GREATEST(
-                        p.fecha_actualizacion,
-                        (SELECT MAX(creado_en) FROM proyectos_hitos WHERE proyecto_id = p.id),
-                        (SELECT MAX(creado_en) FROM proyectos_observaciones WHERE proyecto_id = p.id),
-                        (SELECT MAX(fecha_subida) FROM proyectos_documentos WHERE proyecto_id = p.id),
-                        (SELECT MAX(fecha_creacion) FROM proyectos_geomapas WHERE proyecto_id = p.id)
-                    ) AS ult_modificacion,
-                    u.nombre AS user_nombre,
-                    ua.nombre AS actualizado_por_nombre,
-                    a.id AS area_id, a.nombre AS area_nombre,
-                    le.id AS lineamiento_id, le.nombre AS lineamiento_nombre,
-                    le.nombre AS lineamiento_estrategico_nombre,
-                    f.id AS financiamiento_id,
-                    COALESCE(f.fuente, f.nombre) AS financiamiento_nombre,
-                    ep.id AS etapa_id, ep.nombre AS etapa_nombre,
-                    es.id AS estado_id, es.nombre AS estado_nombre, es.color AS estado_color,
-                    epost.id AS estado_postulacion_id, epost.nombre AS estado_postulacion_nombre,
-                    s.id AS sector_id, s.nombre AS sector_nombre,
-                    COALESCE(
-                        json_agg(
-                            DISTINCT jsonb_build_object(
-                                'id', h.id, 'fecha', h.fecha, 'observacion', h.observacion,
-                                'creado_por', h.creado_por, 'nombre_creador', hu.nombre,
-                                'creado_en', h.creado_en
-                            )
-                        ) FILTER (WHERE h.id IS NOT NULL), '[]'
-                    ) AS hitos_lista,
-                    COALESCE(
-                        json_agg(
-                            DISTINCT jsonb_build_object(
-                                'id', o.id, 'fecha', o.fecha, 'observacion', o.observacion,
-                                'creado_por', o.creado_por, 'nombre_creador', ou.nombre,
-                                'creado_en', o.creado_en
-                            )
-                        ) FILTER (WHERE o.id IS NOT NULL), '[]'
-                    ) AS observaciones_lista
-                FROM proyectos p
-                INNER JOIN users u ON u.user_id = p.user_id
-                LEFT JOIN users ua ON ua.user_id = p.actualizado_por
-                LEFT JOIN areas a ON a.id = p.area_id
-                LEFT JOIN lineamientos_estrategicos le ON le.id = p.lineamiento_estrategico_id
-                LEFT JOIN financiamientos f ON f.id = p.financiamiento_id
-                LEFT JOIN etapas_proyecto ep ON ep.id = p.etapa_proyecto_id
-                LEFT JOIN estados_proyecto es ON es.id = p.estado_proyecto_id
-                LEFT JOIN estados_postulacion epost ON epost.id = p.estado_postulacion_id
-                LEFT JOIN sectores s ON s.id = p.sector_id
-                LEFT JOIN proyectos_hitos h ON h.proyecto_id = p.id
-                LEFT JOIN users hu ON hu.user_id = h.creado_por
-                LEFT JOIN proyectos_observaciones o ON o.proyecto_id = p.id
-                LEFT JOIN users ou ON ou.user_id = o.creado_por
-                GROUP BY
-                    p.id, u.nombre, ua.nombre,
-                    a.id, le.id, f.id, ep.id, es.id, epost.id, s.id;
-            """)
-            proyectos = cur.fetchall()
-        return jsonify(proyectos)
+            if page is not None:
+                cur.execute("SELECT COUNT(*) FROM proyectos")
+                total = cur.fetchone()["count"]
+                offset = (page - 1) * per_page
+                cur.execute(base_query + " LIMIT %s OFFSET %s", (per_page, offset))
+                proyectos = cur.fetchall()
+                return jsonify({"data": proyectos, "total": total, "page": page, "per_page": per_page})
+            else:
+                cur.execute(base_query)
+                return jsonify(cur.fetchall())
     finally:
         if conn:
             release_db_connection(conn)

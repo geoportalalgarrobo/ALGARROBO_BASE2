@@ -245,7 +245,7 @@ def auditoria_pdf_view(current_user_id, proyecto_id):
                      download_name=download_name, as_attachment=as_attachment)
 
 
-@auditoria_bp.route("/api/proyectos/<int:proyecto_id>/enviar-auditoria", methods=["POST"])
+@auditoria_bp.route("/proyectos/<int:proyecto_id>/enviar-auditoria", methods=["POST"])
 @session_required
 def endpoint_enviar_auditoria(current_user_id, proyecto_id):
     """Envía el reporte de auditoría por correo a los responsables."""
@@ -297,7 +297,7 @@ def endpoint_enviar_auditoria(current_user_id, proyecto_id):
         if conn: release_db_connection(conn)
 
 
-@auditoria_bp.route("/api/auditoria/enviar-lote", methods=["POST"])
+@auditoria_bp.route("/auditoria/enviar-lote", methods=["POST"])
 @session_required
 def endpoint_enviar_auditoria_lote(current_user_id):
     """Envía las auditorías de todos los proyectos en lote."""

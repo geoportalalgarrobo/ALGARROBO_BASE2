@@ -375,18 +375,12 @@
         <a href="../division/secplan/admin_general/dashboard.html" class="btn-cta secondary">
             <i class="fa-solid fa-chart-line"></i> SECPLAC
         </a>
-        <a href="../division/seguridad/admin_general/dashboard.html" class="btn-cta secondary">
-            <i class="fa-solid fa-shield-halved"></i> Seguridad
-        </a>
-        <a href="../division/secplan/admin_general/calendario.html" class="btn-cta secondary">
-            <i class="fa-solid fa-calendar-days"></i> Calendario
-        </a>
+        
+       
         <a href="../division/licitaciones/admin_proyectos/dashboard.html" class="btn-cta secondary">
             <i class="fa-solid fa-file-invoice-dollar"></i> Licitaciones
         </a>
-        <a href="../division/transparencia/admin_general/index/inicio.html" class="btn-cta secondary">
-            <i class="fa-solid fa-scale-balanced"></i> Transparencia
-        </a>
+        
         <a href="../division/control/dashboard.html" class="btn-cta"
             style="background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 100%);">
             <i class="fa-solid fa-shield-halved"></i> Control y Auditoría
@@ -422,12 +416,34 @@
                         Categorías Calendario</a>
                     <!-- Herramientas de Infraestructura (Railway) -->
                     <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
-                    <a href="window.API_BASE_URL:8000/api/volume/gui" class="card-link" style="background-color: #fffaf0; border-color: #fbd38d;">
+                    <a id="volumeLink" href="#" class="card-link" style="background-color: #fffaf0; border-color: #fbd38d; display: none;">
                         <i class="fa-solid fa-server" style="color: #d97706;"></i> 
                         <b style="color: #92400e;">Gestión de Volumen (Migración)</b>
                     </a>
                 </div>
             </article>
+
+            <script>
+                // Script específico para inicializar el link de Gestión de Volumen
+                document.addEventListener('DOMContentLoaded', () => {
+                    const volumeLink = document.getElementById('volumeLink');
+                    const userDataStr = localStorage.getItem('userData') || localStorage.getItem('user_data');
+
+                    if (userDataStr) {
+                        try {
+                            const user = JSON.parse(userDataStr);
+                            // Solo mostrar si es admin_general (nivel 10) o superior
+                            if (parseInt(user.nivel_acceso) >= 10) {
+                                volumeLink.style.display = 'flex';
+                                const base = window.location.hostname.endsWith('github.io') ? '/ALGARROBO_BASE2' : '';
+                                volumeLink.href = `${base}/frontend/administracion/gestion_volumen.html`;
+                            }
+                        } catch (e) {
+                            console.error("Error al configurar link de volumen:", e);
+                        }
+                    }
+                });
+            </script>
 
             <article class="card" data-type="SECPLAC">
                 <div class="card-header">
@@ -486,97 +502,17 @@
                 </div>
             </article>
 
-            <article class="card" data-type="Transparencia">
-                <div class="card-header">
-                    <h3>Transparencia</h3>
-                    <i class="fa-solid fa-scale-balanced"></i>
-                </div>
-                <div class="card-body">
-                    <a href="../division/transparencia/admin_general/index/inicio.html" class="card-link">
-                        <i class="fa-solid fa-house"></i> Portal Principal
-                    </a>
-                    <a href="../division/transparencia/admin_general/index/inicio.html" class="card-link">
-                        <i class="fa-solid fa-chart-pie"></i> Pagos por Organismo
-                    </a>
-                    <a href="../division/transparencia/admin_general/index/remuneracion_bruta.html" class="card-link">
-                        <i class="fa-solid fa-file-invoice"></i> Remuneración Bruta
-                    </a>
-                    <a href="../division/transparencia/admin_general/index/rutUnico.html" class="card-link">
-                        <i class="fa-solid fa-users"></i> Fichas de Personal
-                    </a>
-                </div>
-            </article>
+            
 
-            <article class="card" data-type="DOM">
-                <div class="card-header">
-                    <h3>DOM</h3>
-                    <i class="fa-solid fa-tree-city"></i>
-                </div>
-                <div class="card-body">
-                    <a href="#" class="card-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-database"></i> Base Datos</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-map"></i> Mapas</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-file-invoice"></i> Informes</a>
-                    <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
-                    <a href="#" class="card-link"><i class="fa-solid fa-robot"></i> Asistente Virtual</a>
-                </div>
-            </article>
+            
 
-            <article class="card" data-type="Seguridad">
-                <div class="card-header">
-                    <h3>Seguridad</h3>
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <div class="card-body">
-                    <a href="../division/seguridad/admin_general/dashboard.html" class="card-link"><i
-                            class="fa-solid fa-chart-pie"></i> Dashboard RID</a>
-                </div>
-            </article>
+            
 
-            <article class="card" data-type="Rentas">
-                <div class="card-header">
-                    <h3>Rentas</h3>
-                    <i class="fa-solid fa-coins"></i>
-                </div>
-                <div class="card-body">
-                    <a href="#" class="card-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-database"></i> Base Datos</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-map"></i> Mapas</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-file-invoice"></i> Informes</a>
-                    <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
-                    <a href="#" class="card-link"><i class="fa-solid fa-robot"></i> Asistente Virtual</a>
-                </div>
-            </article>
+           
 
-            <article class="card" data-type="DIMAO">
-                <div class="card-header">
-                    <h3>DIMAO</h3>
-                    <i class="fa-solid fa-hammer"></i>
-                </div>
-                <div class="card-body">
-                    <a href="#" class="card-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-database"></i> Base Datos</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-map"></i> Mapas</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-file-invoice"></i> Informes</a>
-                    <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
-                    <a href="#" class="card-link"><i class="fa-solid fa-robot"></i> Asistente Virtual</a>
-                </div>
-            </article>
+            
 
-            <article class="card" data-type="DIDECO">
-                <div class="card-header">
-                    <h3>DIDECO</h3>
-                    <i class="fa-solid fa-users"></i>
-                </div>
-                <div class="card-body">
-                    <a href="#" class="card-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-database"></i> Base Datos</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-map"></i> Mapas</a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-file-invoice"></i> Informes</a>
-                    <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
-                    <a href="#" class="card-link"><i class="fa-solid fa-robot"></i> Asistente Virtual</a>
-                </div>
-            </article>
+           
 
             <!-- Módulo de Control Transversal -->
             <article class="card" data-type="Control">

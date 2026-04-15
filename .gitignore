@@ -1,30 +1,75 @@
-# Git ignore para el repositorio ALGARROBO_BASE2
-
-# 1. Secretos del Backend (MUY IMPORTANTE)
-backend/.env
-backend_railway/.env
-*.env
-*.pem
-*.key
-
-# 2. Archivos basura de Python
+# ─── Python ────────────────────────────────────────────────────
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
-.Python
-env/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.whl
+
+# ─── Entorno virtual ───────────────────────────────────────────
 venv/
+.venv/
+env/
 .env/
+ENV/
 
-# 3. Logs y temporales
+# ─── Variables de entorno y secretos ──────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+config_correo.json
+
+# ─── Logs ─────────────────────────────────────────────────────
 *.log
-docs/
-temp/
-tmp/
-.ipynb_checkpoints/
+logs/
+municipal_api.log
 
-# 4. Otros
+# ─── Base de datos y dumps ────────────────────────────────────
+*.sql
+*.dump
+*.sqlite
+*.db
+
+# ─── Archivos generados en runtime ────────────────────────────
+backend/docs/
+backend/fotos_reportes/
+backend/auditoria_reportes/
+/data/
+
+# ─── Herramientas de desarrollo ───────────────────────────────
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ─── IDEs ─────────────────────────────────────────────────────
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+
+# ─── Sistema operativo ────────────────────────────────────────
 .DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Node (tailwind, scripts frontend) ───────────────────────
+node_modules/
+npm-debug.log*
+
+# ─── Archivos temporales / de trabajo ─────────────────────────
+*.tmp
+*.bak
+*_respaldo.*
+*_backup.*
+.claude/settings.local.json
