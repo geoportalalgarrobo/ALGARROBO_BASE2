@@ -9,6 +9,7 @@ import io
 import time
 import tempfile
 import zipfile
+import shutil
 import traceback
 import bcrypt
 import psycopg2.extras
@@ -737,6 +738,7 @@ def volume_import(current_user_id):
         return jsonify({"message": "Solo se aceptan archivos ZIP"}), 400
 
     try:
+        logger.info(f"Iniciando importación de volumen por user_id={current_user_id}. Archivo: {file.filename}")
         BASE_TARGET = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         if os.path.exists("/data") and os.path.isdir("/data"):
             BASE_TARGET = "/data"
@@ -772,13 +774,18 @@ def volume_import(current_user_id):
 
                 # Verificar que la ruta final quede dentro del árbol permitido
                 target_path = os.path.realpath(os.path.join(BASE_TARGET, clean_member))
-                if not target_path.startswith(base_real + os.sep):
+                if not target_path.startswith(base_real + os.sep) and target_path != base_real:
                     return jsonify({"message": f"Ruta maliciosa detectada: {member}"}), 400
 
                 os.makedirs(os.path.dirname(target_path), exist_ok=True)
+                
+                # OPTIMIZACIÓN: Usar copyfileobj en lugar de read() para manejar archivos grandes sin saturar RAM
                 with zf.open(info) as src, open(target_path, 'wb') as dst:
-                    dst.write(src.read())
+                    shutil.copyfileobj(src, dst)
+                
                 extracted += 1
+                if extracted % 100 == 0:
+                    logger.info(f"Importación en progreso: {extracted} archivos extraídos...")
 
         log_auditoria(current_user_id, "volume_import",
                       f"Importación de {extracted} archivos desde {request.remote_addr}")

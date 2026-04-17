@@ -35,11 +35,12 @@ if allowed_origins_raw:
     ALLOWED_ORIGINS = [origin.strip() for origin in allowed_origins_raw.split(",")]
 else:
     # SEGURIDAD [H-03]: Fallback a desarrollos locales comunes si no hay config
-    ALLOWED_ORIGINS = [
-        "*"
-    ]
+    # SEGURIDAD [H-03]: Permitir todos en desarrollo si no hay config
+    # Nota: Flask-CORS con supports_credentials=True requiere orígenes explícitos.
+    # Usaremos "*" para permitir todo, pero Flask-CORS lo manejará.
+    ALLOWED_ORIGINS = ["*"]
     logging.getLogger("municipal_api").warning(
-        "ALLOWED_ORIGINS no definida en .env. Usando localhost por defecto."
+        "ALLOWED_ORIGINS no definida en .env. Usando '*' (Modo permisivo)."
     )
 
 # ─── Sesiones ──────────────────────────────────────────────────
@@ -52,21 +53,25 @@ BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
 BACKEND_DIR = os.path.dirname(BACKEND_DIR)  # subimos de core/ a backend/
 
 DOCS_FOLDER = os.path.join(BACKEND_DIR, "docs")
-os.makedirs(DOCS_FOLDER, exist_ok=True)
-
-FOTOS_DIR = os.path.join(BACKEND_DIR, "fotos_reportes")
-os.makedirs(FOTOS_DIR, exist_ok=True)
-
 AUDIT_OUT_DIR = os.getenv(
     "AUDIT_OUT_DIR",
     os.path.join(BACKEND_DIR, "auditoria_reportes")
 )
-if os.path.exists("/data") or os.path.isdir("/data"):
+
+# Si estamos en Railway con volumen montado
+if os.path.exists("/data") and os.path.isdir("/data"):
+    DOCS_FOLDER = "/data/docs"
     AUDIT_OUT_DIR = "/data/auditoria_reportes"
+
+os.makedirs(DOCS_FOLDER, exist_ok=True)
 os.makedirs(AUDIT_OUT_DIR, exist_ok=True)
 
+# Rutas finales (unificadas)
 FOTOS_OUT_DIR = AUDIT_OUT_DIR.replace("auditoria_reportes", "fotos_reportes")
+FOTOS_DIR = FOTOS_OUT_DIR  # Alias para compatibilidad con rutas móviles
+
 os.makedirs(FOTOS_OUT_DIR, exist_ok=True)
+os.makedirs(FOTOS_DIR, exist_ok=True)
 
 # ─── Extensiones de archivo permitidas ─────────────────────────
 ALLOWED_EXTENSIONS = {
