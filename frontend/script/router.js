@@ -17,8 +17,7 @@ const diccionarioRutas = {
         `${BASE}/frontend/division/secplan/admin_general/mapa.html`,
         `${BASE}/frontend/division/secplan/admin_general/informe.html`,
         `${BASE}/frontend/division/secplan/admin_general/calendario.html`,
-        `${BASE}/frontend/administracion/index.html`,
-        `${BASE}/frontend/administracion/index2.html`
+        `${BASE}/frontend/administracion/`
     ],
     11: [
         `${BASE}/frontend/division/secplan/admin_proyectos/dashboard.html`,
