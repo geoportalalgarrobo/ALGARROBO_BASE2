@@ -767,18 +767,17 @@
                         <div class="form-grid">
 
                             <div class="form-group">
-                                <label for="financiamiento_id">Financiamiento</label>
-                                <select id="financiamiento_id" name="financiamiento_id" onchange="onFinanciamientoChange(this)">
-                                    <option value="">Seleccione Financiamiento</option>
+                                <label for="fuente_select">Fuente</label>
+                                <select id="fuente_select" onchange="onFuenteChange()">
+                                    <option value="">Seleccione Fuente</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="financiamiento_fuente_display">Fuente</label>
-                                <input type="text" id="financiamiento_fuente_display" placeholder="Se carga al seleccionar financiamiento" readonly style="background:#f1f5f9;color:#64748b;cursor:not-allowed;">
-                            </div>
-                            <div class="form-group">
-                                <label for="financiamiento_anyo_display">Año Financiamiento</label>
-                                <input type="text" id="financiamiento_anyo_display" placeholder="Se carga al seleccionar financiamiento" readonly style="background:#f1f5f9;color:#64748b;cursor:not-allowed;">
+                                <label for="anyo_select">Año Financiamiento</label>
+                                <select id="anyo_select" onchange="onAnyoChange()">
+                                    <option value="">Seleccione Año</option>
+                                </select>
+                                <input type="hidden" id="financiamiento_id" name="financiamiento_id">
                             </div>
                             <div class="form-group">
                                 <label for="monto">Monto ($) </label>
@@ -1217,11 +1216,20 @@
             };
 
             fillSelect('area_id', catalogData.areas, 'Seleccione Área');
-            fillSelect('financiamiento_id', catalogData.financiamientos, 'Seleccione Financiamiento', (i) => {
-                const fuente = i.fuente || i.nombre || 'S/F';
-                const anyo = i.anyo ? ` (${i.anyo})` : '';
-                return `${fuente}${anyo}`;
-            });
+            
+            // Nueva lógica de financiamiento segmentada
+            const fuentes = [...new Set(catalogData.financiamientos.map(f => f.fuente || f.nombre || 'S/F'))].sort();
+            const fuenteSelect = document.getElementById('fuente_select');
+            if (fuenteSelect) {
+                fuenteSelect.innerHTML = '<option value="">Seleccione Fuente</option>';
+                fuentes.forEach(f => {
+                    const opt = document.createElement('option');
+                    opt.value = f;
+                    opt.textContent = f;
+                    fuenteSelect.appendChild(opt);
+                });
+            }
+
             fillSelect('estado_proyecto_id', catalogData.estados_proyecto, 'Seleccione Estado');
             fillSelect('etapa_proyecto_id', catalogData.etapas_proyecto, 'Seleccione Etapa');
             fillSelect('estado_postulacion_id', catalogData.estados_postulacion, 'Seleccione Estado Postulación');
@@ -1229,24 +1237,48 @@
             fillSelect('lineamiento_estrategico_id', catalogData.lineamientos_estrategicos, 'Seleccione Lineamiento');
         }
 
-        function onFinanciamientoChange(selectEl) {
-            const selectedId = parseInt(selectEl.value);
-            const fuenteInput = document.getElementById('financiamiento_fuente_display');
-            const anyoInput = document.getElementById('financiamiento_anyo_display');
-            if (!selectedId || !fuenteInput || !anyoInput) {
-                if (fuenteInput) fuenteInput.value = '';
-                if (anyoInput) anyoInput.value = '';
+        function onFuenteChange() {
+            const fuente = document.getElementById('fuente_select').value;
+            const anyoSelect = document.getElementById('anyo_select');
+            const hiddenId = document.getElementById('financiamiento_id');
+            
+            anyoSelect.innerHTML = '<option value="">Seleccione Año</option>';
+            hiddenId.value = '';
+
+            if (!fuente) return;
+
+            const anyos = catalogData.financiamientos
+                .filter(f => (f.fuente || f.nombre || 'S/F') === fuente)
+                .map(f => f.anyo)
+                .filter((v, i, a) => a.indexOf(v) === i)
+                .sort((a, b) => b - a);
+
+            anyos.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a || '';
+                opt.textContent = a || 'Sin Año';
+                anyoSelect.appendChild(opt);
+            });
+        }
+
+        function onAnyoChange() {
+            const fuente = document.getElementById('fuente_select').value;
+            const anyo = document.getElementById('anyo_select').value;
+            const hiddenId = document.getElementById('financiamiento_id');
+
+            if (!fuente) {
+                hiddenId.value = '';
                 return;
             }
-            const fin = catalogData.financiamientos.find(f => f.id === selectedId);
-            if (fin) {
-                fuenteInput.value = fin.fuente || fin.nombre || '';
-                anyoInput.value = fin.anyo || '';
-            } else {
-                fuenteInput.value = '';
-                anyoInput.value = '';
-            }
+
+            const fin = catalogData.financiamientos.find(f => 
+                (f.fuente || f.nombre || 'S/F') === fuente && 
+                (String(f.anyo || '') === anyo)
+            );
+
+            hiddenId.value = fin ? fin.id : '';
         }
+
 
         function formatDateForInput(dateString) {
             if (!dateString) return '';
@@ -2181,9 +2213,24 @@
                     'sector_id': null
                 };
 
-                // Precargar campos de solo lectura de fuente/año
-                document.getElementById('financiamiento_fuente_display').value = proyecto.financiamiento_fuente || '';
-                document.getElementById('financiamiento_anyo_display').value = proyecto.financiamiento_anyo || '';
+                // Lógica especial para financiamiento segmentado
+                const hiddenFinId = document.getElementById('financiamiento_id');
+                const fuenteSelect = document.getElementById('fuente_select');
+                const anyoSelect = document.getElementById('anyo_select');
+
+                if (proyecto.financiamiento_id) {
+                    const fin = catalogData.financiamientos.find(f => f.id === proyecto.financiamiento_id);
+                    if (fin) {
+                        fuenteSelect.value = fin.fuente || fin.nombre || 'S/F';
+                        onFuenteChange(); // Cargar años
+                        anyoSelect.value = fin.anyo || '';
+                        hiddenFinId.value = fin.id;
+                    }
+                } else {
+                    fuenteSelect.value = '';
+                    anyoSelect.innerHTML = '<option value="">Seleccione Año</option>';
+                    hiddenFinId.value = '';
+                }
 
                 Object.keys(proyecto).forEach(key => {
                     // Saltar campos marcados como null en el mapping (campos de solo lectura)
